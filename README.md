@@ -52,6 +52,20 @@ The application also helps the Organization /Clubs /Communities to organize, mai
 
 🆕 Assists in keeping the AICTE diary up-to-date.
 
+
+## Tech Stack
+
+**Frontend** - Next.js, Chakra UI, TailwindCSS
+
+**Backend** - Firebase
+
+**Framework** - Xstate
+
+**Database** - Firestore
+
+
+
+
 ## Languages and Tools
 
 <p align="left"> <a href="https://www.gnu.org/software/bash/" target="_blank" rel="noreferrer"> <img src="https://www.vectorlogo.zone/logos/gnu_bash/gnu_bash-icon.svg" alt="bash" width="40" height="40"/> </a> <a href="https://www.w3schools.com/css/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original-wordmark.svg" alt="css3" width="40" height="40"/> </a> <a href="https://git-scm.com/" target="_blank" rel="noreferrer"> <img src="https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg" alt="git" width="40" height="40"/> </a> <a href="https://www.w3.org/html/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original-wordmark.svg" alt="html5" width="40" height="40"/> </a> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" alt="javascript" width="40" height="40"/> </a> <a href="https://www.linux.org/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/linux/linux-original.svg" alt="linux" width="40" height="40"/> </a> <a href="https://tailwindcss.com/" target="_blank" rel="noreferrer"> <img src="https://www.vectorlogo.zone/logos/tailwindcss/tailwindcss-icon.svg" alt="tailwind" width="40" height="40"/><a href="https://nodejs.org/en/.com/.com/" target="_blank" rel="noreferrer"> <img src="[https://www.vectorlogo.zone/logos/nodejs/nodejs-icon.svg" alt="nodejs" width="40" height="40"/></a><a href="https://nextjs.org/" target="_blank" rel="noreferrer"> <img src="https://ui-lib.com/blog/wp-content/uploads/2021/12/nextjs-boilerplate-logo.png" alt="nextjs" width="40" height="40"/> </a> <a href="https://nodejs.org" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original-wordmark.svg" alt="nodejs" width="40" height="40"/> </a>
@@ -84,4 +98,52 @@ Start the server
 ```bash
   http://localhost:3000
 ```
+
+
+
+## Authors
+
+🔆 [@Jayesh Potlabattini](https://github.com/Mr-Jayesh)
+
+🔆 [@Roshan Patil](https://www.github.com/R-ctrl-ctrl)
+
+🔆 [@Ashutosh Pandey](https://www.github.com/ap3249)
+
+🔆 [@Prathik Shetty](https://www.github.com/prathikshetty2002)
+
+
+
+
+
+## Contributing
+
+Contributions are always welcome!
+
+See `CONTRIBUTING.md` for ways to get started.
+
+Please adhere to this project's `CODE_OF_CONDUCT.md`.
+
+## Guide
+
+A guideline of project composition and creation.
+
+soon adding `guide.md`
+
+Please adhere to this project's `CODE_OF_CONDUCT.md`.
+
+## Feedback
+
+If you have any feedback, please reach out to us at **jayeshpotlabattini24@gmail.com**
+
+
+## Support
+
+For support join our Slack channel - [AMA](https://ml-geeksworkspace.slack.com/archives/C03K2M9SBAA)
+
+## License
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+
+
 
