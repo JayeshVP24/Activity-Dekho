@@ -1,56 +1,96 @@
-import {
-  Link as ChakraLink,
-  Text,
-  Code,
-  List,
-  ListIcon,
-  ListItem,
-} from '@chakra-ui/react'
-import { CheckCircleIcon, LinkIcon } from '@chakra-ui/icons'
+import { NextPage } from "next";
+import { useMachine, useActor } from "@xstate/react";
+import ClubAuthMachine from "../machines/clubAuth";
+import { ClubAddEventMachine } from "../machines/clubAddEvent";
+import ClientOnly from "../components/ClientOnly";
+import { ActorRefFrom } from "xstate";
+import { getClubsListQuery, validateAuthQuery } from "../firebase/Club";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase/config";
+import { useEffect } from "react";
 
-import { Hero } from '../components/Hero'
-import { Container } from '../components/Container'
-import { Main } from '../components/Main'
-import { DarkModeSwitch } from '../components/DarkModeSwitch'
-import { CTA } from '../components/CTA'
-import { Footer } from '../components/Footer'
+const Index: NextPage = () => {
+  const [state, send] = useMachine(ClubAuthMachine, {
+    services: {
+      getClubsList: async () => await getClubsListQuery(),
+      validateAuth: async (context, event) =>
+        validateAuthQuery(context.club.name, context.club.email, event.password ),
+    },
+  });
 
-const Index = () => (
-  <Container height="100vh">
-    <Hero />
-    <Main>
-      <Text color="text">
-        Example repository of <Code>Next.js</Code> + <Code>chakra-ui</Code> +{' '}
-        <Code>TypeScript</Code>.
-      </Text>
+  // useEffect(() => {
+  //   signInWithEmailAndPassword(auth,"sort.tcet@gmail.com", "sort123")
+  //     .then((userCred) => {
+  //       console.log(userCred.user)
+  //     })
+  //     .catch((err) => {
+  //       console.log(err)
+  //     })
+  // },[])
+  // const [state2, send2] = useActor(state.context.addEventRef);
+  // console.log(state.nextEvents);
+  return (
+    <ClientOnly>
+      <div>
+        <div>
+          <pre className="mb-8">
+            {JSON.stringify(
+              {
+                value: state.value,
+                context: state.context,
+              },
+              null,
+              2
+            )}
+          </pre>
+          <div className="flex gap-x-5">
+            {state.nextEvents.map((event) => (
+              <button key={event} onClick={() => send(event)}>{event}</button>
+            ))}
+          </div>
+          <div className="flex gap-x-5 ">
+            {state.matches("displayingClubsList") &&
+              state.context.clubList.map((c) => (
+                <span key={c.name} className="cursor-pointer" onClick={() => 
+                send({ type: "SELECT_CLUB", club: c })}>
+                  {c.name}
+                </span>
+              ))}
+          </div>
+          {state.matches("promtEnterPassword") && (
+            <form onSubmit={(f) => {
+              f.preventDefault()
+              send({type: "VALIDATE_AUTH",password: f.currentTarget["PASSWORD"].value })
+              }} >
+            <input 
+              type="password"
+              name="PASSWORD"
+              placeholder="enter your password"
+            />
+            <button type="submit">Submit</button>
+            </form>
+          )}
+        </div>
+        {/* <div className="mt-10">
+        <pre className="mb-8">
+          {JSON.stringify(
+            {
+              value: state2.value,
+              context: state2.context,
+            },
+            null,
+            2
+          )}
+        </pre>
+        <div className="flex gap-x-5" >
+          {state2.nextEvents.map((event) => (
+            <button onClick={() => send2(event)}>{event}</button>
+          ))}
+        </div>
+      </div> */}
+      </div>
+    </ClientOnly>
+  );
+};
 
-      <List spacing={3} my={0} color="text">
-        <ListItem>
-          <ListIcon as={CheckCircleIcon} color="green.500" />
-          <ChakraLink
-            isExternal
-            href="https://chakra-ui.com"
-            flexGrow={1}
-            mr={2}
-          >
-            Chakra UI <LinkIcon />
-          </ChakraLink>
-        </ListItem>
-        <ListItem>
-          <ListIcon as={CheckCircleIcon} color="green.500" />
-          <ChakraLink isExternal href="https://nextjs.org" flexGrow={1} mr={2}>
-            Next.js <LinkIcon />
-          </ChakraLink>
-        </ListItem>
-      </List>
-    </Main>
-
-    <DarkModeSwitch />
-    <Footer>
-      <Text>Next ❤️ Chakra</Text>
-    </Footer>
-    <CTA />
-  </Container>
-)
-
-export default Index
+export default Index;
