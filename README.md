@@ -1,39 +1,87 @@
-# Example app with [chakra-ui](https://github.com/chakra-ui/chakra-ui) and TypeScript
 
-This example features how to use [chakra-ui](https://github.com/chakra-ui/chakra-ui) as the component library within a Next.js app with TypeScript.
+<br />
+<div align="center">
+  <a href="https://github.com/JayeshVP24/AICTE-Diary">
+    <img src="src/logo.png" alt="Logo" width="80" height="80">
+  </a>
 
-Next.js and chakra-ui have built-in TypeScript declarations, so we'll get autocompletion for their modules straight away.
+  <h3 align="center">AICTE Dairy</h3>
 
-We are connecting the Next.js `_app.js` with `chakra-ui`'s Provider and theme so the pages can have app-wide dark/light mode. We are also creating some components which shows the usage of `chakra-ui`'s style props.
+  <p align="center">
+    AICTE Dairy - To Help Organize and Maintain your Points
+    <br />
+    <a href="https://github.com/JayeshVP24/AICTE-Diary"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/JayeshVP24/AICTE-Diary">View Demo</a>
+    ·
+    <a href="https://github.com/JayeshVP24/AICTE-Diary/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/JayeshVP24/AICTE-Diary/issues">Request Feature</a>
+  </p>
+</div>
 
-## Deploy your own
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example) or preview live with [StackBlitz](https://stackblitz.com/github/vercel/next.js/tree/canary/examples/with-chakra-ui)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/vercel/next.js/tree/canary/examples/with-chakra-ui&project-name=with-chakra-ui&repository-name=with-chakra-ui)
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#About">About</a></li>
+    <li><a href="#Features">Features</a></li>
+    <li><a href="#Languages-and-Tools">Languages and Tools</a></li>
+    <li><a href="#Instructions-on-running-project-locally">Instructions on running project locally</a></li>
+  </ol>
+</details>
 
-## How to use
+------
 
-### Using `create-next-app`
+## About
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
+Do you have difficulty remembering the events that you have attended and maintaining your record feels tedious. AICTE's diary application allows you to track events you've attended and maintains a record as a proof of attendance 🏫.
+
+The application also helps the Organization /Clubs /Communities to organize, maintain and distribute the AICTE credits easily by putting the data on platform. It provides a one stop platform for any queries associated with the AICTE Diary 📝.
+
+
+## Features
+
+🗄️ It aims to organize and store the data of the events that are conducted by the organization.
+
+👨‍🎓 Systematically providing AICTE points to an individual user (student).
+
+💯 Platform helps to provide proof of attendance and work done for AICTE Points eligibility.
+
+🆕 Assists in keeping the AICTE diary up-to-date.
+
+## Languages and Tools
+
+<p align="left"> <a href="https://www.gnu.org/software/bash/" target="_blank" rel="noreferrer"> <img src="https://www.vectorlogo.zone/logos/gnu_bash/gnu_bash-icon.svg" alt="bash" width="40" height="40"/> </a> <a href="https://www.w3schools.com/css/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original-wordmark.svg" alt="css3" width="40" height="40"/> </a> <a href="https://git-scm.com/" target="_blank" rel="noreferrer"> <img src="https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg" alt="git" width="40" height="40"/> </a> <a href="https://www.w3.org/html/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original-wordmark.svg" alt="html5" width="40" height="40"/> </a> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" alt="javascript" width="40" height="40"/> </a> <a href="https://www.linux.org/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/linux/linux-original.svg" alt="linux" width="40" height="40"/> </a> <a href="https://tailwindcss.com/" target="_blank" rel="noreferrer"> <img src="https://www.vectorlogo.zone/logos/tailwindcss/tailwindcss-icon.svg" alt="tailwind" width="40" height="40"/><a href="https://nodejs.org/en/.com/.com/" target="_blank" rel="noreferrer"> <img src="[https://www.vectorlogo.zone/logos/nodejs/nodejs-icon.svg" alt="nodejs" width="40" height="40"/></a><a href="https://nextjs.org/" target="_blank" rel="noreferrer"> <img src="https://ui-lib.com/blog/wp-content/uploads/2021/12/nextjs-boilerplate-logo.png" alt="nextjs" width="40" height="40"/> </a> <a href="https://nodejs.org" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original-wordmark.svg" alt="nodejs" width="40" height="40"/> </a>
+ </p>
+ 
+ ## Instructions on running project locally:
+
+Clone the project
 
 ```bash
-npx create-next-app --example with-chakra-ui with-chakra-ui-app
+  git clone https://github.com/JayeshVP24/AICTE-Diary.git
 ```
+
+Install dependencies:
 
 ```bash
-yarn create next-app --example with-chakra-ui with-chakra-ui-app
+  cd www.aicte-dairy.com/
+  
+  yarn install
 ```
+
+Run Project on terminal
 
 ```bash
-pnpm create next-app --example with-chakra-ui with-chakra-ui-app
+  yarn dev
 ```
 
-Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+Start the server
 
-## Notes
+```bash
+  http://localhost:3000
+```
 
-Chakra has supported Gradients and RTL in `v1.1`. To utilize RTL, [add RTL direction and swap](https://chakra-ui.com/docs/features/rtl-support).
-
-If you don't have multi-direction app, you should make `<Html lang="ar" dir="rtl">` inside `_document.ts`.
