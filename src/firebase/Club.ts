@@ -3,28 +3,80 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { ClubType } from "../../types";
 import { auth, firedb } from "./config";
 
-// export const getClubsListQuery = () => {
-//   return new Promise<{ clubs: ClubType[]; error?: string }>(
-//     (resolve, reject) => {
-//       setTimeout(() => {
-//         reject({error: "failed"});
-//         resolve({
-//           clubs: [
-//             {
-//               id: "1",
-//               name: "SORT",
-//             },
-//             {
-//               id: "2",
-//               name: "GDSC",
-//             },
-//           ],
-//           error: "ph noo",
-//         });
-//       }, 1000);
-//     }
-//   );
-// };
+export const getClubsListQuery1 = () => {
+  return new Promise<{ clubs: ClubType[]; error?: string }>(
+    (resolve, reject) => {
+      setTimeout(() => {
+        reject({error: "failed"});
+        resolve({
+          clubs: [
+            {
+              id: "1",
+              name: "SORT-TCET",
+              email: "sort.tcet@gmail.com",
+              photoUrl: "/sort-logo.png"
+            },
+            {
+              id: "2",
+              name: "GDSC-TCET",
+             email: "gdsc.tcet@gmail.com",
+             photoUrl: "/sort-logo.png"
+            },
+            {
+              id: "1",
+              name: "SORT-TCET",
+              email: "sort.tcet@gmail.com",
+              photoUrl: "/sort-logo.png"
+            },
+            {
+              id: "2",
+              name: "GDSC-TCET",
+             email: "gdsc.tcet@gmail.com",
+             photoUrl: "/sort-logo.png"
+            },
+            {
+              id: "1",
+              name: "SORT-TCET",
+              email: "sort.tcet@gmail.com",
+              photoUrl: "/sort-logo.png"
+            },
+            {
+              id: "2",
+              name: "GDSC-TCET",
+             email: "gdsc.tcet@gmail.com",
+             photoUrl: "/sort-logo.png"
+            },
+            {
+              id: "1",
+              name: "SORT-TCET",
+              email: "sort.tcet@gmail.com",
+              photoUrl: "/sort-logo.png"
+            },
+            {
+              id: "2",
+              name: "GDSC-TCET",
+             email: "gdsc.tcet@gmail.com",
+             photoUrl: "/sort-logo.png"
+            },
+            {
+              id: "1",
+              name: "SORT-TCET",
+              email: "sort.tcet@gmail.com",
+              photoUrl: "/sort-logo.png"
+            },
+            {
+              id: "2",
+              name: "GDSC-TCET",
+             email: "gdsc.tcet@gmail.com",
+             photoUrl: "/sort-logo.png"
+            },
+          ],
+          error: "ph noo",
+        });
+      }, 100);
+    }
+  );
+};
 
 export const getClubsListQuery = async () => {
   const clubList: ClubType[] = [];
@@ -58,7 +110,8 @@ export const validateAuthQuery = (name: string, email: string, password: string)
           club: {
             name,
             email: userCred.user.email,
-            id: userCred.user.uid
+            id: userCred.user.uid,
+            photoUrl: userCred.user.photoURL
           }
         })
       })

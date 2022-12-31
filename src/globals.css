@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    html {
+        @apply bg-emerald-100 min-h-screen min-w-full;
+    }
+
+    .btnFtrs {
+        @apply rounded-2xl py-2 text-2xl font-semibold   
+        active:scale-90 transition-all active:ring-0
+        ;
+    }
+}
