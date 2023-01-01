@@ -1,12 +1,13 @@
 import { useActor, useMachine } from "@xstate/react";
-import { getClubsListQuery, validateAuthQuery } from "../firebase/Club";
-import ClubAuthMachine, { ClubAuthContext } from "../machines/clubAuth";
+import { getClubsListQuery, validateAuthQuery } from "../firebase/firestore/Club";
+import ClubAuthMachine, { ClubAuthContext, ClubAuthEvent } from "../machines/clubAuth";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { use, useContext, useEffect } from "react";
 import Image from "next/image";
 import AvatarGenerator from "./AvatarGenerator";
 import { useRouter } from "next/router";
 import { GlobalStateContext } from "./GlobalStateProvider";
+import { Sender } from "xstate";
 
 const ClubAuth: React.FC = () => {
   const router = useRouter();
@@ -41,6 +42,7 @@ const ClubAuth: React.FC = () => {
 
   useEffect(() => {
     console.log(state.value);
+    console.log(state.context)
   }, [state]);
 
   const variants: Variants = {
@@ -55,16 +57,7 @@ const ClubAuth: React.FC = () => {
   // ', 'gm')
   return (
     <section>
-      <button
-        className="fixed left-[50%] translate-x-[-50%] bottom-5 bg-red-400 w-4/5 text-center py-2 rounded-2xl 
-            max-w-md xl:bottom-10 font-medium ring-red-100 ring-4 hover:ring-red-300 transition-all
-            active:scale-90"
-        onClick={() => {
-          send("LOGIN");
-        }}
-      >
-        🥷 Are you a club admin? 🥷
-      </button>
+      
       <AnimatePresence>
         {state.context.modalOpen && (
           <motion.section className="">
@@ -247,6 +240,7 @@ const ClubAuth: React.FC = () => {
                         >
                           Go Back 🥚
                         </button>
+                        {/* <ChildComp send={send} /> */}
                       </div>
                     )}
                     {state.matches("authSuccessful") && (
@@ -268,3 +262,11 @@ const ClubAuth: React.FC = () => {
 };
 
 export default ClubAuth;
+
+
+// const ChildComp: React.FC<{send: Sender<ClubAuthEvent>}> = ({send}) => {
+//   send("")
+//   return (
+//     <h1>heeffe</h1>
+//   )
+// }

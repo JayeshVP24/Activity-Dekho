@@ -10,15 +10,25 @@ export interface ClubAuthContext {
   modalOpen: boolean;
   loading: boolean;
 }
-type ClubAuthEvent =
+export type ClubAuthEvent =
   | { type: "LOGIN" }
   | { type: "SELECT_CLUB"; club: ClubType }
   | { type: "RETRY" }
   | { type: "GO_BACK" }
   | { type: "CLOSE_MODAL" }
   | { type: "VALIDATE_AUTH", password: string }
-  | {type: "error.platform.getclublist", data: {error: string}}
-  | {type: "error.platform.validateauth", data: {error: string}}
+  | {type: "error.platform.getclublist", data: string}
+  | {type: "error.platform.validateauth", data: string}
+  
+// interface ClubAuthServices  {
+//   getClubsList: {
+//     data: { clubs?: ClubType[], error?: string };
+//   };
+//   validateAuth: {
+//     data: {club?: ClubType, error? :string}
+//   }
+// } 
+
   const ClubAuthMachine =
   /** @xstate-layout N4IgpgJg5mDOIC5QGMA2BXARgYgMIBkB5AZQFEB9AWUIBEBBfAbQAYBdRUABwHtYBLAC59uAOw4gAHogC0ARgDsANgB0zAKwAmeQA4AzLu0aNa5gBZtAGhABPGRt0BOZWu2LZG5tve7F8hwF9-KzQsZVRuKBgIQnQBbCIAcQBJADkWdiQQHn4hUXEpBGYrW0LA4IxMZRgBIREoXArYfD5YOIhRMGU+EQA3bgBrTuqQzFQWgXTxbMFhMUyCzTVlX1dPA29jYsRZZg1lBwUHU3kjWW15HY0ykBGqsBru+sbm1uwwACd37nflTlQAQwEADNvgBbO4CEZjVqTTLTXJzUALPamWSmZjMXTqeymVGKLYIdxLDEOXTyY72HH2a63CAtP7-ayPBpYJrjbBkfCkXAAFXIBAAqgAhWFcXgzPLzRBk0zKRwmVznA5kgkaRSynS40yKTy7YzyXQ0irKOmwBlMuqkT7fbAAJVIPNtAE1RVlxQj8og1SoduTTA4HGpTFoHBoCd5nMxSUo3FGtIpFEbQpwvqCBKQRAIPgAFf6wWAAd2+EGwADUGEl6DyKHQBTyABKu+GzT0IDSuOXHA4OMyKNQJgmmNTyZTacxrOMY4dJyop7hpjNZ965-NF94lhKEchCui4ADSTfdLalCBc2lHvnkUa8qLRagJBnP8mHijJZg0sjU+hnyh6-zGECAo8dCxAAFtg7QiJ03R9IMv7-nwgFZv8YGHjkx5Iog2pOLIRwBp+5xqF+ugEr4zDKIcaiBhooYKNOQQ3Maf4AUBdQgQI4EfF8PwMsCYLwSxyGoWwUxHpKmEIEcFGaO4PbrFeaoPu2qhkrIr7+qGWKGtcIjcBAcDiCMonoeJkh2DRo5DswuEhrspJhjYMi6FoqiuN46p+MGRw-uEkSQDEAjGRKiJmQgcheJZJg2X4dnOQSzA-tUtRPKyLyBXCYkhQUH57KGpjObi+hKIGJGOWF-qRhishomSAbBuSP6muazLPOMQUeieVEjm4DjaGOPbmGqpUlFoujKOiXiaIoeg6MwiYMbS9IAhaUBWtx7UYaFaL7F47jaAcZw0X28iqvlyztpo2hUeqw5qD+c4LpmOZ5oWxYbaZBRkt16i4c5z79pipgPuckZKMGWIfocP7MYhrFQOxoHvVlXoXPsOzosd5L7SqZVBnsHihg46rBloOg-ihHHEOgyDIHAsBAugqBI62025cGri6Aoz4ePeuNqLIyhqoG3gXNquimIEgRAA */
   createMachine(
@@ -29,10 +39,10 @@ type ClubAuthEvent =
       schema: {
         services: {} as {
           getClubsList: {
-            data: { clubs?: ClubType[], error?: string };
+            data: ClubType[] | string ;
           };
           validateAuth: {
-            data: {club?: ClubType, error? :string}
+            data: ClubType | string
           }
         },
         events: {} as ClubAuthEvent,
@@ -138,7 +148,7 @@ type ClubAuthEvent =
 
       actions: {
         addClubsListToContext: assign({
-          clubList: (_,event) => event.data.clubs
+          clubList: (_,event) => event.data as ClubType[]
         }),
     
         addClubToContext: assign({
@@ -149,7 +159,7 @@ type ClubAuthEvent =
           loggedIn: true
         }),
         addErrorMsgToContext: assign({
-          error: (_,event) => event.data.error
+          error: (_,event) => event.data as string
         }),
         clearErrorMsgFromContext: assign({
           error:(_) => undefined
