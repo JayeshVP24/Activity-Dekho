@@ -7,7 +7,7 @@ import { createContext } from "react";
 import { useInterpret } from "@xstate/react";
 import ClubAuth from "../components/ClubAuth";
 import ClubAuthMachine from "../machines/clubAuth";
-import { getClubsListQuery, validateAuthQuery } from "../firebase/Club";
+import { getClubsListQuery, validateAuthQuery } from "../firebase/firestore/Club";
 import { useRouter } from "next/router";
 import GlobalStateProvider from "../components/GlobalStateProvider";
 const poppins = Raleway({

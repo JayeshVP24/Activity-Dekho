@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface ClubType {
     id: string;
     name: string;
@@ -10,9 +12,10 @@ export interface ClubType {
 export interface EventType {
   id: string,
   name: string,
-  startDate: Date,
-  endDate: Date,
-  attendance: Set<string>
+  startDate: Timestamp,
+  endDate: Timestamp,
+  attendance: Set<string>,
+  activityHours: number
 }
 
 export interface ClubStudentType {

@@ -1,10 +1,14 @@
 import { NextPage } from "next";
+import { useContext } from "react";
 import ClubAuth from "../components/ClubAuth";
+import { GlobalStateContext } from "../components/GlobalStateProvider";
 const Index: NextPage = () => {
 
-
+  const globalServices = useContext(GlobalStateContext)
+  // const [state, send] = useActor(globalServices.clubAuthService)
+  const { send } = globalServices.clubAuthService;
   return (
-    <main className="mx-10 xl:mx-20 xl:flex 2xl:mx-32 ">
+    <main className="mx-10 xl:mx-20 2xl:mx-32 xl:flex  ">
       <h1
         className="text-6xl mt-4 font-bold leading-[1.2] tracking-wide
       xl:w-2/4 xl:text-8xl xl:mr-4 xl:leading-[1.25] "
@@ -48,8 +52,16 @@ const Index: NextPage = () => {
           🚀 Generate 🚀
         </button>
       </form>
-
-      <ClubAuth />
+      <button
+        className="fixed left-[50%] translate-x-[-50%] bottom-5 bg-red-400 w-4/5 text-center py-2 rounded-2xl 
+            max-w-md xl:bottom-10 font-medium ring-red-100 ring-4 hover:ring-red-300 transition-all
+            active:scale-90"
+        onClick={() => {
+          send("LOGIN");
+        }}
+      >
+        🥷 Are you a club admin? 🥷
+      </button>
     </main>
   );
 
