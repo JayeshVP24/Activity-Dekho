@@ -56,9 +56,11 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
         // console.log("well i reached in global context");
         return await retrieveClubEventsQuery(authClub.id);
       },
+      // @ts-ignore
       addAttendanceToDB: async (context) => {
         return await addAttendanceQuery(authClub.id, context.currentEvent.id, context.attendance)
       },
+      // @ts-ignore
       addEventToDB: async (context, event) => {
         return await addEventToDBQuery(authClub.id, event.newEvent)
       }
