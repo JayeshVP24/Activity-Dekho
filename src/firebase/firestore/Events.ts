@@ -1,4 +1,5 @@
 import {
+  addDoc,
   collection,
   doc,
   DocumentData,
@@ -9,10 +10,14 @@ import {
   query,
   runTransaction,
   setDoc,
+  Timestamp,
+  where,
   writeBatch,
 } from "firebase/firestore";
 import { EventType } from "../../../types";
 import { firedb } from "../config";
+import XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 export const retrieveClubEventsQuery = async (clubId: string) => {
   //   console.log("i came in firebase folder too");
@@ -60,35 +65,49 @@ export const addAttendanceQuery = async (
       console.log({ eventDoc });
       const studentSnapshots: DocumentSnapshot<DocumentData>[] = [];
       // student document - read
+      // const studentSnapshots =  await getDocs(query(collection(firedb, "STUDENTS"),
+      // where("Document ID", "in", UIDs)))
       for (const studentId of UIDs) {
         const studentRef = doc(firedb, "STUDENTS", studentId);
         const studentDoc = await transacton.get(studentRef);
         console.log({ studentDoc });
         studentSnapshots.push(studentDoc);
       }
-      for (const studentDoc of studentSnapshots) {
+      console.log(studentSnapshots);
+      // for (const studentDoc of studentSnapshots) {
+      for (const studentId of UIDs) {
         // clubs->event->attendance - write
-        eventAttendance[studentDoc.id] = true;
-
+        eventAttendance[studentId] = true;
+        const studentDoc = studentSnapshots.find((s) => s.id === studentId);
         // student document - write
         let studentAttendance = {};
+        console.log(studentDoc);
         if (studentDoc.exists()) {
           studentAttendance = {
+            [clubId]: {
+              [eventId]: true,
+              ...studentDoc.data().attendance[clubId],
+            },
             ...studentDoc.data().attendance,
           };
-          studentAttendance[clubId] = {
-            [eventId]: true,
-            ...studentAttendance[clubId],
-          };
+          // studentAttendance[clubId] = {
+          //   [eventId]: true,
+          //   ...studentAttendance[clubId],
+          // };
+          transacton.update(studentDoc.ref, {
+            attendance: studentAttendance,
+          });
         } else {
-          studentAttendance[clubId] = {
-            [eventId]: true,
+          studentAttendance = {
+            [clubId]: {
+              [eventId]: true,
+            },
           };
+          const newStudentRef = doc(firedb, "STUDENTS", studentId);
+          transacton.set(newStudentRef, {
+            attendance: studentAttendance,
+          });
         }
-        transacton.set(studentDoc.ref, {
-          attendance: studentAttendance,
-          ...studentDoc.data(),
-        });
       }
       console.log(eventDoc.data());
       console.log({ eventAttendance });
@@ -114,37 +133,87 @@ export const addAttendanceQuery = async (
   }
 };
 
-interface displayAttendanceType {
+export interface displayAttendanceType {
   club: string;
   event: string;
-  from: Date;
-  to: Date;
+  from: string;
+  to: string;
   activityHours: number;
   email: string;
 }
 
 export const getStudentEvents = async (studentId: string) => {
-  const studentRef = doc(firedb, "STUDENTS/" + studentId);
-  const studentDoc = await getDoc(studentRef);
-  const attendance = studentDoc.data().attendance;
-  const displayAttendance: displayAttendanceType[] = [];
-  const ObjectAttendance = Object.entries(attendance);
-  console.log(ObjectAttendance);
-  for (const [clubId, value] of Object.entries(attendance)) {
-    for (const eventId of Object.keys(value)) {
-      const clubRef = doc(firedb, "clubs", clubId);
-      const clubDetails = (await getDoc(clubRef)).data();
-      const eventRef = doc(firedb, "clubs", clubId, "EVENTS", eventId);
-      const eventDetails = (await getDoc(eventRef)).data();
-      displayAttendance.push({
-        club: clubDetails.name,
-        email: clubDetails.email,
-        event: eventDetails.name,
-        activityHours: eventDetails.activityHours,
-        from: eventDetails.startDate,
-        to: eventDetails.endDate,
-      });
+  try {
+    const studentRef = doc(firedb, "STUDENTS", studentId);
+    console.log("studentId in firestore query: ", studentId)
+    const studentDoc = await getDoc(doc(firedb, "STUDENTS", studentId));
+    const attendance = studentDoc.data().attendance;
+    const displayAttendance: displayAttendanceType[] = [];
+    const ObjectAttendance = Object.entries(attendance);
+    console.log(ObjectAttendance);
+    for (const [clubId, value] of Object.entries(attendance)) {
+      for (const eventId of Object.keys(value)) {
+        const clubRef = doc(firedb, "clubs", clubId);
+        const clubDetails = (await getDoc(clubRef)).data();
+        const eventRef = doc(firedb, "clubs", clubId, "EVENTS", eventId);
+        // @ts-ignore
+        const eventDetails: EventType = (await getDoc(eventRef)).data();
+        displayAttendance.push({
+          club: clubDetails.name,
+          email: clubDetails.email,
+          event: eventDetails.name,
+          activityHours: eventDetails.activityHours,
+          from: eventDetails.startDate.toDate().toLocaleDateString(),
+          to: eventDetails.endDate.toDate().toLocaleDateString(),
+        });
+      }
     }
+    console.log(displayAttendance);
+    return {displayAttendance};
+  } catch (e) {
+    return {
+      error: e,
+    };
   }
-  console.log(displayAttendance);
+};
+
+export const saveExcel = (
+  studentId: string,
+  displayAttendance: displayAttendanceType[]
+) => {
+  const EXCEL_TYPE =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const EXCEL_EXTENSION = ".xlsx";
+  const worksheet = XLSX.utils.json_to_sheet(displayAttendance);
+  const workbook = {
+    Sheets: {
+      data: worksheet,
+    },
+    SheetNames: ["data"],
+  };
+  const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+
+  const data = new Blob([excelBuffer], { type: EXCEL_TYPE });
+  console.log(data);
+  saveAs(data, studentId + ".xlsx");
+};
+
+export const addEventToDBQuery = async (
+  clubId: string,
+  newEvent: EventType
+) => {
+  try {
+    console.log("Im in firestore folder");
+    console.log(newEvent);
+    const newEventRef = await addDoc(
+      collection(firedb, "clubs", clubId, "EVENTS"),
+      newEvent
+    );
+    console.log(newEventRef.id);
+    return {
+      successful: true,
+    };
+  } catch (e) {
+    error: e;
+  }
 };

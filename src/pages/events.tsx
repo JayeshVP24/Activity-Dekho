@@ -6,6 +6,7 @@ import { useContext, useEffect } from "react";
 import { State } from "xstate";
 import { ClubType } from "../../types";
 import AddAttendanceForm from "../components/AddAttendanceForm";
+import AddEventForm from "../components/AddEventForm";
 import AvatarGenerator from "../components/AvatarGenerator";
 import { GlobalStateContext } from "../components/GlobalStateProvider";
 import ModalWrapper from "../components/ModalWrapper";
@@ -188,6 +189,25 @@ const Events: NextPage = () => {
           loading={state.context.loading}
         >
           <AddAttendanceForm />
+        </ModalWrapper>
+      )}
+      {state.matches("displayingEvents") && (
+        <button
+          className="btnFtrs fixed  bg-stone-800 text-white 
+          bottom-10 right-5 rounded-full px-4 
+          "
+          onClick={() => send({type: "ADD_EVENT",  })}
+        >
+          Add Event
+        </button>
+      )}
+      {state.matches("AddEvent") && (
+        <ModalWrapper
+          isModalOpen={state.context.modalAddEvent}
+          loading={state.context.loading}
+          closeModal={() => send("ADD_EVENT.CLOSE")}
+        >
+          <AddEventForm />
         </ModalWrapper>
       )}
     </main>

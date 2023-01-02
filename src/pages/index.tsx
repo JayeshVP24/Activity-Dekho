@@ -1,11 +1,37 @@
 import { NextPage } from "next";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import ClubAuth from "../components/ClubAuth";
 import { GlobalStateContext } from "../components/GlobalStateProvider";
-import { getStudentEvents } from "../firebase/firestore/Events";
+import {
+  displayAttendanceType,
+  getStudentEvents,
+  saveExcel,
+} from "../firebase/firestore/Events";
 const Index: NextPage = () => {
+  // const [studentData, setStudentData] = useState<displayAttendanceType | {error: string}>()
+  const [studentId, setStudentId] = useState<string>();
+  const [error, setError] = useState<string | boolean>();
+  const getStudentData = async () => {
 
-  const globalServices = useContext(GlobalStateContext)
+    const regex = new RegExp("^\\d{2}-[A-Z]+\\d{2}-\\d{2}$", "s")
+    setError(false)
+    if(!regex.test(studentId)) {
+      setError("UID Entered is not of correct format!")
+      return
+    }
+    const studentData: {
+      displayAttendance?: displayAttendanceType[];
+      error?: string;
+    } = await getStudentEvents(studentId);
+    if (studentData.error) {
+      setError("You don't seem to have attended any events");
+    } else {
+      setError(false);
+      saveExcel(studentId, studentData.displayAttendance)
+    }
+  };
+
+  const globalServices = useContext(GlobalStateContext);
   // const [state, send] = useActor(globalServices.clubAuthService)
   const { send } = globalServices.clubAuthService;
   return (
@@ -18,13 +44,18 @@ const Index: NextPage = () => {
       </h1>
       <form
         className="mt-6 block xl:mt-12 "
-        onSubmit={(e) => e.preventDefault()}
+        onSubmit={(e) => {
+          e.preventDefault();
+          console.log(e.currentTarget["UID"].value);
+          getStudentData();
+        }}
       >
         <label htmlFor="UID" className="text-2xl font-medium xl:text-4xl ">
           Enter your UID 🪪
         </label>
         <input
           name="UID"
+          onChange={(e) => {setStudentId(e.currentTarget.value.toUpperCase())}}
           className="w-full border-2 bg-transparent border-blue-600 py-4 rounded-2xl mt-2 outline-none
         pl-4 text-slate-900 placeholder:text-slate-600  font-semibold
         focus:text-lg  transition-all focus:ring-4 ring-blue-300
@@ -32,6 +63,9 @@ const Index: NextPage = () => {
         "
           placeholder="Enter your UID Here"
         />
+        {error && 
+        <span>{error}</span>
+        }
         <span
           className="block tracking-wider bg-orange-200 rounded-2xl px-4 py-2 mt-3
         xl:mt-6 "
@@ -49,7 +83,6 @@ const Index: NextPage = () => {
           type="submit"
           className="bg-green-400 ring-4 ring-green-200  hover:ring-green-300 w-full mt-12 btnFtrs
         "
-        onClick={() => getStudentEvents('21-AIML07-24')}
         >
           🚀 Generate 🚀
         </button>

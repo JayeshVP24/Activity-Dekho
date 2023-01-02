@@ -8,7 +8,7 @@ import {
   getClubsListQuery,
   validateAuthQuery,
 } from "../firebase/firestore/Club";
-import { addAttendanceQuery, retrieveClubEventsQuery } from "../firebase/firestore/Events";
+import { addAttendanceQuery, addEventToDBQuery, retrieveClubEventsQuery } from "../firebase/firestore/Events";
 import ClubAuthMachine, { ClubAuthActor } from "../machines/clubAuth";
 import ClubEventMachine, { ClubEventActor } from "../machines/clubEvents";
 import ClubAuth from "./ClubAuth";
@@ -58,6 +58,9 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
       },
       addAttendanceToDB: async (context) => {
         return await addAttendanceQuery(authClub.id, context.currentEvent.id, context.attendance)
+      },
+      addEventToDB: async (context, event) => {
+        return await addEventToDBQuery(authClub.id, event.newEvent)
       }
       //   retrieveAttendance: async (_) =>
       //     new Promise(() => {
@@ -75,8 +78,6 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
         isModalOpen={state.context.modalOpen}
         closeModal={() => send("CLOSE_MODAL")}
         loading={state.context.loading}
-        retryEvent={() => send("RETRY")}
-        errorInModal={state.context.error}
       >
         <ClubAuth  />
       </ModalWrapper>

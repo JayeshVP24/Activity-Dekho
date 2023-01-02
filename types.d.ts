@@ -10,11 +10,11 @@ export interface ClubType {
   }
 
 export interface EventType {
-  id: string,
+  id?: string,
   name: string,
   startDate: Timestamp,
   endDate: Timestamp,
-  attendance: Record<string, string>,
+  attendance?: Record<string, string>,
   activityHours: number
 }
 
