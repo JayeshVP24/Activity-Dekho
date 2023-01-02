@@ -1472,6 +1472,10 @@ wrap-ansi@^7.0.0:
     string-width "^4.1.0"
     strip-ansi "^6.0.0"
 
+"xlsx@https://cdn.sheetjs.com/xlsx-0.19.1/xlsx-0.19.1.tgz":
+  version "0.19.1"
+  resolved "https://cdn.sheetjs.com/xlsx-0.19.1/xlsx-0.19.1.tgz#26b48611bb82799de36add2f63b197bec4fc6a8d"
+
 xstate@^4.35.1:
   version "4.35.1"
   resolved "https://registry.yarnpkg.com/xstate/-/xstate-4.35.1.tgz#f2ea205e6e47cca285336a8f44ef2c154c9629a5"

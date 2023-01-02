@@ -1,10 +1,11 @@
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { EventType } from "../../../types";
 import { firedb } from "../config";
 
 export const retrieveClubEventsQuery = async (clubId: string) => {
-  console.log("i came in firebase folder too");
-  return await getDocs(collection(firedb, "clubs/" + clubId + "/EVENTS"))
+//   console.log("i came in firebase folder too");
+const q =  query(collection(firedb, "clubs/" + clubId + "/EVENTS"), orderBy("startDate", "desc"))
+return await  getDocs(q)
     .then((snap) =>
       {
           const eventsList: EventType[] = [];
@@ -21,7 +22,11 @@ export const retrieveClubEventsQuery = async (clubId: string) => {
     }
     )
     .catch((err) => {
-      console.log(err);
+    //   console.log(err);
       return err.message as string;
     });
 };
+
+export const addAttendanceQuery = (UIDs: string[], event:EventType) => {
+    
+}

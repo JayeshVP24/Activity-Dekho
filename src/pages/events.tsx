@@ -1,11 +1,15 @@
 import { useActor, useSelector } from "@xstate/react";
+import { AnimatePresence } from "framer-motion";
 import { NextPage } from "next";
 import Image from "next/image";
 import { useContext, useEffect } from "react";
 import { State } from "xstate";
 import { ClubType } from "../../types";
+import AddAttendanceForm from "../components/AddAttendanceForm";
 import AvatarGenerator from "../components/AvatarGenerator";
 import { GlobalStateContext } from "../components/GlobalStateProvider";
+import ModalWrapper from "../components/ModalWrapper";
+import ViewAttendance from "../components/ViewAttendance";
 import { auth } from "../firebase/config";
 import {
   ClubAuthActor,
@@ -17,46 +21,35 @@ const loggedIn = (state: State<ClubAuthContext, ClubAuthEvent>) => {
   return state.matches("authSuccesfull");
 };
 
-const Club: NextPage = () => {
+const Events: NextPage = () => {
   const globalServices = useContext(GlobalStateContext);
-
-  // if(!auth.currentUser) {
-  //     return (
-  //         <p>not allowed please login</p>
-  //     )
-  // }
-
   const [state, send] = useActor(globalServices.clubEventService);
   //   const [authState, authSend] = useActor(globalServices.clubAuthService);
   const { send: authSend } = globalServices.clubAuthService;
   const authClub = globalServices.authClub;
 
-  const isloggedIn = useSelector(globalServices.clubAuthService, loggedIn);
+  //   const isloggedIn = useSelector(globalServices.clubAuthService, loggedIn);
   useEffect(() => {
     console.log(state.value);
   }, [state]);
 
   useEffect(() => {
-    console.log();
-    if (auth.currentUser) {
+    // console.log();
+    if (authClub) {
       send("LOAD");
     }
-  }, [auth.currentUser]);
+  }, [authClub]);
 
   useEffect(() => {
     if (!authClub) {
-      console.log("login pop");
+      //   console.log("login pop");
       authSend("LOGIN");
     }
   }, [authClub]);
 
   if (!authClub) {
     return (
-      <div
-        className="  mx-auto px-20 top-[30%]
-   
-    "
-      >
+      <div className="  mx-auto px-20 top-[30%]">
         <h1 className="text-5xl mx-auto p-10 bg-red-500 rounded-3xl">
           Please Login
         </h1>
@@ -94,14 +87,39 @@ const Club: NextPage = () => {
           Loading 💭
         </div>
       )}
-      {state.matches("displayingEvents") && (
-        <section className="">
+      {state.matches("displayingError") && (
+        <div className="  mx-auto px-5 top-[30%]">
+          <h1 className="text-5xl mx-auto p-10 bg-red-500 rounded-3xl">
+            Uhh oh!🥴 <br />
+            Some error occured
+          </h1>
+          <button
+            onClick={() => send("RETRIEVE_EVENTS.RETRY")}
+            className="btnFtrs bg-cyan-400 w-full mt-10
+         ring-4 ring-cyan-200  hover:ring-cyan-300 "
+          >
+            Try Again 💪
+          </button>
+        </div>
+      )}
+      {state.context.events && (
+        <section className="lg:flex flex-wrap gap-10">
           {state.context.events.map((e) => {
             // const startDate = e.startDate.toDate().toDateString()
             // const endDate = e.endDate.toDate().toDateString()
             return (
-              <div key={e.id} className="bg-yellow-200 px-5 py-8 rounded-3xl mt-8 block">
-                <span className="text-2xl block font-semibold mb-2">{e.name}</span>
+              <button
+                onClick={() =>
+                  send({ type: "VIEW_ATTENDANCE", currentEvent: e })
+                }
+                key={e.id}
+                className="bg-yellow-200 px-5 py-8 rounded-3xl mt-8 block w-full text-left
+                hover:ring-4 ring-yellow-300 ring-opacity-70 active:scale-90 transition-all
+                max-w-sm "
+              >
+                <span className="text-2xl block font-semibold mb-2 overflow-hidden">
+                  {e.name}
+                </span>
                 {e.startDate.toDate().toDateString() ===
                 e.endDate.toDate().toDateString() ? (
                   <span className="block">
@@ -131,20 +149,42 @@ const Club: NextPage = () => {
                   </>
                 )}
                 <span className="block">
-                  <span className="italic mr-2 inline-block">activity Hours - </span>
-                  <span className="bg-indigo-300 px-4  rounded-full mt-2 inline-block">
+                  <span className="italic mr-2 inline-block">
+                    activity hours -{" "}
+                  </span>
+                  <span className="bg-orange-400 px-4  rounded-full mt-2 inline-block">
                     {e.activityHours}
                   </span>
                 </span>
-              </div>
+                <button className="bg-teal-400 px-4 py-1 rounded-xl mt-4
+                hover:ring-4 ring-teal-300 ring-opacity-50
+                
+                " onClick={() => send({type:"ADD_ATTENDANCE",
+                currentEvent: e
+                })} >Add attendance</button>
+              </button>
             );
           })}
         </section>
       )}
-      {/* {state.matches("displayingError") && <div>{state.context.errorMsg}</div>}
-      {state.matches("viewingAttendance") &&
-        state.context.events.map((e) => <div>{e.name}</div>)} */}
+      {state.matches("viewingAttendance") && (
+          <ModalWrapper
+            isModalOpen={state.context.modalViewAttendance}
+            closeModal={() => send("CLOSE_VIEW_ATTENDANCE")}
+            loading={state.context.loading}
+          >
+            <ViewAttendance />
+          </ModalWrapper>
+      )}
+      {state.matches("addAttendance") && (
+        <ModalWrapper isModalOpen={state.context.modalAddAttendance} 
+        closeModal={() => send("ADD_ATTENDANCE.CLOSE")} 
+        loading={state.context.loading}
+        >
+          <AddAttendanceForm />
+        </ModalWrapper>
+      )}
     </main>
   );
 };
-export default Club;
+export default Events;

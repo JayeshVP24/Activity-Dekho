@@ -38,9 +38,7 @@ export type ClubAuthEvent =
       initial: "loggedOut",
       schema: {
         services: {} as {
-          getClubsList: {
-            data: ClubType[] | string ;
-          };
+          getClubsList: {data: ClubType[] | string} ;
           validateAuth: {
             data: ClubType | string
           }
@@ -148,7 +146,9 @@ export type ClubAuthEvent =
 
       actions: {
         addClubsListToContext: assign({
-          clubList: (_,event) => event.data as ClubType[]
+          clubList: (_,event) => {
+            // console.log("inside machine event: ", event.data)
+            return event.data as ClubType[]}
         }),
     
         addClubToContext: assign({

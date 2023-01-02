@@ -91,12 +91,9 @@ export const getClubsListQuery = async () => {
       return clubList;
     })
     .catch((error) => {
-      console.log(error)
-      error.message as string});
-  // return {
-  //   clubs: clubList,
-  //   error: errorMsg,
-  // };
+      // console.log(error)
+      return error.message as string;
+    });
 };
 
 export const validateAuthQuery = (
@@ -105,7 +102,6 @@ export const validateAuthQuery = (
   password: string
 ) => {
   return new Promise<ClubType | string>((resolve, reject) => {
-    console.log({ email, password });
     signInWithEmailAndPassword(auth, email, password)
       .then((userCred) => {
         resolve({
