@@ -10,20 +10,20 @@ export interface ClubType {
   }
 
 export interface EventType {
-  id: string,
+  id?: string,
   name: string,
   startDate: Timestamp,
   endDate: Timestamp,
-  attendance: Set<string>,
+  attendance?: Record<string, string>,
   activityHours: number
 }
 
 export interface ClubStudentType {
   id: string,
-  events: Set<string>
+  events: string[]
 }
 
 export interface StudentType {
   id: string,
-  clubs: Set<string>
+  clubs: string[]
 }

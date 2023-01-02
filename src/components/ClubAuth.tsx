@@ -1,8 +1,14 @@
 import { useActor, useMachine } from "@xstate/react";
-import { getClubsListQuery, validateAuthQuery } from "../firebase/firestore/Club";
-import ClubAuthMachine, { ClubAuthContext, ClubAuthEvent } from "../machines/clubAuth";
+import {
+  getClubsListQuery,
+  validateAuthQuery,
+} from "../firebase/firestore/Club";
+import ClubAuthMachine, {
+  ClubAuthContext,
+  ClubAuthEvent,
+} from "../machines/clubAuth";
 import { AnimatePresence, motion, Variants } from "framer-motion";
-import { use, useContext, useEffect } from "react";
+import {  useContext, useEffect } from "react";
 import Image from "next/image";
 import AvatarGenerator from "./AvatarGenerator";
 import { useRouter } from "next/router";
@@ -11,7 +17,14 @@ import { Sender } from "xstate";
 
 const ClubAuth: React.FC = () => {
   const router = useRouter();
-
+  const variants: Variants = {
+    hidden: {
+      opacity: 0,
+    },
+    visible: {
+      opacity: 1,
+    },
+  };
   // const [state, send] = useMachine(ClubAuthMachine, {
   //   services: {
   //     getClubsList: async () => await getClubsListQuery(),
@@ -32,110 +45,46 @@ const ClubAuth: React.FC = () => {
   //   },
   // });
 
-  const globalServices = useContext(GlobalStateContext)
-  const [state, send] = useActor(globalServices.clubAuthService)
+  const globalServices = useContext(GlobalStateContext);
+  const [state, send] = useActor(globalServices.clubAuthService);
   //   console.log(typeof send)
 
-//   useEffect(() => {
-//     send("LOGIN");
-//   }, []);
+  //   useEffect(() => {
+  //     send("LOGIN");
+  //   }, []);
 
   useEffect(() => {
     console.log(state.value);
-    console.log(state.context)
+    console.log(state.context);
   }, [state]);
 
-  const variants: Variants = {
-    hidden: {
-      opacity: 0,
-    },
-    visible: {
-      opacity: 1,
-    },
-  };
-  // const regex = new RegExp('^\\d{2}-\\b[A-Z]+\\d{2}-\\d{2}$
-  // ', 'gm')
+
   return (
-    <section>
-      
-      <AnimatePresence>
-        {state.context.modalOpen && (
-          <motion.section className="">
-            <motion.div
-              initial={{
-                opacity: 0,
-              }}
-              animate={{
-                opacity: 0.7,
-              }}
-              exit={{
-                opacity: 0,
-              }}
-              transition={{
-                duration: 0.2,
-              }}
-              onClick={() => send("CLOSE_MODAL")}
-              className={`bg-stone-800  w-screen h-screen fixed top-0 left-0    
-         `}
-            />
-            <motion.div
-              initial={{
-                scale: 0.4,
-                opacity: 0,
-                top: "50%",
-                left: "50%",
-                translateX: "-50%",
-                translateY: "-50%",
-              }}
-              animate={{
-                scale: 1,
-                opacity: 1,
-              }}
-              exit={{
-                scale: 0.9,
-                opacity: 0,
-              }}
-              className={`bg-violet-400 fixed w-4/5 max-w-xl h-auto max-h-[75%]
-                top-[50%] translate-y-[-50%] left-[50%] translate-x-[-50%]
-                rounded-3xl px-10 py-16 
-                `}
-            >
-              {state.matches("displayingError") && (
-                <motion.div
-                  variants={variants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
-                  className="flex flex-col text-center text-black text-5xl font-semibold my-auto "
-                >
-                  <span> Something went wrong! 😶‍🌫️ </span>
-                  <button
-                    className="bg-orange-400 ring-4 font-normal ring-orange-300   
-                  hover:ring-orange-200 w-full mt-12 btnFtrs"
-                    onClick={() => send("RETRY")}
-                  >
-                    RETRY
-                  </button>
-                </motion.div>
-              )}
-              {state.context.loading && (
-                <motion.span
-                  variants={variants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
-                  className="text-3xl font-semibold w-full text-center"
-                >
-                  Loading 💭{" "}
-                </motion.span>
-              )}
+    <section>{state.matches("displayingError") && (
+      <motion.div
+        variants={variants}
+        initial="hidden"
+        animate="visible"
+        exit="hidden"
+        className="flex flex-col text-center text-black text-5xl font-semibold my-auto "
+      >
+        <span> Something went wrong! 😶‍🌫️ </span>
+        <button
+          className="bg-orange-400 ring-4 font-normal ring-orange-300   
+          hover:ring-orange-200 w-full mt-12 btnFtrs"
+          onClick={() => send("RETRY")}
+        >
+          RETRY
+        </button>
+      </motion.div>
+    )}
               {state.matches("displayingClubsList") && (
                 <div>
                   <h2 className="text-4xl font-semibold  ">
                     Select your Club 🏫
                   </h2>
                   <div className="flex flex-col gap-y-6 mt-8 max-h-64 overflow-scroll p-2">
-                    {state.context.clubList.map((c) => (
+                    { state.context.clubList && state.context.clubList.map((c) => (
                       <motion.button
                         variants={variants}
                         initial="hidden"
@@ -227,16 +176,14 @@ const ClubAuth: React.FC = () => {
                       <div>
                         <button
                           type="submit"
-                          className=" ring-4 bg-sky-400 ring-sky-400 ring-opacity-50 hover:ring-sky-300 w-full mt-8 btnFtrs text-lg
-        "
+                          className=" ring-4 bg-sky-400 ring-sky-400 ring-opacity-50 hover:ring-sky-300 w-full mt-8 btnFtrs text-lg"
                         >
                           Login 🐣
                         </button>
                         <button
                           type="submit"
                           onClick={() => send("GO_BACK")}
-                          className=" ring-4 bg-rose-400 ring-rose-400 ring-opacity-50 hover:ring-rose-300 w-full mt-4 btnFtrs text-lg
-        "
+                          className=" ring-4 bg-rose-400 ring-rose-400 ring-opacity-50 hover:ring-rose-300 w-full mt-4 btnFtrs text-lg"
                         >
                           Go Back 🥚
                         </button>
@@ -253,16 +200,11 @@ const ClubAuth: React.FC = () => {
                   </motion.div>
                 </form>
               )}
-            </motion.div>
-          </motion.section>
-        )}
-      </AnimatePresence>
     </section>
   );
 };
 
 export default ClubAuth;
-
 
 // const ChildComp: React.FC<{send: Sender<ClubAuthEvent>}> = ({send}) => {
 //   send("")

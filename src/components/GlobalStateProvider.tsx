@@ -8,10 +8,11 @@ import {
   getClubsListQuery,
   validateAuthQuery,
 } from "../firebase/firestore/Club";
-import { retrieveClubEventsQuery } from "../firebase/firestore/Events";
+import { addAttendanceQuery, addEventToDBQuery, retrieveClubEventsQuery } from "../firebase/firestore/Events";
 import ClubAuthMachine, { ClubAuthActor } from "../machines/clubAuth";
 import ClubEventMachine, { ClubEventActor } from "../machines/clubEvents";
 import ClubAuth from "./ClubAuth";
+import ModalWrapper from "./ModalWrapper";
 
 export const GlobalStateContext = createContext<{
   clubAuthService: ClubAuthActor | undefined;
@@ -30,7 +31,7 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
   const [authClub, setAuthClub] = useState<ClubType | undefined>(undefined);
   const clubAuthService = useInterpret(ClubAuthMachine, {
     services: {
-      getClubsList: async () => await getClubsListQuery(),
+      getClubsList: async (_) => await getClubsListQuery(),
       validateAuth: async (context, event) =>
         validateAuthQuery(
           context.club.name,
@@ -44,31 +45,44 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
     actions: {
       moveToDashboardPage: (context) => {
         setAuthClub(context.club);
-        router.push("/club");
+        router.push("/events");
       },
     },
   });
-
-  //   const [state] = useActor(clubAuthService);
 
   const clubEventService = useInterpret(ClubEventMachine, {
     services: {
       retrieveClubEvents: async (_) => {
-        console.log("well i reached in global context");
+        // console.log("well i reached in global context");
         return await retrieveClubEventsQuery(authClub.id);
       },
-    //   retrieveAttendance: async (_) =>
-    //     new Promise(() => {
-    //       return resolve("afw")
-    //     }),
+      // @ts-ignore
+      addAttendanceToDB: async (context) => {
+        return await addAttendanceQuery(authClub.id, context.currentEvent.id, context.attendance)
+      },
+      // @ts-ignore
+      addEventToDB: async (context, event) => {
+        return await addEventToDBQuery(authClub.id, event.newEvent)
+      }
+      //   retrieveAttendance: async (_) =>
+      //     new Promise(() => {
+      //       return resolve("afw")
+      //     }),
     },
   });
 
+  const [state, send] = useActor(clubAuthService);
   return (
     <GlobalStateContext.Provider
       value={{ clubAuthService, clubEventService, authClub }}
     >
-      <ClubAuth />
+      <ModalWrapper
+        isModalOpen={state.context.modalOpen}
+        closeModal={() => send("CLOSE_MODAL")}
+        loading={state.context.loading}
+      >
+        <ClubAuth  />
+      </ModalWrapper>
       {children}
     </GlobalStateContext.Provider>
   );
