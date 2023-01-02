@@ -51,7 +51,7 @@ const AddAttendanceForm: React.FC = () => {
         className="mt-4"
         onSubmit={(e) => {
           e.preventDefault();
-          send("ADD_ATTENDANCE.SUBMIT");
+          send({type: "ADD_ATTENDANCE.SUBMIT"});
         }}
       >
         <input
@@ -86,7 +86,7 @@ const AddAttendanceForm: React.FC = () => {
               className="bg-green-300 px-4 py-1 rounded-full text-sm
             block mt-4"
             >
-              Your Excel if Valid, go ahead and submit it
+              Your Excel is Valid, go ahead and submit it
             </span>
             <button
               type="submit"

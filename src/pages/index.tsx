@@ -2,6 +2,7 @@ import { NextPage } from "next";
 import { useContext } from "react";
 import ClubAuth from "../components/ClubAuth";
 import { GlobalStateContext } from "../components/GlobalStateProvider";
+import { getStudentEvents } from "../firebase/firestore/Events";
 const Index: NextPage = () => {
 
   const globalServices = useContext(GlobalStateContext)
@@ -48,6 +49,7 @@ const Index: NextPage = () => {
           type="submit"
           className="bg-green-400 ring-4 ring-green-200  hover:ring-green-300 w-full mt-12 btnFtrs
         "
+        onClick={() => getStudentEvents('21-AIML07-24')}
         >
           🚀 Generate 🚀
         </button>

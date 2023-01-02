@@ -108,14 +108,14 @@ const Events: NextPage = () => {
             // const startDate = e.startDate.toDate().toDateString()
             // const endDate = e.endDate.toDate().toDateString()
             return (
-              <button
+              <div
                 onClick={() =>
                   send({ type: "VIEW_ATTENDANCE", currentEvent: e })
                 }
                 key={e.id}
                 className="bg-yellow-200 px-5 py-8 rounded-3xl mt-8 block w-full text-left
                 hover:ring-4 ring-yellow-300 ring-opacity-70 active:scale-90 transition-all
-                max-w-sm "
+                max-w-sm cursor-pointer"
               >
                 <span className="text-2xl block font-semibold mb-2 overflow-hidden">
                   {e.name}
@@ -156,30 +156,36 @@ const Events: NextPage = () => {
                     {e.activityHours}
                   </span>
                 </span>
-                <button className="bg-teal-400 px-4 py-1 rounded-xl mt-4
+                <button
+                  className="bg-teal-400 px-4 py-1 rounded-xl mt-4
                 hover:ring-4 ring-teal-300 ring-opacity-50
                 
-                " onClick={() => send({type:"ADD_ATTENDANCE",
-                currentEvent: e
-                })} >Add attendance</button>
-              </button>
+                "
+                  onClick={() =>
+                    send({ type: "ADD_ATTENDANCE", currentEvent: e })
+                  }
+                >
+                  Add attendance
+                </button>
+              </div>
             );
           })}
         </section>
       )}
       {state.matches("viewingAttendance") && (
-          <ModalWrapper
-            isModalOpen={state.context.modalViewAttendance}
-            closeModal={() => send("CLOSE_VIEW_ATTENDANCE")}
-            loading={state.context.loading}
-          >
-            <ViewAttendance />
-          </ModalWrapper>
+        <ModalWrapper
+          isModalOpen={state.context.modalViewAttendance}
+          closeModal={() => send("CLOSE_VIEW_ATTENDANCE")}
+          loading={state.context.loading}
+        >
+          <ViewAttendance />
+        </ModalWrapper>
       )}
       {state.matches("addAttendance") && (
-        <ModalWrapper isModalOpen={state.context.modalAddAttendance} 
-        closeModal={() => send("ADD_ATTENDANCE.CLOSE")} 
-        loading={state.context.loading}
+        <ModalWrapper
+          isModalOpen={state.context.modalAddAttendance}
+          closeModal={() => send("ADD_ATTENDANCE.CLOSE")}
+          loading={state.context.loading}
         >
           <AddAttendanceForm />
         </ModalWrapper>

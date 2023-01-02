@@ -8,7 +8,7 @@ import {
   getClubsListQuery,
   validateAuthQuery,
 } from "../firebase/firestore/Club";
-import { retrieveClubEventsQuery } from "../firebase/firestore/Events";
+import { addAttendanceQuery, retrieveClubEventsQuery } from "../firebase/firestore/Events";
 import ClubAuthMachine, { ClubAuthActor } from "../machines/clubAuth";
 import ClubEventMachine, { ClubEventActor } from "../machines/clubEvents";
 import ClubAuth from "./ClubAuth";
@@ -56,6 +56,9 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
         // console.log("well i reached in global context");
         return await retrieveClubEventsQuery(authClub.id);
       },
+      addAttendanceToDB: async (context) => {
+        return await addAttendanceQuery(authClub.id, context.currentEvent.id, context.attendance)
+      }
       //   retrieveAttendance: async (_) =>
       //     new Promise(() => {
       //       return resolve("afw")

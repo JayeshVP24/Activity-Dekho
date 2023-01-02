@@ -15,8 +15,8 @@ const ViewAttendance: React.FC = () => {
         </h3>
       </div>
       <div className="flex flex-col gap-y-4 mt-6 h-72 overflow-scroll">
-        {Object.keys(state.context.currentEvent.attendance).map((a) => (
-          <span className="flex justify-between w-full bg-lime-300 px-4 py-1 rounded-2xl
+        {state.context.currentEvent.attendance && Object.keys(state.context.currentEvent.attendance).map((a) => (
+          <span key={a} className="flex justify-between w-full bg-lime-300 px-4 py-1 rounded-2xl
           ">
             <p> {a}</p>
             <button className="bg-red-400 px-2 rounded-3xl" >Delete</button>
