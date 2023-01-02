@@ -393,6 +393,10 @@ const ClubEventMachine =
               reject("Empty attendance, please check the sample format");
               return;
             }
+            if (arr.length >= 200) {
+              reject(`Limit on Students UID in one Excel Upload is 200!`);
+              return;
+            }
             const regex = new RegExp("^\\d{2}-[A-Z]+\\d{2}-\\d{2}$", "s");
             let valid: boolean = true;
             console.log("arrayy  ", arr);
