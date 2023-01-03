@@ -9,19 +9,31 @@ import { getAuth } from "firebase/auth";
 
 console.log("prod env ", process.env.NODE_ENV);
 let firebaseConfig = {};
+// if (process.env.NODE_ENV === "production") {
+//   console.log("here is the node env")
+//   firebaseConfig = {
+//     apiKey: process.env.FIREBASE_API_KEY,
+//     authDomain: "aicte-diary.firebaseapp.com",
+//     projectId: "aicte-diary",
+//     storageBucket: "aicte-diary.appspot.com",
+//     messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+//     appId: process.env.FIREBASE_APP_ID,
+//   };
+// } 
 if (process.env.NODE_ENV === "production") {
   console.log("here is the node env")
   firebaseConfig = {
-    apiKey: process.env.FIREBASE_API_KEY,
+    apiKey: "AIzaSyDvyg0ymLOqs181XfDZ2VxvuAEqDcvZrOI",
     authDomain: "aicte-diary.firebaseapp.com",
     projectId: "aicte-diary",
     storageBucket: "aicte-diary.appspot.com",
-    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.FIREBASE_APP_ID,
+    messagingSenderId: "944319415450",
+    appId: "1:944319415450:web:7598324a715c03c1f68b23",
   };
-} else {
+} 
+else {
   firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    apiKey: "process.env.NEXT_PUBLIC_FIREBASE_API_KEY",
     authDomain: "aicte-diary.firebaseapp.com",
     projectId: "aicte-diary",
     storageBucket: "aicte-diary.appspot.com",
