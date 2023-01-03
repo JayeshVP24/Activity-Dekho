@@ -12,12 +12,12 @@ let firebaseConfig = {};
 if (process.env.NODE_ENV === "production") {
   console.log("here is the node env")
   firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    apiKey: process.env.FIREBASE_API_KEY,
     authDomain: "aicte-diary.firebaseapp.com",
     projectId: "aicte-diary",
     storageBucket: "aicte-diary.appspot.com",
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.FIREBASE_APP_ID,
   };
 } else {
   firebaseConfig = {
