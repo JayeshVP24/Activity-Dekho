@@ -8,7 +8,7 @@ on:
 env:
   PROJECT_ID: ${{ secrets.CLOUD_RUN_PROJECT_NAME}}
   REGION: asia-south1
-  REPO_NAME: Activity-Dekho
+  REPO_NAME: activity-dekho
 
 jobs:
   build-and-deploy:
