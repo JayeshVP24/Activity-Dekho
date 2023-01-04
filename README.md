@@ -1,7 +1,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/JayeshVP24/AICTE-Diary">
-    <img src="src/logo.png" alt="Logo" width="80" height="80">
+    <img src="src/logo.jpeg" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">Activity Dekho</h3>
