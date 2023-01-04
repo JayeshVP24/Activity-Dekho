@@ -1,23 +1,192 @@
-import { assign, createMachine } from "xstate";
+import { assign, createMachine, ActorRefFrom } from "xstate";
 import { ClubType } from "../../types";
 
-interface ClubAuthContext {
+export interface ClubAuthContext {
   club?: ClubType;
   error?: string;
   clubList?: ClubType[];
   password?: string;
-  loggedIn: boolean
+  loggedIn: boolean;
+  modalOpen: boolean;
+  loading: boolean;
 }
-type ClubAuthEvent =
+export type ClubAuthEvent =
   | { type: "LOGIN" }
   | { type: "SELECT_CLUB"; club: ClubType }
   | { type: "RETRY" }
-  | { type: "RETRY_PASSWORD" }
   | { type: "GO_BACK" }
+  | { type: "CLOSE_MODAL" }
   | { type: "VALIDATE_AUTH", password: string }
-  | {type: "error.platform.getclublist", data: {error: string}}
-  | {type: "error.platform.validateauth", data: {error: string}}
+  | {type: "error.platform.getclublist", data: string}
+  | {type: "error.platform.validateauth", data: string}
   
+// interface ClubAuthServices  {
+//   getClubsList: {
+//     data: { clubs?: ClubType[], error?: string };
+//   };
+//   validateAuth: {
+//     data: {club?: ClubType, error? :string}
+//   }
+// } 
+
+  const ClubAuthMachine =
+  /** @xstate-layout N4IgpgJg5mDOIC5QGMA2BXARgYgMIBkB5AZQFEB9AWUIBEBBfAbQAYBdRUABwHtYBLAC59uAOw4gAHogC0ARgDsANgB0zAKwAmeQA4AzLu0aNa5gBZtAGhABPGRt0BOZWu2LZG5tve7F8hwF9-KzQsZVRuKBgIQnQBbCIAcQBJADkWdiQQHn4hUXEpBGYrW0LA4IxMZRgBIREoXArYfD5YOIhRMGU+EQA3bgBrTuqQzFQWgXTxbMFhMUyCzTVlX1dPA29jYsRZZg1lBwUHU3kjWW15HY0ykBGqsBru+sbm1uwwACd37nflTlQAQwEADNvgBbO4CEZjVqTTLTXJzUALPamWSmZjMXTqeymVGKLYIdxLDEOXTyY72HH2a63CAtP7-ayPBpYJrjbBkfCkXAAFXIBAAqgAhWFcXgzPLzRBk0zKRwmVznA5kgkaRSynS40yKTy7YzyXQ0irKOmwBlMuqkT7fbAAJVIPNtAE1RVlxQj8og1SoduTTA4HGpTFoHBoCd5nMxSUo3FGtIpFEbQpwvqCBKQRAIPgAFf6wWAAd2+EGwADUGEl6DyKHQBTyABKu+GzT0IDSuOXHA4OMyKNQJgmmNTyZTacxrOMY4dJyop7hpjNZ965-NF94lhKEchCui4ADSTfdLalCBc2lHvnkUa8qLRagJBnP8mHijJZg0sjU+hnyh6-zGECAo8dCxAAFtg7QiJ03R9IMv7-nwgFZv8YGHjkx5Iog2pOLIRwBp+5xqF+ugEr4zDKIcaiBhooYKNOQQ3Maf4AUBdQgQI4EfF8PwMsCYLwSxyGoWwUxHpKmEIEcFGaO4PbrFeaoPu2qhkrIr7+qGWKGtcIjcBAcDiCMonoeJkh2DRo5DswuEhrspJhjYMi6FoqiuN46p+MGRw-uEkSQDEAjGRKiJmQgcheJZJg2X4dnOQSzA-tUtRPKyLyBXCYkhQUH57KGpjObi+hKIGJGOWF-qRhishomSAbBuSP6muazLPOMQUeieVEjm4DjaGOPbmGqpUlFoujKOiXiaIoeg6MwiYMbS9IAhaUBWtx7UYaFaL7F47jaAcZw0X28iqvlyztpo2hUeqw5qD+c4LpmOZ5oWxYbaZBRkt16i4c5z79pipgPuckZKMGWIfocP7MYhrFQOxoHvVlXoXPsOzosd5L7SqZVBnsHihg46rBloOg-ihHHEOgyDIHAsBAugqBI62025cGri6Aoz4ePeuNqLIyhqoG3gXNquimIEgRAA */
+  createMachine(
+    {
+      predictableActionArguments: true,
+      id: "club",
+      initial: "loggedOut",
+      schema: {
+        services: {} as {
+          getClubsList: {data: ClubType[] | string} ;
+          validateAuth: {
+            data: ClubType | string
+          }
+        },
+        events: {} as ClubAuthEvent,
+        context: {} as ClubAuthContext,
+      },
+      context: {
+        club: undefined,
+        clubList: undefined,
+        error: undefined,
+        password: undefined,
+        loggedIn: false,
+        modalOpen: false,
+        loading: false
+      },
+      tsTypes: {} as import("./clubAuth.typegen").Typegen0,
+      on: {
+        "CLOSE_MODAL": {
+          target: "loggedOut",
+          actions: ["closeModal", "clearErrorMsgFromContext"]
+        }
+      },
+      states: {
+        loggedOut: {
+          on: {
+            LOGIN: {
+              target: "gettingClubsList",
+              actions: ["openModal"]
+            },
+          },
+        },
+
+        gettingClubsList: {
+          invoke: {
+            src: "getClubsList",
+            id:"getclublist",
+            onDone: {
+              target: "displayingClubsList",
+              actions: "addClubsListToContext",
+              internal: true
+            },
+
+            onError: {
+              target: "displayingError",
+              actions: "addErrorMsgToContext"
+            }
+          },
+
+          entry: "setLoadingTrue",
+          exit: "setLoadingFalse"
+        },
+
+        displayingClubsList: {
+          on: {
+            SELECT_CLUB: {
+              target: "promtEnterPassword",
+              actions: "addClubToContext",
+            },
+          },
+        },
+
+        displayingError: {
+          on: {
+            RETRY: {
+              target: "gettingClubsList",
+              actions: ["clearErrorMsgFromContext"],
+            }
+          }
+        },
+
+        promtEnterPassword: {
+          on: {
+            VALIDATE_AUTH: "validatingAuth",
+            GO_BACK: {
+              target: "displayingClubsList",
+              actions: "clearErrorMsgFromContext"
+            }
+          },
+        },
+
+        validatingAuth: {
+          invoke: {
+            src: "validateAuth",
+            id: "validateauth",
+            onDone: {
+              target: "authSuccessful",
+              actions: ["changeContextToLoggedIn", "closeModal"]
+            },
+            onError: {
+              target: "promtEnterPassword",
+              actions: "addErrorMsgToContext",
+            },
+          },
+        },
+
+        authSuccessful: {
+          entry: "clearPasswordFromContext",
+          type: "final",
+          exit: "moveToDashboardPage"
+        }
+      },
+    },
+    {
+
+      actions: {
+        addClubsListToContext: assign({
+          clubList: (_,event) => {
+            // console.log("inside machine event: ", event.data)
+            return event.data as ClubType[]}
+        }),
+    
+        addClubToContext: assign({
+          club: (_, event) => event.club
+        }),
+ 
+        changeContextToLoggedIn: assign({
+          loggedIn: true
+        }),
+        addErrorMsgToContext: assign({
+          error: (_,event) => event.data as string
+        }),
+        clearErrorMsgFromContext: assign({
+          error:(_) => undefined
+        }),
+        clearPasswordFromContext: assign({
+          password: (_) =>undefined
+        }),
+        openModal: assign({
+          modalOpen: true
+        }),
+        closeModal: assign({
+          modalOpen: false
+        }),
+        setLoadingTrue: assign({
+          loading: true
+        }),
+        setLoadingFalse: assign({
+          loading: false
+        })
+      },
+    }
+  );
+
+export default ClubAuthMachine;
+
+export type ClubAuthActor = ActorRefFrom<typeof ClubAuthMachine>
+
 // type ClubAuthTypestate =
 //   | {
 //       value: "loggedOut" | "gettingClubsList";
@@ -47,142 +216,7 @@ type ClubAuthEvent =
 //       };
 //     };
 
-const ClubAuthMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QGMA2BXARgOlQeyhggHl0AXAYgBliBxASQDkBtABgF1FQAHPWASzL88AOy4gAHolYAaEAE9pAXyVy0WbDDJCRUAMIZMsKv1iUIosNn4iAbngDWVresypTZNpyQheAoaLiUggArABMIdgAbADsABxRrHEAzHEAjGHJEXKKCGmsYdgAnGkxRQAsMWFhaXEx+WEqaoaaYNo2+obGHhRgAE59eH3Y3KgAhmQAZkMAtq1kru5mXuJ+gsJiPsHh2OVpyfFhMckhVbXlOYhptdhpUSGsp8lRcZlRaSFNIK7YEKajY3kHQMWG6ZgoAGUAKJUKF6AAqAH09FQAKoAIRWPjWAU2oGCB3K2GSRQeCTqJQOlwQYSiRPi5UZiTiBQixy+Pz+sABQN0UIGQwoACUofChQBNLE8PjrQJbRAAWjC5VYuxSIQqRVpJ1YUWpaQq2EeETqqWStTeHJa3EGMzIUJEZH6AAUxrBYAB3IYQCgANQAglR6AARf3wqGI-2o+EACSlvhluKCiDCCWJlRKRVY5XuUT1CkQ5VO2Di5RZKVYWtYjxiVo0tjG7ggEw6-vIAAsKBYRFYbPYnNgG02JmAxh34ziNsmEDmirdNSUQnUQiFkslqbFVaVSaSwlrSqc6zgh-xmzooG2yJ3+oNhgCprNB43TyOx1eJ4mp-KEAqtdhwjURQkpW2blEB1KnHExIPOURwskUCFlkevz-OMvIXh2-K3sKooSoizr+hCEIAOrEEKwYfv4X74lcmS3MqcQpPcYFRCUaTUmuMRGqmdw1EuZbpMhNp4HaDpOn0rrul6fQ+rQxCIui-p6AA0pRsp4pIiBLlBCQxDElbpHsaRFhxjHYDEpxRAc2Z8WuKiqCAIh4BAcDiK4qyfnKNE-qmUFlicmrag8VnUgq+RpLcpYgdWjFgSE5TIfghCQKQZAeVRXmaT+tQRaWDwGkcWZ7lk1KsMhWjniCRgmGY6XqdOYRJLs9RZMqJx1Ik+a5GFyTRFFcSriE+wsoByFcjywJdDVaXYp5GnbEUXHvEUsVZmW2rUkcvUquk4QvAcLJRGNqGAh0WFDHVSbfquxRFtmDx7tU4TsQWNLHLsSS8RqZTlCcCUOT8wmiY6Lpup63qXdRWUHEtjwGlkFkhIkyQXK9qRcQ8MR0pkBTXGUyEnmerYdpDmXBEcEUlNmuqnDEZZATEEGwdgjVakUdKwUc8TIW+7YQugyDIHAsCTOgqCk-NiAvIUFSplZpQWY1IQQUNLOsUNmT1DmKPHdyaHE1e519BL049aqSO47BgXpOur0qnOA17uzv2rlqtb2UAA */
-  createMachine(
-    {
-      predictableActionArguments: true,
-      id: "club",
-      initial: "loggedOut",
-      schema: {
-        services: {} as {
-          getClubsList: {
-            data: { clubs?: ClubType[], error?: string };
-          };
-          validateAuth: {
-            data: {club?: ClubType, error? :string}
-          }
-        },
-        events: {} as ClubAuthEvent,
-        context: {} as ClubAuthContext,
-      },
-      context: {
-        club: undefined,
-        clubList: undefined,
-        error: undefined,
-        password: undefined,
-        loggedIn: false
-      },
-      tsTypes: {} as import("./clubAuth.typegen").Typegen0,
-      states: {
-        loggedOut: {
-          on: {
-            LOGIN: {
-              target: "gettingClubsList",
-            },
-          },
-        },
 
-        gettingClubsList: {
-          invoke: {
-            src: "getClubsList",
-            id:"getclublist",
-            onDone: {
-              target: "displayingClubsList",
-              actions: "addClubsListToContext",
-              internal: true
-            },
-
-            onError: {
-              target: "displayingError",
-              actions: "addErrorMsgToContext"
-            }
-          },
-        },
-
-        displayingClubsList: {
-          on: {
-            SELECT_CLUB: {
-              target: "promtEnterPassword",
-              actions: "addClubToContext",
-            },
-          },
-        },
-
-        displayingError: {
-          on: {
-            RETRY: {
-              target: "loggedOut",
-              actions: ["clearErrorMsgFromContext"],
-            }
-          },
-        },
-
-        promtEnterPassword: {
-          on: {
-            VALIDATE_AUTH: "validatingAuth",
-            GO_BACK: "displayingClubsList"
-          },
-        },
-
-        validatingAuth: {
-          invoke: {
-            src: "validateAuth",
-            id: "validateauth",
-            onDone: {
-              target: "authSuccessful",
-              actions: "changeContextToLoggedIn"
-            },
-            onError: {
-              target: "displayingAuthError",
-              actions: "addErrorMsgToContext",
-            },
-          },
-        },
-
-        authSuccessful: {
-          entry: "clearPasswordFromContext",
-          type: "final",
-        },
-
-        displayingAuthError: {
-          on: {
-            RETRY_PASSWORD: {
-              target: "promtEnterPassword",
-              actions: ["clearErrorMsgFromContext"],
-            }
-          }
-        }
-      },
-    },
-    {
-
-      actions: {
-        addClubsListToContext: assign({
-          clubList: (_,event) => event.data.clubs
-        }),
-    
-        addClubToContext: assign({
-          club: (_, event) => event.club
-        }),
- 
-        changeContextToLoggedIn: assign({
-          loggedIn: true
-        }),
-        addErrorMsgToContext: assign({
-          error: (_,event) => event.data.error
-        }),
-        clearErrorMsgFromContext: assign({
-          error: () => ""
-        }),
-        clearPasswordFromContext: assign({
-          password: () => undefined
-        }),
-      },
-    }
-  );
-
-export default ClubAuthMachine;
 
 // export const ClubLoginMachine =
 //   /** @xstate-layout N4IgpgJg5mDOIC5QGEA2BXARgAgDIHsoBLAO2wFkBDAYwAtSwA6IiVMAYinwBV8DiSAbQAMAXUSgADvlhEALkXwkJIAB6JhAGhABPDQF9D2kvghwVaLHkKkKNeiTArpshUpXqEAWgAsADm09bz8AdkYAViMQSxx+Wyo6BmZWJyQQF3lFZTTPLV1EAEYCvwiATnLS4T8fHxCAJgA2cIaomOsBO0THRhg5BRIoGNwiWDlnGUz3HMLSgsYCitKG0v86nzq6wMRK+eE9uoKAZga6w+EfZcNDIA */

@@ -2,22 +2,21 @@
   "private": true,
   "scripts": {
     "dev": "next",
-    "build": "next build",
+    "build": "next build ",
     "start": "next start"
   },
   "dependencies": {
-    "@chakra-ui/icons": "^2.0.2",
-    "@chakra-ui/react": "^2.2.1",
-    "@chakra-ui/theme-tools": "^2.0.2",
-    "@emotion/react": "^11.9.0",
-    "@emotion/styled": "^11.9.0",
+    "@next/font": "^13.1.1",
+    "@types/file-saver": "^2.0.5",
     "@types/firebase": "^3.2.1",
     "@xstate/react": "^3.0.1",
+    "file-saver": "^2.0.5",
     "firebase": "^9.15.0",
-    "framer-motion": "^6.3.0",
+    "framer-motion": "^8.0.2",
     "next": "latest",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.1/xlsx-0.19.1.tgz",
     "xstate": "^4.35.1"
   },
   "devDependencies": {
