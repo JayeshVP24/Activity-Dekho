@@ -9,7 +9,26 @@
 
     .btnFtrs {
         @apply rounded-2xl py-2 text-2xl font-semibold   
-        active:scale-90 transition-all active:ring-0
-        ;
+        active:scale-90 transition-all active:ring-0;
+    }
+   
+}
+
+@layer utilities {
+    .customScrollbar::-webkit-scrollbar {
+        width: 14px;
+        background-color: rgba(4, 0, 57, 0.4);
+        border-radius: 5em; 
+        padding: 10px;
+    }
+    .customScrollbar::-webkit-scrollbar-thumb  {
+        /* width: 0.2rem; */
+        background-color: rgb(202, 245, 32);
+        border: 4px solid rgba(0, 0, 0, 0);
+
+        background-clip: padding-box;
+        border-radius: 9999px;
+        padding-left: 10px;
+
     }
 }
