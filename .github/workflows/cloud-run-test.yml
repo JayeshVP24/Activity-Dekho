@@ -40,7 +40,7 @@ jobs:
       - name: Creating Env file
         env:
           ENV_LOCAL: ${{secrets.ENV_LOCAL}}
-        run: base64 --decode ${ENV_LOCAL} > .env.local
+        run: base64 --decode $ENV_LOCAL > .env.local
 
       # build docker image
       - name: Build and tag the docker image
