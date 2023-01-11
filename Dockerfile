@@ -5,7 +5,7 @@ FROM node:18.12.1-alpine
 WORKDIR /usr/app
 
 COPY . .
-RUN --mount=type=secret,id=_env_local,target=/usr/app
+RUN --mount=type=secret,id=_env_local,target=/
 
 # ARG FIREBASE_API_KEY
 # ARG FIREBASE_MESSAGING_SENDER_ID
