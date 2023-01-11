@@ -24,6 +24,11 @@ jobs:
         with:
           credentials_json: "${{ secrets.CLOUD_RUN_SERVICE_ACCOUNT }}"
       
+      # create env encodde
+      - name: Creating Env file
+        run: |
+          echo "${{ secrets.ENV_LOCAL }}" > .env.local
+
       # setup gcloud CLI/SDK
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v0
@@ -35,7 +40,7 @@ jobs:
       # build docker image
       - name: Build and tag the docker image
         run: |-
-          docker build . --tag gcr.io/$PROJECT_ID/$REPO_NAME:$GITHUB_SHA          
+          docker buildx build . --tag gcr.io/$PROJECT_ID/$REPO_NAME:$GITHUB_SHA --secret id=_env_local,src=.env.local
 
       # pushing image to google container registry
       - name: Push the image to the Google Container Registry (GCR)
