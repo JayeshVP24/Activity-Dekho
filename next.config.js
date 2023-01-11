@@ -11,8 +11,9 @@ const nextConfig = {
       // Dangerously allow production builds to successfully complete even if
       // your project has type errors.
       // !! WARN !!
-      ignoreBuildErrors: true,
+      ignoreBuildErrors: false,  
     },
+    distDir: 'build'
   }
   
 module.exports = nextConfig
