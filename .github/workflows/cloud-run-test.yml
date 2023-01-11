@@ -9,9 +9,9 @@ env:
   PROJECT_ID: ${{ secrets.CLOUD_RUN_PROJECT_NAME}}
   REGION: asia-south1
   REPO_NAME: activity-dekho-staging
-  FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY}}
-  FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID}}
-  FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID}}
+  # FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY}}
+  # FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID}}
+  # FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID}}
 jobs:
   build-and-deploy:
     name: Setup, Build, and Deploy
@@ -24,25 +24,9 @@ jobs:
 
       # create env encodde
       - name: Creating Env file
-        # run: touch .env.local > ${{secrets.ENV_LOCAL}}
-        # run: echo ${{secrets.ENV_LOCAL}} | base64 --decode > .env.local
-        # run: cat ${{secrets.ENV_LOCAL}} > .env.local
-        # env:
-        #   ENV_LOCALE: ${{ secrets.ENV_LOCAL}}
-        # run: echo $ENV_LOCALE | base64 --decode $ENV_LOCALE > .env.local
-        # uses: SpicyPizza/create-envfile@v1.3
         run: |
           echo "${{ secrets.ENV_LOCAL }}" > .env.local
-        # run: |
-        #   touch .env.local
-        #   echo NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }} >> .env.local
-        #   echo NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="aicte-diary.firebaseapp.com" >> .env.local
-        #   echo NEXT_PUBLIC_FIREBASE_PROJECT_ID = "aicte-diary" >> .env.local
-        #   echo NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET = "aicte-diary.appspot.com" >> .env.local
-        #   echo NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }} >> .env.local
-        #   echo NEXT_PUBLIC_FIREBASE_APP_ID= ${{ secrets.FIREBASE_APP_ID}} >> .env.local
-          
-
+     
       
       # authenticate with google cloud
       - id: "auth"
