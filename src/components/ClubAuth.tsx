@@ -83,7 +83,7 @@ const ClubAuth: React.FC = () => {
                   <h2 className="text-4xl font-semibold  ">
                     Select your Club 🏫
                   </h2>
-                  <div className="flex flex-col gap-y-6 mt-8 max-h-64 overflow-scroll p-2">
+                  <div className="flex flex-col gap-y-6 mt-8 max-h-64 overflow-y-auto  p-2 customScrollbar">
                     { state.context.clubList && state.context.clubList.map((c) => (
                       <motion.button
                         variants={variants}
@@ -107,7 +107,7 @@ const ClubAuth: React.FC = () => {
                         {!c.photoUrl && <AvatarGenerator name={c.name} />}
                         <p className="w-fit ">{c.name}</p>
                       </motion.button>
-                    ))}
+                    ))}                
                   </div>
                 </div>
               )}
