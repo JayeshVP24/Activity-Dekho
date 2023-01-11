@@ -26,7 +26,7 @@ jobs:
       - name: Creating Env file
         env:
           ENV_LOCALE: ${{ secrets.ENV_LOCAL}}
-        run: echo $ENV_LOCALE | base64 --decode > .env.local
+        run: echo $ENV_LOCALE | base64 --decode $ENV_LOCALE > .env.local
       
       # authenticate with google cloud
       - id: "auth"
