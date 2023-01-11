@@ -9,14 +9,10 @@ env:
   PROJECT_ID: ${{ secrets.CLOUD_RUN_PROJECT_NAME}}
   REGION: asia-south1
   REPO_NAME: activity-dekho-staging
-<<<<<<< HEAD
   FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY}}
   FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID}}
   FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID}}
   
-=======
-
->>>>>>> ede71521b8c65e6233e2d5d795c0c5e693b641ba
 jobs:
   build-and-deploy:
     name: Setup, Build, and Deploy
@@ -55,9 +51,5 @@ jobs:
           --region $REGION \
           --image gcr.io/$PROJECT_ID/$REPO_NAME:$GITHUB_SHA \
           --platform "managed" \
-<<<<<<< HEAD
           --quiet \
           
-=======
-          --quiet
->>>>>>> ede71521b8c65e6233e2d5d795c0c5e693b641ba

@@ -23,7 +23,7 @@ let firebaseConfig = {};
 if (process.env.NODE_ENV === "production") {
   console.log("here is the node env")
   firebaseConfig = {
-    apiKey: "AIzaSyDvyg0ymLOqs181XfDZ2VxvuAEqDcvZrOI",
+    apiKey: "AIzaSyAXaqKx8APu7fsUZUA1A1T7UvsP-8UKwt4",
     authDomain: "aicte-diary.firebaseapp.com",
     projectId: "aicte-diary",
     storageBucket: "aicte-diary.appspot.com",
@@ -33,7 +33,7 @@ if (process.env.NODE_ENV === "production") {
 } 
 else {
   firebaseConfig = {
-    apiKey: "process.env.NEXT_PUBLIC_FIREBASE_API_KEY",
+    apiKey: "AIzaSyAXaqKx8APu7fsUZUA1A1T7UvsP-8UKwt4",
     authDomain: "aicte-diary.firebaseapp.com",
     projectId: "aicte-diary",
     storageBucket: "aicte-diary.appspot.com",
