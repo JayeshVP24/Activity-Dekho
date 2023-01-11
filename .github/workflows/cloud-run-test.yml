@@ -22,6 +22,12 @@ jobs:
       # - name: show secret
       #   run: 'echo "API KEY $FIREBASE_API_KEY" > key '
 
+      # create env file
+      - name: Creating Env file
+        env:
+          ENV_LOCALE: ${{ secrets.ENV_LOCAL}}
+        run: echo $ENV_LOCALE | base64 --decode > .env.local
+      
       # authenticate with google cloud
       - id: "auth"
         uses: "google-github-actions/auth@v0"
@@ -36,11 +42,6 @@ jobs:
       - name: Authorize Docker push
         run: gcloud auth configure-docker
 
-      # create env file
-      - name: Creating Env file
-        env:
-          ENV_LOCAL: ${{secrets.ENV_LOCAL}}
-        run: echo $ENV_LOCAL | base64 --decode > .env
 
       # build docker image
       - name: Build and tag the docker image
