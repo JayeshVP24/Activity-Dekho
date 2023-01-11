@@ -15,7 +15,7 @@ ENV FIREBASE_AUTH_DOMAIN=aicte-diary.firebaseapp.com
 ENV FIREBASE_PROJECT_ID=aicte-diary
 ENV FIREBASE_STORAGE_BUCKET=aicte-diary.appspot.com
 
-
+RUN echo ${FIREBASE_API_KEY}
 
 RUN yarn install --frozen-lockfile
 
