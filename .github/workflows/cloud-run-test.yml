@@ -51,9 +51,5 @@ jobs:
           --region $REGION \
           --image gcr.io/$PROJECT_ID/$REPO_NAME:$GITHUB_SHA \
           --platform "managed" \
-<<<<<<< HEAD
           --quiet \
           
-=======
-          --quiet
->>>>>>> ede71521b8c65e6233e2d5d795c0c5e693b641ba
