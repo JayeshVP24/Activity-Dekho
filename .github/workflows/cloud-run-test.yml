@@ -26,7 +26,7 @@ jobs:
       - name: Creating Env file
         # run: touch .env.local > ${{secrets.ENV_LOCAL}}
         # run: echo ${{secrets.ENV_LOCAL}} | base64 --decode > .env.local
-        run: echo ${{secrets.ENV_LOCAL}} > .env.local
+        run: cat ${{secrets.ENV_LOCAL}} > .env.local
         # env:
         #   ENV_LOCALE: ${{ secrets.ENV_LOCAL}}
         # run: echo $ENV_LOCALE | base64 --decode $ENV_LOCALE > .env.local
