@@ -35,7 +35,7 @@ export const retrieveClubEventsQuery = async (clubId: string) => {
           endDate: s.data().endDate.toDate(),
           ...s.data(),
         } as EventType);
-        console.log(eventsList);
+        // console.log(eventsList);
       });
       return eventsList;
     })
@@ -52,17 +52,17 @@ export const addAttendanceQuery = async (
 ) => {
   // const batch = writeBatch(firedb);
   // const studentRef = doc(firedb, "STUDENTS", studentID)
-  console.log({ clubId, UIDs, eventId });
+  console.log({ clubId, eventId });
   const eventRef = doc(firedb, "clubs", clubId, "EVENTS", eventId);
   try {
     const newAttendance = await runTransaction(firedb, async (transacton) => {
       // clubs->event document - read
       const eventDoc = await transacton.get(eventRef);
-      console.log(eventDoc.data());
+      // console.log(eventDoc.data());
       const eventAttendance: Record<string, boolean> = {
         ...eventDoc.data().attendance,
       };
-      console.log({ eventDoc });
+      // console.log({ eventDoc });
       const studentSnapshots: DocumentSnapshot<DocumentData>[] = [];
       // student document - read
       // const studentSnapshots =  await getDocs(query(collection(firedb, "STUDENTS"),
@@ -70,10 +70,10 @@ export const addAttendanceQuery = async (
       for (const studentId of UIDs) {
         const studentRef = doc(firedb, "STUDENTS", studentId);
         const studentDoc = await transacton.get(studentRef);
-        console.log({ studentDoc });
+        // console.log({ studentDoc });
         studentSnapshots.push(studentDoc);
       }
-      console.log(studentSnapshots);
+      // console.log(studentSnapshots);
       // for (const studentDoc of studentSnapshots) {
       for (const studentId of UIDs) {
         // clubs->event->attendance - write
@@ -81,15 +81,19 @@ export const addAttendanceQuery = async (
         const studentDoc = studentSnapshots.find((s) => s.id === studentId);
         // student document - write
         let studentAttendance = {};
-        console.log(studentDoc);
+        // console.log(studentDoc);
+        console.log("student attendance: ", studentDoc.data().attendance)
+        console.log("student club attendance: ", studentDoc.data().attendance[clubId])
         if (studentDoc.exists()) {
+          console.log("student exists")
           studentAttendance = {
             [clubId]: {
-              [eventId]: true,
               ...studentDoc.data().attendance[clubId],
             },
             ...studentDoc.data().attendance,
           };
+          studentAttendance[clubId][eventId] = true
+
           // studentAttendance[clubId] = {
           //   [eventId]: true,
           //   ...studentAttendance[clubId],
@@ -98,6 +102,7 @@ export const addAttendanceQuery = async (
             attendance: studentAttendance,
           });
         } else {
+          console.log("student doesn't exists")
           studentAttendance = {
             [clubId]: {
               [eventId]: true,
@@ -108,9 +113,10 @@ export const addAttendanceQuery = async (
             attendance: studentAttendance,
           });
         }
+        console.log( "after adding new", studentAttendance)
       }
-      console.log(eventDoc.data());
-      console.log({ eventAttendance });
+      // console.log(eventDoc.data());
+      // console.log({ eventAttendance });
       transacton.update(eventRef, {
         attendance: eventAttendance as Record<string, boolean>,
       });
@@ -121,7 +127,7 @@ export const addAttendanceQuery = async (
     // await setDoc(collection(firedb,eventRef) ,{
 
     // })
-    console.log({ newAttendance });
+    // console.log({ newAttendance });
     return {
       newAttendance,
     };
