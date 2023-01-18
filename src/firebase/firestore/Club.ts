@@ -1,5 +1,5 @@
 import { collection, getDocs } from "firebase/firestore";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { browserSessionPersistence, setPersistence, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { ClubType } from "../../../types";
 import { auth, firedb } from "../config";
 
@@ -102,20 +102,31 @@ export const validateAuthQuery = (
   password: string
 ) => {
   return new Promise<ClubType | string>((resolve, reject) => {
-    signInWithEmailAndPassword(auth, email, password)
+    setPersistence(auth, browserSessionPersistence).then(() => {
+
+      signInWithEmailAndPassword(auth, email, password)
       .then((userCred) => {
-        resolve({
+        const club: ClubType = {
           name,
           email: userCred.user.email,
           id: userCred.user.uid,
           photoUrl: userCred.user.photoURL,
-        } as ClubType);
+        }
+        sessionStorage.setItem("club", JSON.stringify(club))
+        resolve(club);
       })
       .catch((err) => {
         reject(err.message as string);
       });
+    })
   });
 };
+
+// export const sessionSignOut = () => {
+//   signOut(auth).then(() => {
+//     sessionStorage.removeItem("club")
+//   })
+// }
 
 // export const validateAuthQuery =  (
 //   name: string,

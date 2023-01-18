@@ -1,14 +1,20 @@
 import { useActor, useInterpret } from "@xstate/react";
+import { signOut } from "firebase/auth";
 import { useRouter } from "next/router";
 import { resolve } from "node:path/win32";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createContext } from "react";
 import { ClubType } from "../../types";
+import { auth } from "../firebase/config";
 import {
   getClubsListQuery,
   validateAuthQuery,
 } from "../firebase/firestore/Club";
-import { addAttendanceQuery, addEventToDBQuery, retrieveClubEventsQuery } from "../firebase/firestore/Events";
+import {
+  addAttendanceQuery,
+  addEventToDBQuery,
+  retrieveClubEventsQuery,
+} from "../firebase/firestore/Events";
 import ClubAuthMachine, { ClubAuthActor } from "../machines/clubAuth";
 import ClubEventMachine, { ClubEventActor } from "../machines/clubEvents";
 import ClubAuth from "./ClubAuth";
@@ -29,6 +35,9 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const router = useRouter();
   const [authClub, setAuthClub] = useState<ClubType | undefined>(undefined);
+  useEffect(() => {
+    setAuthClub(JSON.parse(sessionStorage.getItem("club")))
+  }, [])
   const clubAuthService = useInterpret(ClubAuthMachine, {
     services: {
       getClubsList: async (_) => await getClubsListQuery(),
@@ -41,6 +50,8 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
     },
     context: {
       modalOpen: false,
+      loggedIn: !!auth.currentUser,
+      club: authClub
     },
     actions: {
       moveToDashboardPage: (context) => {
@@ -58,12 +69,16 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
       },
       // @ts-ignore
       addAttendanceToDB: async (context) => {
-        return await addAttendanceQuery(authClub.id, context.currentEvent.id, context.attendance)
+        return await addAttendanceQuery(
+          authClub.id,
+          context.currentEvent.id,
+          context.attendance
+        );
       },
       // @ts-ignore
       addEventToDB: async (context, event) => {
-        return await addEventToDBQuery(authClub.id, event.newEvent)
-      }
+        return await addEventToDBQuery(authClub.id, event.newEvent);
+      },
       //   retrieveAttendance: async (_) =>
       //     new Promise(() => {
       //       return resolve("afw")
@@ -72,6 +87,23 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
   });
 
   const [state, send] = useActor(clubAuthService);
+  // useEffect(() => {
+  //   if (auth.currentUser) {
+  //     state.context.loggedIn = true;
+  //     state.context.club = JSON.parse(sessionStorage.getItem("club"))
+  //   }
+  //   send("CLOSE_MODAL")
+  // }, []);
+  useEffect(() => {
+    if (authClub) {
+      //   console.log("login pop");
+      state.context.loggedIn = true;
+      state.context.club = JSON.parse(sessionStorage.getItem("club"))
+      send("OPEN_MODAL");
+    } else {
+      send("CLOSE_MODAL")
+    }
+  }, [authClub]);
   return (
     <GlobalStateContext.Provider
       value={{ clubAuthService, clubEventService, authClub }}
@@ -81,8 +113,22 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
         closeModal={() => send("CLOSE_MODAL")}
         loading={state.context.loading}
       >
-        <ClubAuth  />
+        <ClubAuth />
       </ModalWrapper>
+      {state.context.loggedIn && <button
+        className="btnFtrs fixed  bg-stone-800 text-white 
+          bottom-10 right-5 rounded-full px-4  
+          "
+        onClick={() => {
+          signOut(auth).then(() => {
+            sessionStorage.removeItem("club")
+            state.context.loggedIn = false;
+            router.push("/");
+          });
+        }}
+      >
+        Log Out
+      </button>}
       {children}
     </GlobalStateContext.Provider>
   );
