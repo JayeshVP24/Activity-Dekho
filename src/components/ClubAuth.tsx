@@ -40,7 +40,7 @@ const ClubAuth: React.FC = () => {
   //   },
   //   actions: {
   //     moveToDashboardPage: () => {
-  //       router.push("/club");
+  //       router.push("/events");
   //     },
   //   },
   // });
@@ -50,7 +50,7 @@ const ClubAuth: React.FC = () => {
   //   console.log(typeof send)
 
   //   useEffect(() => {
-  //     send("LOGIN");
+  //     send("OPEN_MODAL");
   //   }, []);
 
   useEffect(() => {
@@ -83,7 +83,8 @@ const ClubAuth: React.FC = () => {
                   <h2 className="text-4xl font-semibold  ">
                     Select your Club 🏫
                   </h2>
-                  <div className="flex flex-col gap-y-6 mt-8 max-h-64 overflow-y-auto  p-2 customScrollbar">
+                  <div className="flex flex-col gap-y-6 mt-8 max-h-64 overflow-y-auto  p-2 
+                  ">
                     { state.context.clubList && state.context.clubList.map((c) => (
                       <motion.button
                         variants={variants}

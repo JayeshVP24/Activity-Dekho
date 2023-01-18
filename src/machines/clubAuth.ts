@@ -16,6 +16,7 @@ export type ClubAuthEvent =
   | { type: "RETRY" }
   | { type: "GO_BACK" }
   | { type: "CLOSE_MODAL" }
+  | { type: "OPEN_MODAL" }
   | { type: "VALIDATE_AUTH", password: string }
   | {type: "error.platform.getclublist", data: string}
   | {type: "error.platform.validateauth", data: string}
@@ -30,7 +31,7 @@ export type ClubAuthEvent =
 // } 
 
   const ClubAuthMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QGMA2BXARgYgMIBkB5AZQFEB9AWUIBEBBfAbQAYBdRUABwHtYBLAC59uAOw4gAHogC0ARgDsANgB0zAKwAmeQA4AzLu0aNa5gBZtAGhABPGRt0BOZWu2LZG5tve7F8hwF9-KzQsZVRuKBgIQnQBbCIAcQBJADkWdiQQHn4hUXEpBGYrW0LA4IxMZRgBIREoXArYfD5YOIhRMGU+EQA3bgBrTuqQzFQWgXTxbMFhMUyCzTVlX1dPA29jYsRZZg1lBwUHU3kjWW15HY0ykBGqsBru+sbm1uwwACd37nflTlQAQwEADNvgBbO4CEZjVqTTLTXJzUALPamWSmZjMXTqeymVGKLYIdxLDEOXTyY72HH2a63CAtP7-ayPBpYJrjbBkfCkXAAFXIBAAqgAhWFcXgzPLzRBk0zKRwmVznA5kgkaRSynS40yKTy7YzyXQ0irKOmwBlMuqkT7fbAAJVIPNtAE1RVlxQj8og1SoduTTA4HGpTFoHBoCd5nMxSUo3FGtIpFEbQpwvqCBKQRAIPgAFf6wWAAd2+EGwADUGEl6DyKHQBTyABKu+GzT0IDSuOXHA4OMyKNQJgmmNTyZTacxrOMY4dJyop7hpjNZ965-NF94lhKEchCui4ADSTfdLalCBc2lHvnkUa8qLRagJBnP8mHijJZg0sjU+hnyh6-zGECAo8dCxAAFtg7QiJ03R9IMv7-nwgFZv8YGHjkx5Iog2pOLIRwBp+5xqF+ugEr4zDKIcaiBhooYKNOQQ3Maf4AUBdQgQI4EfF8PwMsCYLwSxyGoWwUxHpKmEIEcFGaO4PbrFeaoPu2qhkrIr7+qGWKGtcIjcBAcDiCMonoeJkh2DRo5DswuEhrspJhjYMi6FoqiuN46p+MGRw-uEkSQDEAjGRKiJmQgcheJZJg2X4dnOQSzA-tUtRPKyLyBXCYkhQUH57KGpjObi+hKIGJGOWF-qRhishomSAbBuSP6muazLPOMQUeieVEjm4DjaGOPbmGqpUlFoujKOiXiaIoeg6MwiYMbS9IAhaUBWtx7UYaFaL7F47jaAcZw0X28iqvlyztpo2hUeqw5qD+c4LpmOZ5oWxYbaZBRkt16i4c5z79pipgPuckZKMGWIfocP7MYhrFQOxoHvVlXoXPsOzosd5L7SqZVBnsHihg46rBloOg-ihHHEOgyDIHAsBAugqBI62025cGri6Aoz4ePeuNqLIyhqoG3gXNquimIEgRAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QGMA2BXARgYgMIBkB5AZQFEB9AWUIBEBBfAbQAYBdRUABwHtYBLAC59uAOw4gAHogC0ARgDsANgB0zAKwAmeQA4AzLu0aNa5gBZtAGhABPGRt0BOZWu2LZG5tve7F8hwF9-KzQsbEIABVIAOSpaBhZ2JBAefiFRcSkEWQVlBwcXRV1TDQdtNQNZK1sEaQ1ZbWcHUyL5LXNZUzV5QOCMTGVUbigYCEJ0AWwiAHEASSiE8RTBYTEkzNrlbVKNdvlW02YjXyqZXVllOvM1NULtO4P6npAQ-pgBIREoXD7YfD5YCYQURgZR8EQAN24AGsQW8Xqh-gIFkklmlVqBMpo1MpfK5PBV7MYTllDrkFE1WnVtPJZIcni9lG8Pl8fn8AdgwAAnTncTnKTioACGAgAZryALaMsACeGI5FcXjLdJrRCaZSmDrMZi6dT2UwaxTE9zYrUOXTyUytXR6+z0vrKCD-AWC6xgllYX6I7BkfCkXAAFXIBAAqgAheXJRVojKIc2mZSOEyuakOWTm4kaRTxnT60yKTyHYzyXR2rAOp1C12fUjc3nYABKpH99YAmhHUSsYwhMypaRbTHk1MU-BojfZnMwzUo3JOtIpFKX+pweeKBKQRAIueFBbBYAB3XkQbAANQYM3o-oodGD-oAEu2o52Vd3XAnLamHGZFDdDTZEJ15E2cx8VnLUukXfkVzXDctx3fdD2wKZCHIUM6FwABpB9UifDFVTuTZfHkScvA1Do1GJAwGnkLpCiI4pZHKEsgmee1wUFBEIGFN06HGAALbAgREEEwUhGFlDYjjhTAQU+KwpV0Ukf8tUafJsmYeprkOYlFD0BNShMWQHEpHwmN6MsJL4TjmR4gR+K5Hk+WdUUJXE9jLKkmTbLk6NnyaZQGLqEptS8IjMwojQGm1GlCgHBx7G1RcwkiGJqHoJhZESBVsOVXCEE6FQ83abV7DUUpf2qORDAufVdCxbRPGMb9AmYkRuAgOBxBeRZHxyxSaiMJxtE6dS4r8Q4zVHP8amtQDPDcHZ9UUCK9AgwZhkgMYBG67KFPWepziGgzRs-EprWJZgIKZN1vg9NktpRHrdsQQLch2a0avNRR8l0YlpAHCctWyZo-CaNoIMdWBnSrd1ME9AFtvkrtSsAtxSiGz9zEzH6pq0XR1U8AKdPNeqF2YhkIaht0awchGfNyjpci8dwtmyQwHG-eQM2aHEIs0Mp2YAtQIOXbhV3XTdOW3XcD05CBaZwvrzRR9RDJm658yKCjqQnJRih1OpyQgiyrO4vj5d6zItHOVMzGYDmLS2dMpqHDQLlnAXii0HQIM83jiHQZBkDgWARXQVBzaehAdNd0HXDOPZNHUYlrnOTNVPsGk8yKZr-CAA */
   createMachine(
     {
       predictableActionArguments: true,
@@ -60,7 +61,15 @@ export type ClubAuthEvent =
         "CLOSE_MODAL": {
           target: "loggedOut",
           actions: ["closeModal", "clearErrorMsgFromContext"]
-        }
+        },
+        "OPEN_MODAL": [{
+          target: "gettingClubsList",
+          actions: ["openModal", "clearErrorMsgFromContext"],
+          cond: "notLoggedIn"
+        }, {
+          target: ".authSuccessful",
+          actions: "closeModal"
+        }]
       },
       states: {
         loggedOut: {
@@ -126,7 +135,7 @@ export type ClubAuthEvent =
             id: "validateauth",
             onDone: {
               target: "authSuccessful",
-              actions: ["changeContextToLoggedIn", "closeModal"]
+              actions: ["changeContextToLoggedIn", "closeModal", "moveToDashboardPage"]
             },
             onError: {
               target: "promtEnterPassword",
@@ -136,14 +145,16 @@ export type ClubAuthEvent =
         },
 
         authSuccessful: {
-          entry: "clearPasswordFromContext",
-          type: "final",
-          exit: "moveToDashboardPage"
+          entry: ["clearPasswordFromContext"]
         }
       },
     },
     {
-
+      guards: {
+        notLoggedIn: (context) => {
+          return context.loggedIn ? false : true
+        }
+      },
       actions: {
         addClubsListToContext: assign({
           clubList: (_,event) => {

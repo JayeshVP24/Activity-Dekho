@@ -3,7 +3,7 @@ import Header from "../components/Header";
 import { Raleway } from "@next/font/google";
 
 import "../globals.css";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect } from "react";
 import { useActor, useInterpret } from "@xstate/react";
 import ClubAuth from "../components/ClubAuth";
 import ClubAuthMachine from "../machines/clubAuth";
@@ -16,6 +16,7 @@ import GlobalStateProvider, {
   GlobalStateContext,
 } from "../components/GlobalStateProvider";
 import ModalWrapper from "../components/ModalWrapper";
+import { auth } from "../firebase/config";
 const poppins = Raleway({
   subsets: ["latin"],
   variable: "--font-raleway",
@@ -25,6 +26,12 @@ const poppins = Raleway({
 function MyApp({ Component, pageProps }: AppProps) {
   // const globalServices = useContext(GlobalStateContext);
   // const [state, send] = useActor(globalServices.clubAuthService);
+  // useEffect(() => {
+  //   if(auth.currentUser) {
+  //     state.context.loggedIn = true
+  //   }
+  // },[])
+
   return (
     // <span>AICTE Diary</span>
     // <span className='' >Are you a club admin?</span>

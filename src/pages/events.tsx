@@ -1,7 +1,9 @@
 import { useActor, useSelector } from "@xstate/react";
+import { signOut } from "firebase/auth";
 import { AnimatePresence } from "framer-motion";
 import { NextPage } from "next";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import { useContext, useEffect } from "react";
 import { State } from "xstate";
 import { ClubType } from "../../types";
@@ -25,9 +27,10 @@ const loggedIn = (state: State<ClubAuthContext, ClubAuthEvent>) => {
 const Events: NextPage = () => {
   const globalServices = useContext(GlobalStateContext);
   const [state, send] = useActor(globalServices.clubEventService);
-  //   const [authState, authSend] = useActor(globalServices.clubAuthService);
-  const { send: authSend } = globalServices.clubAuthService;
+  const [authState, authSend] = useActor(globalServices.clubAuthService);
+  // const { send: authSend } = globalServices.clubAuthService;
   const authClub = globalServices.authClub;
+  const router = useRouter();
 
   //   const isloggedIn = useSelector(globalServices.clubAuthService, loggedIn);
   useEffect(() => {
@@ -41,12 +44,12 @@ const Events: NextPage = () => {
     }
   }, [authClub]);
 
-  useEffect(() => {
-    if (!authClub) {
-      //   console.log("login pop");
-      authSend("LOGIN");
-    }
-  }, [authClub]);
+  // useEffect(() => {
+  //   if (!authClub) {
+  //     //   console.log("login pop");
+  //     authSend("OPEN_MODAL");
+  //   }
+  // }, [authClub]);
 
   if (!authClub) {
     return (
@@ -55,7 +58,7 @@ const Events: NextPage = () => {
           Please Login
         </h1>
         <button
-          onClick={() => authSend("LOGIN")}
+          onClick={() => authSend("OPEN_MODAL")}
           className="btnFtrs bg-cyan-400 w-full mt-10
         ring-4 ring-cyan-200  hover:ring-cyan-300 "
         >
@@ -67,6 +70,7 @@ const Events: NextPage = () => {
 
   return (
     <main className="mx-10 xl:mx-20 2xl:mx-32">
+      
       <div className="flex flex-col gap-y-4">
         {authClub?.photoUrl && (
           <Image
@@ -194,9 +198,9 @@ const Events: NextPage = () => {
       {state.matches("displayingEvents") && (
         <button
           className="btnFtrs fixed  bg-stone-800 text-white 
-          bottom-10 right-5 rounded-full px-4 
+          bottom-24 right-5 rounded-full px-4 
           "
-          onClick={() => send({type: "ADD_EVENT",  })}
+          onClick={() => send({ type: "ADD_EVENT" })}
         >
           Add Event
         </button>
