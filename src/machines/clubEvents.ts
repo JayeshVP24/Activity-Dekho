@@ -77,10 +77,13 @@ type ClubEventEvents =
     }
   | { type: "ADD_ATTENDANCE.SUBMIT" }
   | { type: "FILTER_EVENTS_LIST"; query: string }
-  | { type: "EVENT_DATE_FILTER"; dateFilters: {
-    fromDate: Timestamp;
-    toDate: Timestamp;
-  } }
+  | {
+      type: "EVENT_DATE_FILTER";
+      dateFilters: {
+        fromDate: Timestamp;
+        toDate: Timestamp;
+      };
+    }
   // | { type: "EVENT_DATE_FILTER2"; fromDate: Timestamp; toDate: Timestamp }
   | { type: "VIEW_ATTENDANCE"; currentEvent: EventType }
   | {
@@ -187,14 +190,17 @@ const ClubEventMachine =
 
             ADD_ATTENDANCE: {
               target: "addAttendance",
-              actions: ["addSelectedEventToContext", "openAddAttendanceModal"],
+              actions: [
+                "addSelectedEventAndAttendanceToContext",
+                "openAddAttendanceModal",
+              ],
             },
 
             VIEW_ATTENDANCE: {
               target: "viewingAttendance",
               actions: [
-                "openViewAttendanceModal",
                 "addSelectedEventAndAttendanceToContext",
+                "openViewAttendanceModal",
               ],
             },
 
@@ -537,10 +543,14 @@ const ClubEventMachine =
         }),
         addSelectedEventAndAttendanceToContext: assign({
           currentEvent: (_, event) => event.currentEvent,
-          currentAttendance: (context, event) =>
-            Object.keys(event.currentEvent.attendance),
-          filteredAttendance: (context, event) =>
-            Object.keys(event.currentEvent.attendance),
+          currentAttendance: (context, event) => {
+            if (event.currentEvent.attendance === undefined) return [];
+            else return Object.keys(event.currentEvent.attendance);
+          },
+          filteredAttendance: (context, event) => {
+            if (event.currentEvent.attendance === undefined) return [];
+            else return Object.keys(event.currentEvent.attendance);
+          },
         }),
         filterCurrentAttendance: assign({
           filteredAttendance: (context, event) =>
@@ -574,6 +584,8 @@ const ClubEventMachine =
             string,
             string
           >;
+          context.currentAttendance = Object.keys(event.data.newAttendance)          
+          context.filteredAttendance = Object.keys(event.data.newAttendance)          
         },
         setLoadingTrue: assign({
           loading: true,

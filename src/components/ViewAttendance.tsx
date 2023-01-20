@@ -25,6 +25,19 @@ const ViewAttendance: React.FC = () => {
         }}
       />
       <div className="flex flex-col gap-y-4 mt-6 h-72 overflow-auto customScrollbar">
+        {state.context.filteredAttendance.length === 0 && (
+          <div>
+            <p className="text-center text-3xl">No attendance found</p>
+            <button
+              className="btnFtrs bg-yellow-200 px-6 w-full mt-4 hover:bg-yellow-300"
+              onClick={() => {
+                send("CLOSE_VIEW_ATTENDANCE")
+                send({type: "ADD_ATTENDANCE", currentEvent: state.context.currentEvent})}}
+            >
+              Add Attendance
+            </button>
+          </div>
+        )}
         {state.context.filteredAttendance.map((a) => (
           <span
             key={a}
