@@ -5,6 +5,7 @@ export interface ClubAuthContext {
   club?: ClubType;
   error?: string;
   clubList?: ClubType[];
+  filteredClubList?: ClubType[];
   password?: string;
   loggedIn: boolean;
   modalOpen: boolean;
@@ -16,7 +17,9 @@ export type ClubAuthEvent =
   | { type: "RETRY" }
   | { type: "GO_BACK" }
   | { type: "CLOSE_MODAL" }
+  | { type: "LOGOUT" }
   | { type: "OPEN_MODAL" }
+  | { type: "FILTER_CLUB_LIST", query: string }
   | { type: "VALIDATE_AUTH", password: string }
   | {type: "error.platform.getclublist", data: string}
   | {type: "error.platform.validateauth", data: string}
@@ -31,7 +34,7 @@ export type ClubAuthEvent =
 // } 
 
   const ClubAuthMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QGMA2BXARgYgMIBkB5AZQFEB9AWUIBEBBfAbQAYBdRUABwHtYBLAC59uAOw4gAHogC0ARgDsANgB0zAKwAmeQA4AzLu0aNa5gBZtAGhABPGRt0BOZWu2LZG5tve7F8hwF9-KzQsbEIABVIAOSpaBhZ2JBAefiFRcSkEWQVlBwcXRV1TDQdtNQNZK1sEaQ1ZbWcHUyL5LXNZUzV5QOCMTGVUbigYCEJ0AWwiAHEASSiE8RTBYTEkzNrlbVKNdvlW02YjXyqZXVllOvM1NULtO4P6npAQ-pgBIREoXD7YfD5YCYQURgZR8EQAN24AGsQW8Xqh-gIFkklmlVqBMpo1MpfK5PBV7MYTllDrkFE1WnVtPJZIcni9lG8Pl8fn8AdgwAAnTncTnKTioACGAgAZryALaMsACeGI5FcXjLdJrRCaZSmDrMZi6dT2UwaxTE9zYrUOXTyUytXR6+z0vrKCD-AWC6xgllYX6I7BkfCkXAAFXIBAAqgAheXJRVojKIc2mZSOEyuakOWTm4kaRTxnT60yKTyHYzyXR2rAOp1C12fUjc3nYABKpH99YAmhHUSsYwhMypaRbTHk1MU-BojfZnMwzUo3JOtIpFKX+pweeKBKQRAIueFBbBYAB3XkQbAANQYM3o-oodGD-oAEu2o52Vd3XAnLamHGZFDdDTZEJ15E2cx8VnLUukXfkVzXDctx3fdD2wKZCHIUM6FwABpB9UifDFVTuTZfHkScvA1Do1GJAwGnkLpCiI4pZHKEsgmee1wUFBEIGFN06HGAALbAgREEEwUhGFlDYjjhTAQU+KwpV0Ukf8tUafJsmYeprkOYlFD0BNShMWQHEpHwmN6MsJL4TjmR4gR+K5Hk+WdUUJXE9jLKkmTbLk6NnyaZQGLqEptS8IjMwojQGm1GlCgHBx7G1RcwkiGJqHoJhZESBVsOVXCEE6FQ83abV7DUUpf2qORDAufVdCxbRPGMb9AmYkRuAgOBxBeRZHxyxSaiMJxtE6dS4r8Q4zVHP8amtQDPDcHZ9UUCK9AgwZhkgMYBG67KFPWepziGgzRs-EprWJZgIKZN1vg9NktpRHrdsQQLch2a0avNRR8l0YlpAHCctWyZo-CaNoIMdWBnSrd1ME9AFtvkrtSsAtxSiGz9zEzH6pq0XR1U8AKdPNeqF2YhkIaht0awchGfNyjpci8dwtmyQwHG-eQM2aHEIs0Mp2YAtQIOXbhV3XTdOW3XcD05CBaZwvrzRR9RDJm658yKCjqQnJRih1OpyQgiyrO4vj5d6zItHOVMzGYDmLS2dMpqHDQLlnAXii0HQIM83jiHQZBkDgWARXQVBzaehAdNd0HXDOPZNHUYlrnOTNVPsGk8yKZr-CAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QGMA2BXARgYgMIBkB5AZQFEB9AWUIBEBBfAbQAYBdRUABwHtYBLAC59uAOw4gAHogC0ARgDsANgB0zAKwAmeQA4AzLu0aNa5gBZtAGhABPGRt0BOZWu2LZG5tve7F8hwF9-KzQsbEIABVIAOSpaBhZ2JBAefiFRcSkEWQVlBwcXRV1TDQdtNQNZK1sEaQ1ZbWcHUyL5LXNZUzV5QOCMHAjo2PomWUSuXkFhMSTMzpVTRXbmXXs1UsUqmXqNZQ1TZs0XT2NFNR6QEMxlVG4oGAhCdAFsIgBxAEkohPEUyfSZmS6XJ5dyKQzMZilbStSw2RDyZSuRQOPbuUyyBwGFznS7KGACIQiKC4PqwfB8WDPCCiMDKPgiABu3AA1rT8ZdUBSBN8kr80tNQJlDspfK5PBV7MZNllmDsHAomq06tDZLKcX08WACfTiaTyZTsGAAE5G7hG5ScVAAQwEADMzQBbTUCDlcnnjVJTDKITTKdGmCG6dT2fayDZwrLGVSQ3TyUytFZFezqrDKCAUy1W6w6klYMlc7BkfCkXAAFXIBAAqgAhd3JCb870IWOmZSOEyuaHy2PSjSLZQ6fYLTyy4zyXQpq7p2CZ7NE3OYfMGgBi73wpdIACUK-ga+R8O9iKW63yvQCEEiB3G3LJY35DJUIyU1KoPEZOvIFGUzJO0xnrXOUCkCaZrYJupClpuACaJ4NmegqIH2KiqnGph5GoxR+Bo0reM4MZKG4kJaIoii-pwpoOgIpAiAIxrhFasCwAA7maEDYAAagw7z0Bu5B0JWpYABKwZ6-wIQgGiuG28byg4ZinCR0ofoi5jikREJdGRFFUTRdEMcxrHYK8hDkNWdC4AA0iJfwCpIPraA0rjyPIkJeOiHRqNKBgNPIXSFC5xSyOUE5BBcGoMlanIQDaOp0E8AAW2DUiItL0kyrLKBFUU2mAVoJdZjbngGzCNPk2TMPUagmNhEZgkCjjfhiSo+CFvSpllfDRYSUBxQIiXGqa5qZnajqZZFnU5XlfUFfBdkIE0yhBXUJTLF4Ll9l5kmqLGYZFHk9jLIEoUiNwEBwOIlw-HBYlzbUJQqSYGJaHJJQrNK0grAinhuJJhSKMwpxnKFuI3HckCPAIV2ibZmRyF4D0VSifiypiNXVMwv74t1C5LpDvLXTDiHuLkewrPs+hKPkujvWheEQtkzR+E0bS-tOs45nqXJQzZTZrAibhQmhZiGIUvbjn6nhLXVOgA6z-5ZjqwGDdzhXiR0uReO42jytsDinPIvbNCKkmaGUesfkDbVXOR3CUdRtFGvRjEsUaEAq7NmR3iK6gYp9VX-UUXnQnhSjFEGdQKr+HVdbFCXuzdmRaLIuSqgG+txtrPYRhhOweCi5vFFoOi-lN8XEOgyDIHAsC2ugqDx4TCBgnKxSuLoCi+R4nnZ2oyd9mV9ifgsRRHf4QA */
   createMachine(
     {
       predictableActionArguments: true,
@@ -62,6 +65,7 @@ export type ClubAuthEvent =
           target: "loggedOut",
           actions: ["closeModal", "clearErrorMsgFromContext"]
         },
+
         "OPEN_MODAL": [{
           target: "gettingClubsList",
           actions: ["openModal", "clearErrorMsgFromContext"],
@@ -107,6 +111,12 @@ export type ClubAuthEvent =
               target: "promtEnterPassword",
               actions: "addClubToContext",
             },
+
+            FILTER_CLUB_LIST: {
+              target: "displayingClubsList",
+              internal: true,
+              actions: "filterClublist"
+            }
           },
         },
 
@@ -159,7 +169,13 @@ export type ClubAuthEvent =
         addClubsListToContext: assign({
           clubList: (_,event) => {
             // console.log("inside machine event: ", event.data)
-            return event.data as ClubType[]}
+            return event.data as ClubType[]},
+          filteredClubList: (_, event) => event.data as ClubType[]
+        }),
+        filterClublist: assign({
+          filteredClubList: (context, event) => {
+            return context.clubList.filter(f => f.name.toLowerCase().includes(event.query.toLowerCase()))
+          }
         }),
     
         addClubToContext: assign({

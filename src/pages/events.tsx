@@ -1,12 +1,15 @@
 import { useActor, useSelector } from "@xstate/react";
 import { signOut } from "firebase/auth";
+import { Timestamp } from "firebase/firestore";
 import { AnimatePresence } from "framer-motion";
 import { NextPage } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { State } from "xstate";
+import { DateFilters } from "../../enums";
 import { ClubType } from "../../types";
+import { getFilteredDates } from "../../utils";
 import AddAttendanceForm from "../components/AddAttendanceForm";
 import AddEventForm from "../components/AddEventForm";
 import AvatarGenerator from "../components/AvatarGenerator";
@@ -28,6 +31,9 @@ const Events: NextPage = () => {
   const globalServices = useContext(GlobalStateContext);
   const [state, send] = useActor(globalServices.clubEventService);
   const [authState, authSend] = useActor(globalServices.clubAuthService);
+  const [currentFilter, setCurrentFilter] = useState<DateFilters>(
+    DateFilters.currentYear
+  );
   // const { send: authSend } = globalServices.clubAuthService;
   const authClub = globalServices.authClub;
   const router = useRouter();
@@ -39,6 +45,9 @@ const Events: NextPage = () => {
 
   useEffect(() => {
     // console.log();
+    // console.log(state.context.filteredEvents)
+    // send("CLEAR_CONTEXT")
+    // console.log(state.context.filteredEvents)
     if (authClub) {
       send("LOAD");
     }
@@ -70,7 +79,6 @@ const Events: NextPage = () => {
 
   return (
     <main className="mx-10 xl:mx-20 2xl:mx-32">
-      
       <div className="flex flex-col gap-y-4">
         {authClub?.photoUrl && (
           <Image
@@ -107,75 +115,216 @@ const Events: NextPage = () => {
           </button>
         </div>
       )}
-      {state.context.events && (
-        <section className="lg:flex flex-wrap gap-10">
-          {state.context.events.map((e) => {
-            // const startDate = e.startDate.toDate().toDateString()
-            // const endDate = e.endDate.toDate().toDateString()
-            return (
-              <div
-                onClick={() =>
-                  send({ type: "VIEW_ATTENDANCE", currentEvent: e })
-                }
-                key={e.id}
-                className="bg-yellow-200 px-5 py-8 rounded-3xl mt-8 block w-full text-left
+      {state.context.filteredEvents && (
+        <div>
+          <input
+            className="w-full outline-none rounded-full px-4 py-2 mt-4 bg-opacity-50 bg-white
+            "
+            type="text"
+            placeholder="Search"
+            onChange={(e) => {
+              console.log(e.target.value);
+              send({ type: "FILTER_EVENTS_LIST", query: e.target.value });
+            }}
+          />
+          <div className="mt-4 flex gap-2 flex-wrap ">
+            <button
+              onClick={() => {
+                const dateFilters = getFilteredDates(DateFilters.currentYear);
+                setCurrentFilter(DateFilters.currentYear);
+                send({
+                  type: "EVENT_DATE_FILTER",
+                  dateFilters,
+                });
+              }}
+              className={`border-2 border-black rounded-full px-4
+            hover:bg-slate-200 active:scale-95 transition-all
+            ${
+              currentFilter.includes(DateFilters.currentYear)
+                ? "bg-green-300"
+                : "bg-transparent"
+            }`}
+            >
+              Current Year
+            </button>
+            <button
+              onClick={() => {
+                const dateFilters = getFilteredDates(DateFilters.currentSem);
+                setCurrentFilter(DateFilters.currentSem);
+                send({
+                  type: "EVENT_DATE_FILTER",
+                  dateFilters,
+                });
+              }}
+              className={`border-2 border-black rounded-full px-4
+            hover:bg-slate-200 active:scale-95 transition-all
+            ${
+              currentFilter.includes(DateFilters.currentSem)
+                ? "bg-green-300"
+                : "bg-transparent"
+            }`}
+            >
+              Current Sem
+            </button>
+            <button
+              onClick={() => {
+                const dateFilters = getFilteredDates(DateFilters.lastSem);
+                setCurrentFilter(DateFilters.lastSem);
+                send({
+                  type: "EVENT_DATE_FILTER",
+                  dateFilters,
+                });
+              }}
+              className={`border-2 border-black rounded-full px-4
+            hover:bg-slate-200 active:scale-95 transition-all
+            ${
+              currentFilter.includes(DateFilters.lastSem)
+                ? "bg-green-300"
+                : "bg-transparent"
+            }`}
+            >
+              Last Sem
+            </button>
+            <button
+              onClick={() => {
+                const dateFilters = getFilteredDates(DateFilters.lastYear);
+                setCurrentFilter(DateFilters.lastYear);
+                send({
+                  type: "EVENT_DATE_FILTER",
+                  dateFilters,
+                });
+              }}
+              className={`border-2 border-black rounded-full px-4
+            hover:bg-slate-200 active:scale-95 transition-all
+            ${
+              currentFilter.includes(DateFilters.lastYear)
+                ? "bg-green-300"
+                : "bg-transparent"
+            }`}
+            >
+              Last Year
+            </button>
+            {/* <label htmlFor="fromDate">From: </label>
+            <input
+              value={state.context.dateFilter.fromDate.toDate().getFullYear}
+              className="rounded-full bg-transparent  "
+              type="date"
+              name="fromDate"
+              onChange={e => console.log(e.target.value)}
+
+            />
+            <label htmlFor="toDate">To: </label>
+            <input
+              // value={state.context.dateFilter.toDate.toDate().toString()}
+              className="rounded-full bg-transparent  "
+              type="date"
+              name="toDate"
+            /> */}
+          </div>
+          <form className="flex flex-wrap gap-2 mt-2" 
+            onSubmit={(e) => {
+              e.preventDefault()
+              const fromDate = e.currentTarget["fromDate"].value
+              const toDate = e.currentTarget["toDate"].value
+              if(!fromDate || !toDate) return
+              const dateFilters = {
+                fromDate: Timestamp.fromDate(new Date(fromDate)),
+                toDate: Timestamp.fromDate(new Date(toDate))
+              }
+              setCurrentFilter(DateFilters.custom)
+              send({
+                type: "EVENT_DATE_FILTER",
+                dateFilters
+              })}
+            }
+            >
+              <label htmlFor="fromDate">From: </label>
+              <input className="rounded-full bg-transparent  " type="date" name="fromDate" />
+              <label htmlFor="toDate">To: </label>
+              <input className="rounded-full bg-transparent  " type="date" name="toDate" />
+            <button type="submit"
+            className="bg-blue-300 rounded-full px-4
+            hover:bg-blue-400 active:scale-95 transition-all"
+            >Custom Date</button>
+            </form>
+          <div className="mt-2">
+            <p>Showing Data of dates</p>
+            <p>
+              from - {state.context.dateFilter.fromDate.toDate().toDateString()}{" "}
+            </p>
+            <p>
+              to - {state.context.dateFilter.toDate.toDate().toDateString()}{" "}
+            </p>
+          </div>
+          <section className="lg:flex flex-wrap gap-10">
+            {state.context.filteredEvents.map((e) => {
+              // const startDate = e.startDate.toDate().toDateString()
+              // const endDate = e.endDate.toDate().toDateString()
+              return (
+                <div
+                  onClick={() =>
+                    send({ type: "VIEW_ATTENDANCE", currentEvent: e })
+                  }
+                  key={e.id}
+                  className="bg-yellow-200 px-5 py-8 rounded-3xl mt-8 block w-full text-left
                 hover:ring-4 ring-yellow-300 ring-opacity-70 active:scale-90 transition-all
                 max-w-sm cursor-pointer"
-              >
-                <span className="text-2xl block font-semibold mb-2 overflow-hidden">
-                  {e.name}
-                </span>
-                {e.startDate.toDate().toDateString() ===
-                e.endDate.toDate().toDateString() ? (
-                  <span className="block">
-                    <span className="italic mr-2 inline-block">on - </span>
-                    <span className="bg-green-300 px-4  rounded-full mt-2 inline-block">
-                      {e.startDate.toDate().toDateString()}
-                    </span>
+                >
+                  <span className="text-2xl block font-semibold mb-2 overflow-hidden">
+                    {e.name}
                   </span>
-                ) : (
-                  <>
+                  {e.startDate.toDate().toDateString() ===
+                  e.endDate.toDate().toDateString() ? (
                     <span className="block">
-                      {" "}
-                      <span className="italic mr-2 inline-block">
-                        from -{" "}
-                      </span>{" "}
+                      <span className="italic mr-2 inline-block">on - </span>
                       <span className="bg-green-300 px-4  rounded-full mt-2 inline-block">
-                        {" "}
                         {e.startDate.toDate().toDateString()}
                       </span>
                     </span>
-                    <span className="block">
-                      <span className="italic mr-2 inline-block">to - </span>{" "}
-                      <span className="bg-indigo-300 px-4  rounded-full mt-2 inline-block">
-                        {e.endDate.toDate().toDateString()}
-                      </span>{" "}
+                  ) : (
+                    <>
+                      <span className="block">
+                        {" "}
+                        <span className="italic mr-2 inline-block">
+                          from -{" "}
+                        </span>{" "}
+                        <span className="bg-green-300 px-4  rounded-full mt-2 inline-block">
+                          {" "}
+                          {e.startDate.toDate().toDateString()}
+                        </span>
+                      </span>
+                      <span className="block">
+                        <span className="italic mr-2 inline-block">to - </span>{" "}
+                        <span className="bg-indigo-300 px-4  rounded-full mt-2 inline-block">
+                          {e.endDate.toDate().toDateString()}
+                        </span>{" "}
+                      </span>
+                    </>
+                  )}
+                  <span className="block">
+                    <span className="italic mr-2 inline-block">
+                      activity hours -{" "}
                     </span>
-                  </>
-                )}
-                <span className="block">
-                  <span className="italic mr-2 inline-block">
-                    activity hours -{" "}
+                    <span className="bg-orange-400 px-4  rounded-full mt-2 inline-block">
+                      {e.activityHours}
+                    </span>
                   </span>
-                  <span className="bg-orange-400 px-4  rounded-full mt-2 inline-block">
-                    {e.activityHours}
-                  </span>
-                </span>
-                <button
-                  className="bg-teal-400 px-4 py-1 rounded-xl mt-4
+                  <button
+                    className="bg-teal-400 px-4 py-1 rounded-xl mt-4
                 hover:ring-4 ring-teal-300 ring-opacity-50
                 
                 "
-                  onClick={() =>
-                    send({ type: "ADD_ATTENDANCE", currentEvent: e })
-                  }
-                >
-                  Add attendance
-                </button>
-              </div>
-            );
-          })}
-        </section>
+                    onClick={() =>
+                      send({ type: "ADD_ATTENDANCE", currentEvent: e })
+                    }
+                  >
+                    Add attendance
+                  </button>
+                </div>
+              );
+            })}
+          </section>
+        </div>
       )}
       {state.matches("viewingAttendance") && (
         <ModalWrapper

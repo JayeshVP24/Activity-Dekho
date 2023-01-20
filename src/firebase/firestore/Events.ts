@@ -18,15 +18,35 @@ import { EventType } from "../../../types";
 import { firedb } from "../config";
 import XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { DateFilters } from "../../../enums";
+import { getFilteredDates } from "../../../utils";
 
-export const retrieveClubEventsQuery = async (clubId: string) => {
-  //   console.log("i came in firebase folder too");
+export const retrieveClubEventsQuery = async (
+  clubId: string,
+  dateFilter: {
+  fromDate?: Timestamp,
+  toDate?: Timestamp}
+) => {
+    console.log("i came in firebase folder too");
+  // console.log("retreiving events of club: ", clubId)
+  console.log({dateFilter})
+  // console.log({fromDate, toDate})
+  // const { fromDate, toDate } = getFilteredDates(dateFilter);
+  // console.log({fromDate, toDate})
+  if(!dateFilter.fromDate || !dateFilter.toDate) {
+    dateFilter = getFilteredDates(DateFilters.currentYear);
+    // fromDate = dates.fromDate;
+    // toDate = dates.toDate;
+  }
   const q = query(
     collection(firedb, "clubs/" + clubId + "/EVENTS"),
+    where("startDate", ">=", dateFilter.fromDate),
+    where("startDate", "<=", dateFilter.toDate),
     orderBy("startDate", "desc")
   );
   return await getDocs(q)
     .then((snap) => {
+      console.log("in the query")
       const eventsList: EventType[] = [];
       snap.forEach((s) => {
         eventsList.push({
@@ -35,12 +55,12 @@ export const retrieveClubEventsQuery = async (clubId: string) => {
           endDate: s.data().endDate.toDate(),
           ...s.data(),
         } as EventType);
-        // console.log(eventsList);
       });
+      console.log('events list: ', eventsList);
       return eventsList;
     })
     .catch((err) => {
-      //   console.log(err);
+      console.log("some error occured")
       return err.message as string;
     });
 };
@@ -82,17 +102,20 @@ export const addAttendanceQuery = async (
         // student document - write
         let studentAttendance = {};
         // console.log(studentDoc);
-        console.log("student attendance: ", studentDoc.data().attendance)
-        console.log("student club attendance: ", studentDoc.data().attendance[clubId])
+        console.log("student attendance: ", studentDoc.data().attendance);
+        console.log(
+          "student club attendance: ",
+          studentDoc.data().attendance[clubId]
+        );
         if (studentDoc.exists()) {
-          console.log("student exists")
+          console.log("student exists");
           studentAttendance = {
             [clubId]: {
               ...studentDoc.data().attendance[clubId],
             },
             ...studentDoc.data().attendance,
           };
-          studentAttendance[clubId][eventId] = true
+          studentAttendance[clubId][eventId] = true;
 
           // studentAttendance[clubId] = {
           //   [eventId]: true,
@@ -102,7 +125,7 @@ export const addAttendanceQuery = async (
             attendance: studentAttendance,
           });
         } else {
-          console.log("student doesn't exists")
+          console.log("student doesn't exists");
           studentAttendance = {
             [clubId]: {
               [eventId]: true,
@@ -113,7 +136,7 @@ export const addAttendanceQuery = async (
             attendance: studentAttendance,
           });
         }
-        console.log( "after adding new", studentAttendance)
+        console.log("after adding new", studentAttendance);
       }
       // console.log(eventDoc.data());
       // console.log({ eventAttendance });
@@ -151,7 +174,7 @@ export interface displayAttendanceType {
 export const getStudentEvents = async (studentId: string) => {
   try {
     const studentRef = doc(firedb, "STUDENTS", studentId);
-    console.log("studentId in firestore query: ", studentId)
+    console.log("studentId in firestore query: ", studentId);
     const studentDoc = await getDoc(doc(firedb, "STUDENTS", studentId));
     const attendance = studentDoc.data().attendance;
     const displayAttendance: displayAttendanceType[] = [];
@@ -175,7 +198,7 @@ export const getStudentEvents = async (studentId: string) => {
       }
     }
     console.log(displayAttendance);
-    return {displayAttendance};
+    return { displayAttendance };
   } catch (e) {
     return {
       error: e,

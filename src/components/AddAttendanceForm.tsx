@@ -4,6 +4,7 @@ import {
   FormEvent,
   HTMLInputTypeAttribute,
   useContext,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -39,12 +40,15 @@ const AddAttendanceForm: React.FC = () => {
       excelStringArray: arr,
     });
   };
+  useEffect(() => {
+    console.log({"currentEvent": state.context.currentEvent})
+  }, [])
   return (
     <section>
       <div className="">
         <h2 className="text-2xl font-medium ">Add Attendance</h2>
         <h3 className="text-4xl font-semibold mt-2">
-          {state.context.currentEvent.name}
+          {state.context.currentEvent?.name}
         </h3>
       </div>
       <form
