@@ -14,15 +14,27 @@ const ViewAttendance: React.FC = () => {
           {state.context.currentEvent.name}
         </h3>
       </div>
+      <input
+        className="w-full outline-none rounded-full px-4 py-2 mt-4 bg-opacity-50 bg-white
+            "
+        type="text"
+        placeholder="Search"
+        onChange={(e) => {
+          console.log(e.target.value);
+          send({ type: "FILTER_ATTENDANCE", query: e.target.value });
+        }}
+      />
       <div className="flex flex-col gap-y-4 mt-6 h-72 overflow-auto customScrollbar">
-        {state.context.currentEvent.attendance && Object.keys(state.context.currentEvent.attendance).map((a) => (
-          <span key={a} className="flex justify-between w-full max-w-sm mx-auto bg-lime-300 px-4 py-1 rounded-2xl
-          ">
+        {state.context.filteredAttendance.map((a) => (
+          <span
+            key={a}
+            className="flex justify-between w-full max-w-sm mx-auto bg-lime-300 px-4 py-1 rounded-2xl
+          "
+          >
             <p> {a}</p>
-            <button className="bg-red-400 px-2 rounded-3xl" >Delete</button>
+            <button className="bg-red-400 px-2 rounded-3xl">Delete</button>
           </span>
         ))}
-        
       </div>
     </section>
   );

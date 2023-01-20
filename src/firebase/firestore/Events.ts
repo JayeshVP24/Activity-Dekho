@@ -21,6 +21,7 @@ import { saveAs } from "file-saver";
 
 export const retrieveClubEventsQuery = async (clubId: string) => {
   //   console.log("i came in firebase folder too");
+  // console.log("retreiving events of club: ", clubId)
   const q = query(
     collection(firedb, "clubs/" + clubId + "/EVENTS"),
     orderBy("startDate", "desc")
