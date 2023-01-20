@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useContext, useEffect } from "react";
 import { State } from "xstate";
+import { DateFilters } from "../../enums";
 import { ClubType } from "../../types";
 import AddAttendanceForm from "../components/AddAttendanceForm";
 import AddEventForm from "../components/AddEventForm";
@@ -36,7 +37,6 @@ const Events: NextPage = () => {
   useEffect(() => {
     console.log(state.value);
   }, [state]);
-
 
   useEffect(() => {
     // console.log();
@@ -122,6 +122,74 @@ const Events: NextPage = () => {
               send({ type: "FILTER_EVENTS_LIST", query: e.target.value });
             }}
           />
+          <div className="mt-4 flex gap-2 flex-wrap ">
+            <button
+              onClick={() =>
+                send({
+                  type: "EVENT_DATE_FILTER",
+                  query: DateFilters.currentYear,
+                })
+              }
+              className={`border-2 border-black rounded-full px-4
+            hover:bg-slate-200 active:scale-95 transition-all
+            ${
+              state.context.dateFilter.includes(DateFilters.currentYear)
+                ? "bg-green-300"
+                : "bg-transparent"
+            }`}
+            >
+              Current Year
+            </button>
+            <button
+              onClick={() =>
+                send({
+                  type: "EVENT_DATE_FILTER",
+                  query: DateFilters.currentSem,
+                })
+              }
+              className={`border-2 border-black rounded-full px-4
+            hover:bg-slate-200 active:scale-95 transition-all
+            ${
+              state.context.dateFilter.includes(DateFilters.currentSem)
+                ? "bg-green-300"
+                : "bg-transparent"
+            }`}
+            >
+              Current Sem
+            </button>
+            <button
+              onClick={() =>
+                send({ type: "EVENT_DATE_FILTER", query: DateFilters.lastSem })
+              }
+              className={`border-2 border-black rounded-full px-4
+            hover:bg-slate-200 active:scale-95 transition-all
+            ${
+              state.context.dateFilter.includes(DateFilters.lastSem)
+                ? "bg-green-300"
+                : "bg-transparent"
+            }`}
+            >
+              Last Sem
+            </button>
+            <button
+              onClick={() =>
+                send({
+                  type: "EVENT_DATE_FILTER",
+                  query: DateFilters.lastYear,
+                })
+              }
+              className={`border-2 border-black rounded-full px-4
+            hover:bg-slate-200 active:scale-95 transition-all
+            ${
+              state.context.dateFilter.includes(DateFilters.lastYear)
+                ? "bg-green-300"
+                : "bg-transparent"
+            }`}
+            >
+              Last Year
+            </button>
+            
+          </div>
           <section className="lg:flex flex-wrap gap-10">
             {state.context.filteredEvents.map((e) => {
               // const startDate = e.startDate.toDate().toDateString()

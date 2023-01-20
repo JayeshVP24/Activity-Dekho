@@ -63,9 +63,9 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const clubEventService = useInterpret(ClubEventMachine, {
     services: {
-      retrieveClubEvents: async (_) => {
-        // console.log("well i reached in global context");
-        return await retrieveClubEventsQuery(authClub.id);
+      retrieveClubEvents: async (context,_) => {
+        console.log("well i reached in global context");
+        return await retrieveClubEventsQuery(authClub.id, context.dateFilter);
       },
       // @ts-ignore
       addAttendanceToDB: async (context) => {
