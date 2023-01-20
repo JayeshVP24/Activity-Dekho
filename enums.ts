@@ -4,5 +4,6 @@ export enum DateFilters {
     lastSem = "LASTSEM",
     currentYear = "CURRENTYEAR",
     lastYear = "LASTYEAR",
+    custom = "CUSTOM"
   }
   

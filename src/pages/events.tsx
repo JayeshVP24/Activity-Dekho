@@ -1,13 +1,15 @@
 import { useActor, useSelector } from "@xstate/react";
 import { signOut } from "firebase/auth";
+import { Timestamp } from "firebase/firestore";
 import { AnimatePresence } from "framer-motion";
 import { NextPage } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { State } from "xstate";
 import { DateFilters } from "../../enums";
 import { ClubType } from "../../types";
+import { getFilteredDates } from "../../utils";
 import AddAttendanceForm from "../components/AddAttendanceForm";
 import AddEventForm from "../components/AddEventForm";
 import AvatarGenerator from "../components/AvatarGenerator";
@@ -29,6 +31,9 @@ const Events: NextPage = () => {
   const globalServices = useContext(GlobalStateContext);
   const [state, send] = useActor(globalServices.clubEventService);
   const [authState, authSend] = useActor(globalServices.clubAuthService);
+  const [currentFilter, setCurrentFilter] = useState<DateFilters>(
+    DateFilters.currentYear
+  );
   // const { send: authSend } = globalServices.clubAuthService;
   const authClub = globalServices.authClub;
   const router = useRouter();
@@ -124,16 +129,18 @@ const Events: NextPage = () => {
           />
           <div className="mt-4 flex gap-2 flex-wrap ">
             <button
-              onClick={() =>
+              onClick={() => {
+                const dateFilters = getFilteredDates(DateFilters.currentYear);
+                setCurrentFilter(DateFilters.currentYear);
                 send({
                   type: "EVENT_DATE_FILTER",
-                  query: DateFilters.currentYear,
-                })
-              }
+                  dateFilters,
+                });
+              }}
               className={`border-2 border-black rounded-full px-4
             hover:bg-slate-200 active:scale-95 transition-all
             ${
-              state.context.dateFilter.includes(DateFilters.currentYear)
+              currentFilter.includes(DateFilters.currentYear)
                 ? "bg-green-300"
                 : "bg-transparent"
             }`}
@@ -141,16 +148,18 @@ const Events: NextPage = () => {
               Current Year
             </button>
             <button
-              onClick={() =>
+              onClick={() => {
+                const dateFilters = getFilteredDates(DateFilters.currentSem);
+                setCurrentFilter(DateFilters.currentSem);
                 send({
                   type: "EVENT_DATE_FILTER",
-                  query: DateFilters.currentSem,
-                })
-              }
+                  dateFilters,
+                });
+              }}
               className={`border-2 border-black rounded-full px-4
             hover:bg-slate-200 active:scale-95 transition-all
             ${
-              state.context.dateFilter.includes(DateFilters.currentSem)
+              currentFilter.includes(DateFilters.currentSem)
                 ? "bg-green-300"
                 : "bg-transparent"
             }`}
@@ -158,13 +167,18 @@ const Events: NextPage = () => {
               Current Sem
             </button>
             <button
-              onClick={() =>
-                send({ type: "EVENT_DATE_FILTER", query: DateFilters.lastSem })
-              }
+              onClick={() => {
+                const dateFilters = getFilteredDates(DateFilters.lastSem);
+                setCurrentFilter(DateFilters.lastSem);
+                send({
+                  type: "EVENT_DATE_FILTER",
+                  dateFilters,
+                });
+              }}
               className={`border-2 border-black rounded-full px-4
             hover:bg-slate-200 active:scale-95 transition-all
             ${
-              state.context.dateFilter.includes(DateFilters.lastSem)
+              currentFilter.includes(DateFilters.lastSem)
                 ? "bg-green-300"
                 : "bg-transparent"
             }`}
@@ -172,23 +186,75 @@ const Events: NextPage = () => {
               Last Sem
             </button>
             <button
-              onClick={() =>
+              onClick={() => {
+                const dateFilters = getFilteredDates(DateFilters.lastYear);
+                setCurrentFilter(DateFilters.lastYear);
                 send({
                   type: "EVENT_DATE_FILTER",
-                  query: DateFilters.lastYear,
-                })
-              }
+                  dateFilters,
+                });
+              }}
               className={`border-2 border-black rounded-full px-4
             hover:bg-slate-200 active:scale-95 transition-all
             ${
-              state.context.dateFilter.includes(DateFilters.lastYear)
+              currentFilter.includes(DateFilters.lastYear)
                 ? "bg-green-300"
                 : "bg-transparent"
             }`}
             >
               Last Year
             </button>
-            
+            {/* <label htmlFor="fromDate">From: </label>
+            <input
+              value={state.context.dateFilter.fromDate.toDate().getFullYear}
+              className="rounded-full bg-transparent  "
+              type="date"
+              name="fromDate"
+              onChange={e => console.log(e.target.value)}
+
+            />
+            <label htmlFor="toDate">To: </label>
+            <input
+              // value={state.context.dateFilter.toDate.toDate().toString()}
+              className="rounded-full bg-transparent  "
+              type="date"
+              name="toDate"
+            /> */}
+          </div>
+          <form className="flex flex-wrap gap-2 mt-2" 
+            onSubmit={(e) => {
+              e.preventDefault()
+              const fromDate = e.currentTarget["fromDate"].value
+              const toDate = e.currentTarget["toDate"].value
+              if(!fromDate || !toDate) return
+              const dateFilters = {
+                fromDate: Timestamp.fromDate(new Date(fromDate)),
+                toDate: Timestamp.fromDate(new Date(toDate))
+              }
+              setCurrentFilter(DateFilters.custom)
+              send({
+                type: "EVENT_DATE_FILTER",
+                dateFilters
+              })}
+            }
+            >
+              <label htmlFor="fromDate">From: </label>
+              <input className="rounded-full bg-transparent  " type="date" name="fromDate" />
+              <label htmlFor="toDate">To: </label>
+              <input className="rounded-full bg-transparent  " type="date" name="toDate" />
+            <button type="submit"
+            className="bg-blue-300 rounded-full px-4
+            hover:bg-blue-400 active:scale-95 transition-all"
+            >Custom Date</button>
+            </form>
+          <div className="mt-2">
+            <p>Showing Data of dates</p>
+            <p>
+              from - {state.context.dateFilter.fromDate.toDate().toDateString()}{" "}
+            </p>
+            <p>
+              to - {state.context.dateFilter.toDate.toDate().toDateString()}{" "}
+            </p>
           </div>
           <section className="lg:flex flex-wrap gap-10">
             {state.context.filteredEvents.map((e) => {
