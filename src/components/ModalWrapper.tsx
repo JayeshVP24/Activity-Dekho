@@ -6,7 +6,7 @@ const ModalWrapper: React.FC<{
   isModalOpen: boolean;
   closeModal: () => void;
   loading: boolean;
-}> = ({children, isModalOpen, closeModal,  loading}) => {
+}> = ({ children, isModalOpen, closeModal, loading }) => {
   const variants: Variants = {
     hidden: {
       opacity: 0,
@@ -16,7 +16,7 @@ const ModalWrapper: React.FC<{
     },
   };
   return (
-    <section>
+    <section  >
       <AnimatePresence>
         {isModalOpen && (
           <motion.section className="">
@@ -54,12 +54,11 @@ const ModalWrapper: React.FC<{
                 scale: 0.9,
                 opacity: 0,
               }}
-              className={`bg-violet-400 fixed w-4/5 max-w-xl h-auto max-h-[85%]
+              className={`bg-violet-400 fixed w-4/5 max-w-xl h-auto max-h-[90%]
                   top-[50%] translate-y-[-50%] left-[50%] translate-x-[-50%]
                   rounded-3xl px-10 py-16 
                   `}
             >
-              
               {loading && (
                 <motion.span
                   variants={variants}
@@ -71,7 +70,7 @@ const ModalWrapper: React.FC<{
                   Loading 💭{" "}
                 </motion.span>
               )}
-        {children}
+              {children}
             </motion.div>
           </motion.section>
         )}

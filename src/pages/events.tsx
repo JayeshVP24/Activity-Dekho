@@ -256,7 +256,7 @@ const Events: NextPage = () => {
               to - {state.context.dateFilter.toDate.toDate().toDateString()}{" "}
             </p>
           </div>
-          <section className="lg:flex flex-wrap gap-10">
+          <section className="lg:flex flex-wrap gap-7  mt-8">
             {state.context.filteredEvents.map((e) => {
               // const startDate = e.startDate.toDate().toDateString()
               // const endDate = e.endDate.toDate().toDateString()
@@ -266,7 +266,7 @@ const Events: NextPage = () => {
                     send({ type: "VIEW_ATTENDANCE", currentEvent: e })
                   }
                   key={e.id}
-                  className="bg-yellow-200 px-5 py-8 rounded-3xl mt-8 block w-full text-left
+                  className="bg-yellow-200 px-5 py-8 rounded-3xl block min-w-max pr-16 text-left
                 hover:ring-4 ring-yellow-300 ring-opacity-70 active:scale-90 transition-all
                 max-w-sm cursor-pointer"
                 >
@@ -307,6 +307,14 @@ const Events: NextPage = () => {
                     </span>
                     <span className="bg-orange-400 px-4  rounded-full mt-2 inline-block">
                       {e.activityHours}
+                    </span>
+                  </span>
+                  <span className="block">
+                    <span className="italic mr-2 inline-block">
+                      scope -{" "}
+                    </span>
+                    <span className="bg-pink-300 px-4  rounded-full mt-2 inline-block capitalize">
+                      {e.scope}
                     </span>
                   </span>
                   <button

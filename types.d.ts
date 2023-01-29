@@ -1,4 +1,5 @@
 import { Timestamp } from "firebase/firestore";
+import { Attendee, EventScope } from "./enums";
 
 export interface ClubType {
   id: string;
@@ -14,8 +15,9 @@ export interface EventType {
   name: string;
   startDate: Timestamp;
   endDate: Timestamp;
-  attendance?: Record<string, string>;
+  attendance?: Record<string, Attendee>;
   activityHours: number;
+  scope?: EventScope
 }
 
 export interface ClubStudentType {
@@ -26,4 +28,9 @@ export interface ClubStudentType {
 export interface StudentType {
   id: string;
   clubs: string[];
+}
+
+export interface AttendanceViewType {
+  id: string,
+  attendee: Attendee
 }

@@ -72,7 +72,7 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
         return await addAttendanceQuery(
           authClub.id,
           context.currentEvent.id,
-          context.attendance
+          context.excelAttendance
         );
       },
       // @ts-ignore
