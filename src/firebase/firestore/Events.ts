@@ -18,22 +18,23 @@ import { EventType } from "../../../types";
 import { firedb } from "../config";
 import XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { DateFilters } from "../../../enums";
+import { Attendee, DateFilters, EventScope } from "../../../enums";
 import { getFilteredDates } from "../../../utils";
 
 export const retrieveClubEventsQuery = async (
   clubId: string,
   dateFilter: {
-  fromDate?: Timestamp,
-  toDate?: Timestamp}
+    fromDate?: Timestamp;
+    toDate?: Timestamp;
+  }
 ) => {
-    console.log("i came in firebase folder too");
+  console.log("i came in firebase folder too");
   // console.log("retreiving events of club: ", clubId)
-  console.log({dateFilter})
+  console.log({ dateFilter });
   // console.log({fromDate, toDate})
   // const { fromDate, toDate } = getFilteredDates(dateFilter);
   // console.log({fromDate, toDate})
-  if(!dateFilter.fromDate || !dateFilter.toDate) {
+  if (!dateFilter.fromDate || !dateFilter.toDate) {
     dateFilter = getFilteredDates(DateFilters.currentYear);
     // fromDate = dates.fromDate;
     // toDate = dates.toDate;
@@ -46,7 +47,7 @@ export const retrieveClubEventsQuery = async (
   );
   return await getDocs(q)
     .then((snap) => {
-      console.log("in the query")
+      console.log("in the query");
       const eventsList: EventType[] = [];
       snap.forEach((s) => {
         eventsList.push({
@@ -56,11 +57,11 @@ export const retrieveClubEventsQuery = async (
           ...s.data(),
         } as EventType);
       });
-      console.log('events list: ', eventsList);
+      console.log("events list: ", eventsList);
       return eventsList;
     })
     .catch((err) => {
-      console.log("some error occured")
+      console.log("some error occured");
       return err.message as string;
     });
 };
@@ -68,7 +69,11 @@ export const retrieveClubEventsQuery = async (
 export const addAttendanceQuery = async (
   clubId: string,
   eventId: string,
-  UIDs: string[]
+  data: {
+    participants: string[];
+    organizers: string[];
+    volunteers: string[];
+  }
 ) => {
   // const batch = writeBatch(firedb);
   // const studentRef = doc(firedb, "STUDENTS", studentID)
@@ -79,7 +84,7 @@ export const addAttendanceQuery = async (
       // clubs->event document - read
       const eventDoc = await transacton.get(eventRef);
       // console.log(eventDoc.data());
-      const eventAttendance: Record<string, boolean> = {
+      const eventAttendance: Record<string, string> = {
         ...eventDoc.data().attendance,
       };
       // console.log({ eventDoc });
@@ -87,7 +92,7 @@ export const addAttendanceQuery = async (
       // student document - read
       // const studentSnapshots =  await getDocs(query(collection(firedb, "STUDENTS"),
       // where("Document ID", "in", UIDs)))
-      for (const studentId of UIDs) {
+      for (const studentId of data.participants) {
         const studentRef = doc(firedb, "STUDENTS", studentId);
         const studentDoc = await transacton.get(studentRef);
         // console.log({ studentDoc });
@@ -95,18 +100,31 @@ export const addAttendanceQuery = async (
       }
       // console.log(studentSnapshots);
       // for (const studentDoc of studentSnapshots) {
-      for (const studentId of UIDs) {
+      for (const studentId of data.participants) {
         // clubs->event->attendance - write
-        eventAttendance[studentId] = true;
+        // eventAttendance[studentId] = data.coordinators.includes(studentId)
+        //   ? Attendee.coordinator
+        //   : data.volunteers.includes(studentId)
+        //   ? Attendee.volunteer
+        //   : Attendee.participant;
+        if(data.organizers.includes(studentId)) {
+          eventAttendance[studentId] = Attendee.organizer;
+        } else if(data.volunteers.includes(studentId)) {
+          eventAttendance[studentId] = Attendee.volunteer;
+        } else {
+          eventAttendance[studentId] = Attendee.participant;
+        }
+          // eventAttendance[studentId] = ;
         const studentDoc = studentSnapshots.find((s) => s.id === studentId);
         // student document - write
         let studentAttendance = {};
+        // let coordinatorAttendance = {};
         // console.log(studentDoc);
-        console.log("student attendance: ", studentDoc.data().attendance);
-        console.log(
-          "student club attendance: ",
-          studentDoc.data().attendance[clubId]
-        );
+        // console.log("student attendance: ", studentDoc.data().attendance);
+        // console.log(
+        //   "student club attendance: ",
+        //   studentDoc.data().attendance[clubId]
+        // );
         if (studentDoc.exists()) {
           console.log("student exists");
           studentAttendance = {
@@ -115,8 +133,30 @@ export const addAttendanceQuery = async (
             },
             ...studentDoc.data().attendance,
           };
-          studentAttendance[clubId][eventId] = true;
-
+          // studentAttendance[clubId][eventId] = data.coordinators.includes(studentId)
+          // ? Attendee.coordinator
+          // : data.volunteers.includes(studentId)
+          // ? Attendee.volunteer
+          // : Attendee.participant;
+          if(data.organizers.includes(studentId)) {
+            console.log("student is coordinator")
+            studentAttendance[clubId][eventId] = Attendee.organizer;
+          } else if(data.volunteers.includes(studentId)) {
+            console.log("student is volunteer")
+            studentAttendance[clubId][eventId] = Attendee.volunteer;
+          } else {
+            console.log("student is participant")
+            studentAttendance[clubId][eventId] = Attendee.participant;
+          }
+          // if(data.coordinators.includes(studentId)) {
+          //   coordinatorAttendance = {
+          //     ...studentDoc.data().coordinatorAttendance,
+          //     [clubId]: {
+          //       ...studentDoc.data().coordinatorAttendance[clubId],
+          //       [eventId]: true,
+          //     },
+          //   }
+          // }
           // studentAttendance[clubId] = {
           //   [eventId]: true,
           //   ...studentAttendance[clubId],
@@ -128,9 +168,14 @@ export const addAttendanceQuery = async (
           console.log("student doesn't exists");
           studentAttendance = {
             [clubId]: {
-              [eventId]: true,
+              [eventId]: Attendee.participant,
             },
           };
+          if(data.organizers.includes(studentId)) {
+            studentAttendance[clubId][eventId] = Attendee.organizer;
+          } else if(data.volunteers.includes(studentId)) {
+            studentAttendance[clubId][eventId] = Attendee.volunteer;
+          } 
           const newStudentRef = doc(firedb, "STUDENTS", studentId);
           transacton.set(newStudentRef, {
             attendance: studentAttendance,
@@ -141,7 +186,7 @@ export const addAttendanceQuery = async (
       // console.log(eventDoc.data());
       // console.log({ eventAttendance });
       transacton.update(eventRef, {
-        attendance: eventAttendance as Record<string, boolean>,
+        attendance: eventAttendance as Record<string, string>,
       });
       return eventAttendance;
     });
@@ -150,12 +195,12 @@ export const addAttendanceQuery = async (
     // await setDoc(collection(firedb,eventRef) ,{
 
     // })
-    // console.log({ newAttendance });
+    console.log({ newAttendance });
     return {
       newAttendance,
     };
   } catch (e) {
-    console.log(e);
+    console.log("firebase query error: ", e);
     return {
       error: e,
     };
@@ -167,8 +212,12 @@ export interface displayAttendanceType {
   event: string;
   from: string;
   to: string;
-  activityHours: number;
+  "Activity Hours": number;
   email: string;
+  title: Attendee;
+  scope: EventScope;
+  "Extra Hours": number;
+  "Total Hours": number;
 }
 
 export const getStudentEvents = async (studentId: string) => {
@@ -176,22 +225,40 @@ export const getStudentEvents = async (studentId: string) => {
     const studentRef = doc(firedb, "STUDENTS", studentId);
     console.log("studentId in firestore query: ", studentId);
     const studentDoc = await getDoc(doc(firedb, "STUDENTS", studentId));
-    const attendance = studentDoc.data().attendance;
+    const attendance: Record<string, Record<string, Attendee>> = studentDoc.data().attendance;
     const displayAttendance: displayAttendanceType[] = [];
     const ObjectAttendance = Object.entries(attendance);
     console.log(ObjectAttendance);
     for (const [clubId, value] of Object.entries(attendance)) {
-      for (const eventId of Object.keys(value)) {
+      for (const [eventId, attendeeType] of Object.entries(value)) {
         const clubRef = doc(firedb, "clubs", clubId);
         const clubDetails = (await getDoc(clubRef)).data();
         const eventRef = doc(firedb, "clubs", clubId, "EVENTS", eventId);
         // @ts-ignore
         const eventDetails: EventType = (await getDoc(eventRef)).data();
+        let extraHours: number = 0;
+        if(attendeeType === Attendee.organizer) {
+          if(eventDetails.scope === EventScope.department) {
+            extraHours = 6;
+          } else if(eventDetails.scope === EventScope.institute) {
+            extraHours = 8;
+          }
+        } else if(attendeeType === Attendee.volunteer) {
+          if(eventDetails.scope === EventScope.department) {
+            extraHours = 4;
+          } else if(eventDetails.scope === EventScope.institute) {
+            extraHours = 6;
+          }
+        }
         displayAttendance.push({
           club: clubDetails.name,
           email: clubDetails.email,
           event: eventDetails.name,
-          activityHours: eventDetails.activityHours,
+          "Activity Hours": eventDetails.activityHours,
+          scope: eventDetails.scope,
+          title: attendeeType,
+          "Extra Hours": extraHours,
+          "Total Hours": (Number(eventDetails.activityHours) + Number(extraHours)),
           from: eventDetails.startDate.toDate().toLocaleDateString(),
           to: eventDetails.endDate.toDate().toLocaleDateString(),
         });

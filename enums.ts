@@ -7,3 +7,13 @@ export enum DateFilters {
     custom = "CUSTOM"
   }
   
+export enum Attendee {
+  participant = "PARTICIPANT",
+  organizer = "ORGANIZER",
+  volunteer = "VOLUNTEER",
+}
+
+export enum EventScope {
+  institute = "INSTITUTE",
+  department = "DEPARTMENT",
+}

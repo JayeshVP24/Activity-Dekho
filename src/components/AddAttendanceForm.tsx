@@ -11,40 +11,57 @@ import {
 import { GlobalStateContext } from "./GlobalStateProvider";
 import XLSX from "xlsx";
 import Image from "next/image";
+import { Attendee } from "../../enums";
 const AddAttendanceForm: React.FC = () => {
   const globalServices = useContext(GlobalStateContext);
   const [state, send] = useActor(globalServices.clubEventService);
-  const [excelFileName, setExcelFileName] = useState<string>("");
-  const [excelStringArray, setExcelStringArray] = useState<string[]>([""]);
-  //   const [fileName, setFileName] = useS
   const parseUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     console.log(e.target.files[0]);
+    console.log("file parsing onw");
     const file = e.target.files[0];
-    setExcelFileName(file.name);
-    const data = await file.arrayBuffer();
+    // setExcelFileName(file.name);
+    const data = await file?.arrayBuffer();
+    if (!data) return;
     const workbook = XLSX.read(data);
     const jsonData = XLSX.utils.sheet_to_json(
       workbook.Sheets[workbook.SheetNames[0]]
     );
     console.log(jsonData);
-    const arr: string[] = [];
+    const participants: string[] = [];
+    const organizers: string[] = [];
+    const volunteers: string[] = [];
     Object.values(jsonData).forEach((e) => {
-      console.log(e["UIDS"]);
-      arr.push(e["UIDS"].trim());
+      // console.log(e);
+      console.log(e["STUDENTS"]);
+      e[Attendee.participant + "S"] &&
+        participants.push(e[Attendee.participant + "S"].trim());
+      e[Attendee.organizer + "S"] &&
+        participants.push(e[Attendee.organizer + "S"].trim());
+      e[Attendee.organizer + "S"] &&
+        organizers.push(e[Attendee.organizer + "S"].trim());
+      e[Attendee.volunteer + "S"] &&
+        participants.push(e[Attendee.volunteer + "S"].trim());
+      e[Attendee.volunteer + "S"] &&
+        volunteers.push(e[Attendee.volunteer + "S"].trim());
     });
-    setExcelStringArray(arr);
-    console.log(excelStringArray);
+    // setExcelStringArray(students);
+    console.log({ coordinatorsArr: organizers });
+    console.log({ participants, organizers, volunteers });
     send({
       type: "ADD_ATTENDANCE.UPLOAD_EXCEL",
       excelFileName: file.name,
-      excelStringArray: arr,
+      excelStringArray: {
+        participants: Array.from(new Set(participants)),
+        organizers,
+        volunteers,
+      },
     });
   };
   useEffect(() => {
-    console.log({"currentEvent": state.context.currentEvent})
-  }, [])
+    console.log({ currentEvent: state.context.currentEvent });
+  }, []);
   return (
-    <section>
+    <section className="max-h-[30rem] overflow-y-scroll p-2 customScrollbar" >
       <div className="">
         <h2 className="text-2xl font-medium ">Add Attendance</h2>
         <h3 className="text-4xl font-semibold mt-2">
@@ -55,13 +72,14 @@ const AddAttendanceForm: React.FC = () => {
         className="mt-4"
         onSubmit={(e) => {
           e.preventDefault();
-          send({type: "ADD_ATTENDANCE.SUBMIT"});
+          send({ type: "ADD_ATTENDANCE.SUBMIT" });
         }}
       >
         <input
           type="file"
           name="FILE"
           onChange={parseUpload}
+          onClick={(e) => (e.currentTarget.value = "")}
           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
         />
         <span className="bg-yellow-300 text-sm block px-4 py-1 rounded-3xl my-4">
@@ -71,10 +89,10 @@ const AddAttendanceForm: React.FC = () => {
         </span>
         <Image
           src="/excelSample.png"
-          width="248"
-          height="282"
+          width="600"
+          height="300"
           alt="Example Excel Sample for attendance"
-          className="w-48 mx-auto"
+          className="w-72 mx-auto"
         />
         {state.context.errorMsg && (
           <span
