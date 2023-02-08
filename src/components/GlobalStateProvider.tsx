@@ -13,6 +13,8 @@ import {
 import {
   addAttendanceQuery,
   addEventToDBQuery,
+  deleteEventOnDBQuery,
+  editEventOnDBQuery,
   retrieveClubEventsQuery,
 } from "../firebase/firestore/Events";
 import ClubAuthMachine, { ClubAuthActor } from "../machines/clubAuth";
@@ -75,10 +77,16 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
           context.excelAttendance
         );
       },
-      // @ts-ignore
       addEventToDB: async (context, event) => {
         return await addEventToDBQuery(authClub.id, event.newEvent);
       },
+      editEventOnDb: async (context, event) => {
+        return await editEventOnDBQuery(authClub.id, event.editedEvent)
+      },
+      deleteEvent: async (conext, event) => {
+        console.log("deleting event")
+        return await deleteEventOnDBQuery(authClub.id, event.deleteEventId)
+      }
       //   retrieveAttendance: async (_) =>
       //     new Promise(() => {
       //       return resolve("afw")

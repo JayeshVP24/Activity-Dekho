@@ -5,7 +5,7 @@ import { AnimatePresence } from "framer-motion";
 import { NextPage } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useContext, useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { State } from "xstate";
 import { DateFilters } from "../../enums";
 import { ClubType } from "../../types";
@@ -13,6 +13,8 @@ import { getFilteredDates } from "../../utils";
 import AddAttendanceForm from "../components/AddAttendanceForm";
 import AddEventForm from "../components/AddEventForm";
 import AvatarGenerator from "../components/AvatarGenerator";
+import DeleteConfirmation from "../components/DeleteConfirmation";
+import EditEventForm from "../components/EditEventForm";
 import { GlobalStateContext } from "../components/GlobalStateProvider";
 import ModalWrapper from "../components/ModalWrapper";
 import ViewAttendance from "../components/ViewAttendance";
@@ -37,8 +39,23 @@ const Events: NextPage = () => {
   // const { send: authSend } = globalServices.clubAuthService;
   const authClub = globalServices.authClub;
   const router = useRouter();
-
+  const {dateFilter, currentEvent, events, loading} = useSelector(
+    globalServices.clubEventService,
+    (state) => state.context
+  );
   //   const isloggedIn = useSelector(globalServices.clubAuthService, loggedIn);
+  const fromRef = useRef<HTMLInputElement>(null);
+  const toRef = useRef<HTMLInputElement>(null);
+  const [inputData, setInputData] = useState("");
+  const inputDataHandler = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setInputData(e.target.value);
+  }, []);
+  const filteredEvents = useMemo(() => {
+    if (!inputData) return events;
+    return events.filter((a) =>
+      a.id.toLowerCase().includes(inputData.toLowerCase()) || a.name.toLowerCase().includes(inputData.toLowerCase())
+    );
+  }, [inputData, events]);
   useEffect(() => {
     console.log(state.value);
   }, [state]);
@@ -115,17 +132,15 @@ const Events: NextPage = () => {
           </button>
         </div>
       )}
-      {state.context.filteredEvents && (
+      {filteredEvents && (
         <div>
           <input
             className="w-full outline-none rounded-full px-4 py-2 mt-4 bg-opacity-50 bg-white
             "
             type="text"
             placeholder="Search"
-            onChange={(e) => {
-              console.log(e.target.value);
-              send({ type: "FILTER_EVENTS_LIST", query: e.target.value });
-            }}
+            value={inputData}
+            onChange={inputDataHandler}
           />
           <div className="mt-4 flex gap-2 flex-wrap ">
             <button
@@ -221,33 +236,62 @@ const Events: NextPage = () => {
               name="toDate"
             /> */}
           </div>
-          <form className="flex flex-wrap gap-2 mt-2" 
-            onSubmit={(e) => {
-              e.preventDefault()
-              const fromDate = e.currentTarget["fromDate"].value
-              const toDate = e.currentTarget["toDate"].value
-              if(!fromDate || !toDate) return
+          <form
+            className="flex flex-wrap gap-2 mt-3"
+            onChange={(e) => {
+              e.preventDefault();
+              const fromDate = e.currentTarget["fromDate"].value;
+              const toDate = e.currentTarget["toDate"].value;
+              if (!fromDate || !toDate) return;
               const dateFilters = {
                 fromDate: Timestamp.fromDate(new Date(fromDate)),
-                toDate: Timestamp.fromDate(new Date(toDate))
-              }
-              setCurrentFilter(DateFilters.custom)
+                toDate: Timestamp.fromDate(new Date(toDate)),
+              };
+              setCurrentFilter(DateFilters.custom);
               send({
                 type: "EVENT_DATE_FILTER",
-                dateFilters
-              })}
-            }
+                dateFilters,
+              });
+            }}
+          >
+            <span className="bg-green-300 px-4 py-1 rounded-full "
+                onClick={e => fromRef.current.showPicker()}
+            
             >
               <label htmlFor="fromDate">From: </label>
-              <input className="rounded-full bg-transparent  " type="date" name="fromDate" />
+              <input
+                className="rounded-full bg-transparent  outline-none"
+                type="date"
+                name="fromDate"
+                ref={fromRef}
+                value={
+                  dateFilter.fromDate.toDate().toISOString().split("T")[0]
+                }
+              />
+            </span>
+            <span className="bg-green-300 px-4 py-1 rounded-full"
+                onClick={e => toRef.current.showPicker()}
+            
+            >
               <label htmlFor="toDate">To: </label>
-              <input className="rounded-full bg-transparent  " type="date" name="toDate" />
-            <button type="submit"
-            className="bg-blue-300 rounded-full px-4
+
+              <input
+                className="rounded-full bg-transparent outline-none "
+                type="date"
+                name="toDate"
+                ref={toRef}
+                value={dateFilter.toDate.toDate().toISOString().split("T")[0]}
+              />
+            </span>
+            {/* <button
+              type="submit"
+              className="bg-blue-300 rounded-full px-4
             hover:bg-blue-400 active:scale-95 transition-all"
-            >Custom Date</button>
-            </form>
-          <div className="mt-2">
+            >
+              Custom Date
+            </button> */}
+          </form>
+          {/* <div className="mt-2">
             <p>Showing Data of dates</p>
             <p>
               from - {state.context.dateFilter.fromDate.toDate().toDateString()}{" "}
@@ -255,9 +299,13 @@ const Events: NextPage = () => {
             <p>
               to - {state.context.dateFilter.toDate.toDate().toDateString()}{" "}
             </p>
-          </div>
+          </div> */}
           <section className="lg:flex flex-wrap gap-7  mt-8">
-            {state.context.filteredEvents.map((e) => {
+            {(events?.length <= 0 || filteredEvents?.length <= 0) ? (
+              <div className="w-full mt-10" >
+                <h2 className="text-3xl lg:text-5xl font-semibold mx-auto w-fit">No Events Found 🤐</h2>
+              </div>
+            ) : filteredEvents.map((e) => {
               // const startDate = e.startDate.toDate().toDateString()
               // const endDate = e.endDate.toDate().toDateString()
               return (
@@ -266,9 +314,9 @@ const Events: NextPage = () => {
                     send({ type: "VIEW_ATTENDANCE", currentEvent: e })
                   }
                   key={e.id}
-                  className="bg-yellow-200 px-5 py-8 rounded-3xl block min-w-max pr-16 text-left
+                  className="bg-yellow-200 px-5 py-8 rounded-3xl block  pr-16 text-left
                 hover:ring-4 ring-yellow-300 ring-opacity-70 active:scale-90 transition-all
-                max-w-sm cursor-pointer"
+                max-w-sm cursor-pointer "
                 >
                   <span className="text-2xl block font-semibold mb-2 overflow-hidden">
                     {e.name}
@@ -310,44 +358,66 @@ const Events: NextPage = () => {
                     </span>
                   </span>
                   <span className="block">
-                    <span className="italic mr-2 inline-block">
-                      scope -{" "}
-                    </span>
+                    <span className="italic mr-2 inline-block">scope - </span>
                     <span className="bg-pink-300 px-4  rounded-full mt-2 inline-block capitalize">
                       {e.scope}
                     </span>
                   </span>
-                  <button
-                    className="bg-teal-400 px-4 py-1 rounded-xl mt-4
-                hover:ring-4 ring-teal-300 ring-opacity-50
-                
-                "
-                    onClick={() =>
-                      send({ type: "ADD_ATTENDANCE", currentEvent: e })
-                    }
-                  >
-                    Add attendance
-                  </button>
+                  <span className="flex flex-wrap gap-x-4 gap-y-3 w-fit  mt-6">
+                    <button
+                      className="bg-teal-400 px-4 py-1 rounded-xl 
+                    ring-4 ring-teal-300 ring-opacity-40 hover:ring-opacity-90
+                    
+                    "
+                      onClick={() =>
+                        send({ type: "ADD_ATTENDANCE", currentEvent: e })
+                      }
+                    >
+                      Add attendance
+                    </button>
+                    <button
+                      className="bg-blue-400 px-4 py-1 rounded-xl 
+                    ring-4 ring-blue-300 ring-opacity-40 hover:ring-opacity-90
+                    
+                    "
+                      onClick={() =>
+                        send({ type: "EDIT_EVENT", currentEvent: e })
+                      }
+                    >
+                      Edit event
+                    </button>
+                    <button
+                      className="bg-red-400 px-4 py-1 rounded-xl 
+                    ring-4 ring-red-300 ring-opacity-40 hover:ring-opacity-90
+                    
+                    "
+                      onClick={() =>
+                        send({ type: "DELETE_EVENT", currentEvent: e })
+                      }
+                    >
+                      Delete event
+                    </button>
+                  </span>
                 </div>
               );
             })}
           </section>
         </div>
       )}
-      {state.matches("viewingAttendance") && (
+      {(
         <ModalWrapper
-          isModalOpen={state.context.modalViewAttendance}
+          isModalOpen={state.matches("viewingAttendance") }
           closeModal={() => send("CLOSE_VIEW_ATTENDANCE")}
-          loading={state.context.loading}
+          loading={loading}
         >
           <ViewAttendance />
         </ModalWrapper>
       )}
-      {state.matches("addAttendance") && (
+      {(
         <ModalWrapper
-          isModalOpen={state.context.modalAddAttendance}
+          isModalOpen={state.matches("addAttendance")}
           closeModal={() => send("ADD_ATTENDANCE.CLOSE")}
-          loading={state.context.loading}
+          loading={loading}
         >
           <AddAttendanceForm />
         </ModalWrapper>
@@ -362,13 +432,36 @@ const Events: NextPage = () => {
           Add Event
         </button>
       )}
-      {state.matches("AddEvent") && (
+      {(
         <ModalWrapper
-          isModalOpen={state.context.modalAddEvent}
-          loading={state.context.loading}
+          isModalOpen={state.matches("AddEvent")}
+          loading={loading}
           closeModal={() => send("ADD_EVENT.CLOSE")}
         >
           <AddEventForm />
+        </ModalWrapper>
+      )}
+      {(
+        <ModalWrapper
+          isModalOpen={state.matches("EditEvent")}
+          loading={loading}
+          closeModal={() => send("EDIT_EVENT.CLOSE")}
+        >
+          <EditEventForm />
+        </ModalWrapper>
+      )}
+      {(
+        <ModalWrapper
+          isModalOpen={state.matches("DeleteEvent")}
+          loading={false}
+          closeModal={() => send("DELETE_EVENT.CLOSE")}
+        >
+          <DeleteConfirmation name={currentEvent?.name}
+          loading={loading}
+          msg="This will delete all the attendance records of this event"
+          closeConfirm={() => send("DELETE_EVENT.CLOSE")}
+          submitConfirm={() => send({type: "DELETE_EVENT.SUBMIT", deleteEventId: currentEvent?.id } )}
+          />
         </ModalWrapper>
       )}
     </main>

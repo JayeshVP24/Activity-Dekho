@@ -1,4 +1,4 @@
-import { useActor } from "@xstate/react";
+import { useActor, useSelector } from "@xstate/react";
 import {
   ChangeEvent,
   FormEvent,
@@ -15,6 +15,10 @@ import { Attendee } from "../../enums";
 const AddAttendanceForm: React.FC = () => {
   const globalServices = useContext(GlobalStateContext);
   const [state, send] = useActor(globalServices.clubEventService);
+  const {currentEvent, errorMsg} = useSelector(
+    globalServices.clubEventService,
+    (state) => state.context
+  );
   const parseUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     console.log(e.target.files[0]);
     console.log("file parsing onw");
@@ -58,14 +62,14 @@ const AddAttendanceForm: React.FC = () => {
     });
   };
   useEffect(() => {
-    console.log({ currentEvent: state.context.currentEvent });
+    console.log({ currentEvent });
   }, []);
   return (
-    <section className="max-h-[30rem] overflow-y-scroll p-2 customScrollbar" >
+    <section className="max-h-[30rem] overflow-y-scroll p-2 customScrollbar">
       <div className="">
         <h2 className="text-2xl font-medium ">Add Attendance</h2>
         <h3 className="text-4xl font-semibold mt-2">
-          {state.context.currentEvent?.name}
+          {currentEvent?.name}
         </h3>
       </div>
       <form
@@ -83,23 +87,26 @@ const AddAttendanceForm: React.FC = () => {
           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
         />
         <span className="bg-yellow-300 text-sm block px-4 py-1 rounded-3xl my-4">
-          Note: Excel should only consist of UIDs and the first ROW should be
-          named UIDS <br />
-          Check the sample below
+          Note: Please refere the sample below
+          <br />
+          Please keep ROW 1 as Column Titles with exact same titles as shown in
+          sample below
         </span>
         <Image
           src="/excelSample.png"
           width="600"
           height="300"
+          priority
+          loading="eager"
           alt="Example Excel Sample for attendance"
-          className="w-72 mx-auto"
+          className="w-[80%] mx-auto"
         />
-        {state.context.errorMsg && (
+        {errorMsg && (
           <span
             className="bg-red-400 px-4 py-1 rounded-3xl
           block my-6"
           >
-            {state.context.errorMsg}
+            {errorMsg}
           </span>
         )}
         {state.matches("addAttendance.displayingValidExcel") && (

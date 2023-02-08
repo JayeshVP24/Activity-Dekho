@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   DocumentData,
   DocumentSnapshot,
@@ -107,14 +108,14 @@ export const addAttendanceQuery = async (
         //   : data.volunteers.includes(studentId)
         //   ? Attendee.volunteer
         //   : Attendee.participant;
-        if(data.organizers.includes(studentId)) {
+        if (data.organizers.includes(studentId)) {
           eventAttendance[studentId] = Attendee.organizer;
-        } else if(data.volunteers.includes(studentId)) {
+        } else if (data.volunteers.includes(studentId)) {
           eventAttendance[studentId] = Attendee.volunteer;
         } else {
           eventAttendance[studentId] = Attendee.participant;
         }
-          // eventAttendance[studentId] = ;
+        // eventAttendance[studentId] = ;
         const studentDoc = studentSnapshots.find((s) => s.id === studentId);
         // student document - write
         let studentAttendance = {};
@@ -138,14 +139,14 @@ export const addAttendanceQuery = async (
           // : data.volunteers.includes(studentId)
           // ? Attendee.volunteer
           // : Attendee.participant;
-          if(data.organizers.includes(studentId)) {
-            console.log("student is coordinator")
+          if (data.organizers.includes(studentId)) {
+            console.log("student is coordinator");
             studentAttendance[clubId][eventId] = Attendee.organizer;
-          } else if(data.volunteers.includes(studentId)) {
-            console.log("student is volunteer")
+          } else if (data.volunteers.includes(studentId)) {
+            console.log("student is volunteer");
             studentAttendance[clubId][eventId] = Attendee.volunteer;
           } else {
-            console.log("student is participant")
+            console.log("student is participant");
             studentAttendance[clubId][eventId] = Attendee.participant;
           }
           // if(data.coordinators.includes(studentId)) {
@@ -171,11 +172,11 @@ export const addAttendanceQuery = async (
               [eventId]: Attendee.participant,
             },
           };
-          if(data.organizers.includes(studentId)) {
+          if (data.organizers.includes(studentId)) {
             studentAttendance[clubId][eventId] = Attendee.organizer;
-          } else if(data.volunteers.includes(studentId)) {
+          } else if (data.volunteers.includes(studentId)) {
             studentAttendance[clubId][eventId] = Attendee.volunteer;
-          } 
+          }
           const newStudentRef = doc(firedb, "STUDENTS", studentId);
           transacton.set(newStudentRef, {
             attendance: studentAttendance,
@@ -225,7 +226,10 @@ export const getStudentEvents = async (studentId: string) => {
     const studentRef = doc(firedb, "STUDENTS", studentId);
     console.log("studentId in firestore query: ", studentId);
     const studentDoc = await getDoc(doc(firedb, "STUDENTS", studentId));
-    const attendance: Record<string, Record<string, Attendee>> = studentDoc.data().attendance;
+    const attendance: Record<
+      string,
+      Record<string, Attendee>
+    > = studentDoc.data().attendance;
     const displayAttendance: displayAttendanceType[] = [];
     const ObjectAttendance = Object.entries(attendance);
     console.log(ObjectAttendance);
@@ -237,16 +241,16 @@ export const getStudentEvents = async (studentId: string) => {
         // @ts-ignore
         const eventDetails: EventType = (await getDoc(eventRef)).data();
         let extraHours: number = 0;
-        if(attendeeType === Attendee.organizer) {
-          if(eventDetails.scope === EventScope.department) {
+        if (attendeeType === Attendee.organizer) {
+          if (eventDetails.scope === EventScope.department) {
             extraHours = 6;
-          } else if(eventDetails.scope === EventScope.institute) {
+          } else if (eventDetails.scope === EventScope.institute) {
             extraHours = 8;
           }
-        } else if(attendeeType === Attendee.volunteer) {
-          if(eventDetails.scope === EventScope.department) {
+        } else if (attendeeType === Attendee.volunteer) {
+          if (eventDetails.scope === EventScope.department) {
             extraHours = 4;
-          } else if(eventDetails.scope === EventScope.institute) {
+          } else if (eventDetails.scope === EventScope.institute) {
             extraHours = 6;
           }
         }
@@ -258,7 +262,8 @@ export const getStudentEvents = async (studentId: string) => {
           scope: eventDetails.scope,
           title: attendeeType,
           "Extra Hours": extraHours,
-          "Total Hours": (Number(eventDetails.activityHours) + Number(extraHours)),
+          "Total Hours":
+            Number(eventDetails.activityHours) + Number(extraHours),
           from: eventDetails.startDate.toDate().toLocaleDateString(),
           to: eventDetails.endDate.toDate().toLocaleDateString(),
         });
@@ -298,18 +303,65 @@ export const addEventToDBQuery = async (
   clubId: string,
   newEvent: EventType
 ) => {
-  try {
-    console.log("Im in firestore folder");
-    console.log(newEvent);
-    const newEventRef = await addDoc(
-      collection(firedb, "clubs", clubId, "EVENTS"),
-      newEvent
-    );
-    console.log(newEventRef.id);
-    return {
-      successful: true,
-    };
-  } catch (e) {
-    error: e;
-  }
+  return new Promise<{ successfull: boolean }>(async (resolve, reject) => {
+    try {
+      console.log("Im in firestore folder");
+      console.log(newEvent);
+      const newEventRef = await addDoc(
+        collection(firedb, "clubs", clubId, "EVENTS"),
+        newEvent
+      );
+      console.log(newEventRef.id);
+      return resolve({
+        successfull: true,
+      });
+    } catch (e) {
+      return reject(e.message as string);
+    }
+  });
+};
+export const editEventOnDBQuery = async (
+  clubId: string,
+  editedEvent: EventType
+) => {
+  return new Promise<{ successfull: boolean }>(async (resolve, reject) => {
+    try {
+      console.log("Im in firestore folder");
+      console.log(editedEvent);
+      const newEventRef = await setDoc(
+        doc(firedb, "clubs", clubId, "EVENTS", editedEvent.id),
+        editedEvent,
+        {
+          merge: true,
+        }
+      );
+      console.log(newEventRef);
+      return resolve( {
+        successfull: true,
+      });
+    } catch (e) {
+      reject({error: e.message as string});
+    }
+  });
+};
+export const deleteEventOnDBQuery = async (
+  clubId: string,
+  deleteEventId: string
+) => {
+  return new Promise<{ successfull: boolean }>(async (resolve, reject) => {
+    try {
+      console.log("Im in firestore folder");
+      console.log(deleteEventId);
+      await deleteDoc(
+        doc(firedb, "clubs", clubId, "EVENTS", deleteEventId)
+      );  
+      // console.log(newEventRef);
+      return resolve( {
+        successfull: true,
+      });
+    } catch (e) {
+      console.log(e)
+      reject({error: e.message as string});
+    }
+  });
 };
