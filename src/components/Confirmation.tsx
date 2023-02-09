@@ -4,13 +4,14 @@ import { useContext, useEffect } from "react";
 import AvatarGenerator from "./AvatarGenerator";
 import { GlobalStateContext } from "./GlobalStateProvider";
 
-const DeleteConfirmation: React.FC<{
+const Confirmation: React.FC<{
   loading: boolean,
-  name: string,
-  msg: string,
+  subMsg: string,
+  mainMsg: string
   submitConfirm: () => void,
-  closeConfirm: () => void
-}> = ({loading, name ,msg, submitConfirm, closeConfirm}) => {
+  closeConfirm: () => void,
+  errorMsg: string
+}> = ({loading,subMsg, mainMsg, submitConfirm, closeConfirm, errorMsg}) => {
   // const globalService = useContext(GlobalStateContext);
   // const [state, send] = useActor(globalService.clubEventService!);
 
@@ -25,8 +26,9 @@ const DeleteConfirmation: React.FC<{
   return (
     <section>
       <div className="max-h-[40rem] overflow-y-scroll p-2 customScrollbar overflow-x-hidden ">
-        <h3 className="text-4xl font-semibold mt-2">Delete {name} </h3>
-        <p className="text-xl font-semibold mt-2">Are you sure? <br />{msg}</p>
+        {errorMsg && <p className="text-red-600 text-xl font-semibold">{errorMsg}</p>}
+        <h3 className="text-4xl font-semibold mt-2">{mainMsg} </h3>
+        <p className="text-xl font-semibold mt-2">Are you sure? <br />{subMsg}</p>
         <span className="flex gap-8 mt-4">
           <button className="bg-green-400 ring-4 ring-green-200  hover:ring-green-300 w-full mt-4  btnFtrs "
           onClick={() => {
@@ -49,4 +51,4 @@ const DeleteConfirmation: React.FC<{
   );
 };
 
-export default DeleteConfirmation;
+export default Confirmation;

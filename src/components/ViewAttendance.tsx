@@ -1,17 +1,19 @@
 import { useActor, useSelector } from "@xstate/react";
 import { ChangeEvent, useCallback, useContext, useMemo, useState } from "react";
 import { Attendee } from "../../enums";
+import Confirmation from "./Confirmation";
 import { GlobalStateContext } from "./GlobalStateProvider";
+import ModalWrapper from "./ModalWrapper";
 
 const ViewAttendance: React.FC = () => {
   const globalServices = useContext(GlobalStateContext);
-  // const [state, send] = useActor(globalServices.clubEventService);
+  const [state, send] = useActor(globalServices.clubEventService);
 
-  const { currentEvent, currentAttendance } = useSelector(
+  const { currentEvent, currentAttendance, currentAttendee, loading, errorMsg } = useSelector(
     globalServices.clubEventService,
     (state) => state.context
   );
-  const { send } = globalServices.clubEventService;
+  // const { send } = globalServices.clubEventService;
 
   const [inputData, setInputData] = useState("");
   const inputDataHandler = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -23,6 +25,9 @@ const ViewAttendance: React.FC = () => {
       a.id.toLowerCase().includes(inputData.toLowerCase())
     );
   }, [inputData, currentAttendance]);
+
+
+  const [attendeeType, setAttendeeType] = useState<Attendee>()
 
   return (
     <section>
@@ -74,11 +79,18 @@ const ViewAttendance: React.FC = () => {
               </span>
             </p>
             <span className="mt-2 text-sm flex flex-grap gap-x-4 ">
-              <button className="bg-red-400 px-4 rounded-3xl capitalize outline-none">
+              <button className="bg-red-400 px-4 rounded-3xl capitalize outline-none"
+              onClick={() => {
+                send({type: "DELETE_ATTENDEE", currentAttendee:a.id})
+              }}
+              >
                 delete
               </button>
               <select
-                onChange={(e) => console.log(e.target.value)}
+                onChange={(e) => {
+                  setAttendeeType(e.target.value as Attendee)
+                  send({type: "EDIT_ATTENDEE", currentAttendee:a.id})
+                }}
                 className="bg-red-400 px-3 w-max rounded-3xl  outline-none   "
                 defaultValue={a.attendee}
               >
@@ -98,6 +110,34 @@ const ViewAttendance: React.FC = () => {
           </span>
         ))}
       </div>
+      {(
+        <ModalWrapper
+          isModalOpen={state.matches("DeleteAttendee")}
+          loading={false}
+          closeModal={() => send("DELETE_ATTENDEE.CLOSE")}
+        >
+          <Confirmation errorMsg={errorMsg} mainMsg={`Delete ${currentAttendee}`}
+          loading={loading}
+          subMsg={`This will delete attendance of this student for event ${currentEvent?.name}`}
+          closeConfirm={() => send("DELETE_ATTENDEE.CLOSE")}
+          submitConfirm={() => send({type: "DELETE_ATTENDEE.SUBMIT", deleteAttendeeId: currentAttendee } )}
+          />
+        </ModalWrapper>
+      )}
+      {(
+        <ModalWrapper
+          isModalOpen={state.matches("EditAttendee")}
+          loading={false}
+          closeModal={() => send("EDIT_ATTENDEE.CLOSE")}
+        >
+          <Confirmation errorMsg={errorMsg} mainMsg={`Make ${currentAttendee} ${attendeeType} `}
+          loading={loading}
+          subMsg={`This will mark the attendee as ${attendeeType} for event ${currentEvent?.name}`}
+          closeConfirm={() => send("EDIT_ATTENDEE.CLOSE")}
+          submitConfirm={() => send({type: "EDIT_ATTENDEE.SUBMIT", attendeeId: currentAttendee, attendeeType } )}
+          />
+        </ModalWrapper>
+      )}
     </section>
   );
 };

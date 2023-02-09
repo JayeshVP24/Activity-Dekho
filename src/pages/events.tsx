@@ -13,7 +13,7 @@ import { getFilteredDates } from "../../utils";
 import AddAttendanceForm from "../components/AddAttendanceForm";
 import AddEventForm from "../components/AddEventForm";
 import AvatarGenerator from "../components/AvatarGenerator";
-import DeleteConfirmation from "../components/DeleteConfirmation";
+import Confirmation from "../components/Confirmation";
 import EditEventForm from "../components/EditEventForm";
 import { GlobalStateContext } from "../components/GlobalStateProvider";
 import ModalWrapper from "../components/ModalWrapper";
@@ -39,7 +39,7 @@ const Events: NextPage = () => {
   // const { send: authSend } = globalServices.clubAuthService;
   const authClub = globalServices.authClub;
   const router = useRouter();
-  const {dateFilter, currentEvent, events, loading} = useSelector(
+  const {dateFilter, currentEvent, events, loading, errorMsg, currentAttendee} = useSelector(
     globalServices.clubEventService,
     (state) => state.context
   );
@@ -456,14 +456,15 @@ const Events: NextPage = () => {
           loading={false}
           closeModal={() => send("DELETE_EVENT.CLOSE")}
         >
-          <DeleteConfirmation name={currentEvent?.name}
+          <Confirmation errorMsg={errorMsg} mainMsg={`Delete ${currentEvent?.name}`}
           loading={loading}
-          msg="This will delete all the attendance records of this event"
+          subMsg="This will delete all the attendance records of this event"
           closeConfirm={() => send("DELETE_EVENT.CLOSE")}
           submitConfirm={() => send({type: "DELETE_EVENT.SUBMIT", deleteEventId: currentEvent?.id } )}
           />
         </ModalWrapper>
       )}
+      
     </main>
   );
 };

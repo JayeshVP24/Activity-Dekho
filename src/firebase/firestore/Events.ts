@@ -15,7 +15,7 @@ import {
   where,
   writeBatch,
 } from "firebase/firestore";
-import { EventType } from "../../../types";
+import { AttendanceViewType, EventType, StudentType } from "../../../types";
 import { firedb } from "../config";
 import XLSX from "xlsx";
 import { saveAs } from "file-saver";
@@ -336,32 +336,145 @@ export const editEventOnDBQuery = async (
         }
       );
       console.log(newEventRef);
-      return resolve( {
+      return resolve({
         successfull: true,
       });
     } catch (e) {
-      reject({error: e.message as string});
+      reject({ error: e.message as string });
     }
   });
 };
+// export const deleteEventOnDBQuery1 = async (
+//   clubId: string,
+//   deleteEventId: string,
+//   studentsList: AttendanceViewType[]
+// ) => {
+//   return new Promise<{ successfull: boolean }>(async (resolve, reject) => {
+//     try {
+//       console.log("Im in firestore folder");
+//       console.log(deleteEventId);
+//       await deleteDoc(doc(firedb, "clubs", clubId, "EVENTS", deleteEventId));
+//       // console.log(newEventRef);
+//       return resolve({
+//         successfull: true,
+//       });
+//     } catch (e) {
+//       console.log(e);
+//       reject({ error: e.message as string });
+//     }
+//   });
+// };
+
 export const deleteEventOnDBQuery = async (
   clubId: string,
-  deleteEventId: string
+  deleteEventId: string,
+  studentsList: AttendanceViewType[]
 ) => {
   return new Promise<{ successfull: boolean }>(async (resolve, reject) => {
     try {
-      console.log("Im in firestore folder");
-      console.log(deleteEventId);
-      await deleteDoc(
-        doc(firedb, "clubs", clubId, "EVENTS", deleteEventId)
-      );  
-      // console.log(newEventRef);
-      return resolve( {
+      await runTransaction(firedb, async (transaction) => {
+        const students: StudentType[] = [];
+        // reject({ error: "error" });
+        console.log({clubId, deleteEventId, studentsList})
+        for (const student of studentsList) {
+          const studentRef = doc(firedb, "STUDENTS", student.id);
+          students.push({id: student.id , ...(await transaction.get(studentRef)).data() as StudentType})
+        }
+        for(const student of students) {
+          console.log("student id: ", student.id)
+          console.log("student before delete: ", student.attendance[clubId])
+          delete student.attendance[clubId][deleteEventId];
+          console.log("student after delete: ", student.attendance[clubId])
+          transaction.set(doc(firedb, "STUDENTS", student.id), student);  
+        }
+        const docRef = doc(firedb, "clubs", clubId, "EVENTS", deleteEventId);
+        transaction.delete(docRef);
+        // for (const student of studentsList) {
+        //   const studentRef = doc(firedb, "STUDENTS", student.id);
+        //   const currentStudent = (
+        //     await transaction.get(studentRef)
+        //   ).data() as EventType;
+        //   delete currentStudent.attendance[clubId][deleteEventId];
+        //   transaction.set(studentRef, currentStudent);
+        // }
+        
+      });
+      resolve({
         successfull: true,
       });
     } catch (e) {
-      console.log(e)
-      reject({error: e.message as string});
+      console.log("firebase query error: ", e);
+      // throw new Error(e.message)
+      reject({
+        error: e.message as string,
+      });
+    }
+  });
+};
+
+export const deleteAttendeeOnDBQuery = async (
+  clubId: string,
+  deleteEvent: EventType,
+  deleteAttendeeId: string
+) => {
+  return new Promise<{ deleteAttendeeId: string }>(async (resolve, reject) => {
+    try {
+      await runTransaction(firedb, async (transaction) => {
+
+        const student =  (await transaction.get(doc(firedb, "STUDENTS", deleteAttendeeId))).data() as StudentType;
+        delete student.attendance[clubId][deleteEvent.id];
+
+        // const event = (await transaction.get(doc(firedb, "clubs", clubId, "EVENTS", deleteEventId))).data() as EventType;
+        delete deleteEvent.attendance[deleteAttendeeId];
+
+        transaction.set(doc(firedb, "STUDENTS", deleteAttendeeId), student);
+        transaction.set(doc(firedb, "clubs", clubId, "EVENTS", deleteEvent.id), deleteEvent);
+
+        console.log("Im in firestore folder");
+        console.log(deleteEvent.id);
+        // console.log(newEventRef);
+      
+      })
+      resolve({
+        deleteAttendeeId,
+      });
+    } catch (e) {
+      console.log(e);
+      reject({ error: e.message as string });
+    }
+  });
+};
+export const editAttendeeOnDBQuery = async (
+  clubId: string,
+  editEvent: EventType,
+  attendeeId: string,
+  attendeeType: Attendee
+) => {
+  return new Promise<{ attendeeId: string, attendeeType: Attendee }>(async (resolve, reject) => {
+    try {
+      await runTransaction(firedb, async (transaction) => {
+
+        const student =  (await transaction.get(doc(firedb, "STUDENTS", attendeeId))).data() as StudentType;
+        student.attendance[clubId][editEvent.id] = attendeeType ;
+
+        // const event = (await transaction.get(doc(firedb, "clubs", clubId, "EVENTS", deleteEventId))).data() as EventType;
+        // delete editEvent.attendance[attendeeId];
+        editEvent.attendance[attendeeId] = attendeeType;
+        transaction.set(doc(firedb, "STUDENTS", attendeeId), student);
+        transaction.set(doc(firedb, "clubs", clubId, "EVENTS", editEvent.id), editEvent);
+
+        console.log("Im in firestore folder");
+        console.log(editEvent.id);
+        // console.log(newEventRef);
+        
+      })
+      resolve({
+        attendeeId,
+        attendeeType
+      });
+    } catch (e) {
+      console.log(e);
+      reject({ error: e.message as string });
     }
   });
 };

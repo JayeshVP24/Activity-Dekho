@@ -14,16 +14,16 @@ import { getFilteredDates } from "../../utils";
 export interface ClubEventContext {
   errorMsg?: string;
   events?: EventType[];
-  filteredEvents?: EventType[];
+  // filteredEvents?: EventType[];
   currentEvent?: EventType;
   newEvent?: EventType;
-  attendee?: string;
-  modalAddEvent: boolean;
-  modalAddAttendance: boolean;
+  currentAttendee?: string;
+  // modalAddEvent: boolean;
+  // modalAddAttendance: boolean;
   alert?: string;
   currentAttendance?: AttendanceViewType[];
-  filteredAttendance?: AttendanceViewType[];
-  modalViewAttendance: boolean;
+  // filteredAttendance?: AttendanceViewType[];
+  // modalViewAttendance: boolean;
   loading: boolean;
   excelFileName?: string;
   excelAttendance?: {
@@ -68,8 +68,8 @@ type ClubEventServices = {
       newAttendance: Record<string, Attendee>;
     };
   };
-  addOneAttendeeToDB: { data: EventType | string };
-  deleteOneAttendeeFromDB: { data: EventType | string };
+  // addOneAttendeeToDB: { data: EventType | string };
+  // deleteOneAttendeeFromDB: { data: EventType | string };
   editEventOnDB: {
     data: {
       successfull: boolean;
@@ -78,6 +78,17 @@ type ClubEventServices = {
   deleteEvent: {
     data: {
       successfull: boolean;
+    };
+  };
+  deleteAttendee: {
+    data: {
+      deleteAttendeeId: string;
+    };
+  };
+  editAttendee: {
+    data: {
+      attendeeId: string,
+      attendeeType: Attendee
     }
   }
 };
@@ -117,11 +128,11 @@ type ClubEventEvents =
       };
     }
   | { type: "CLOSE_VIEW_ATTENDANCE" }
-  | { type: "ADD_ONE_ATTENDEE" }
-  | { type: "ADD_ONE_ATTENDEE.SUBMIT"; attendee: string }
-  | { type: "DELETE_ATTENDEE" }
-  | { type: "DELETE_ATTENDEE.YES"; attendee: string }
-  | { type: "DELETE_ATTENDEE.NO" }
+  // | { type: "ADD_ONE_ATTENDEE" }
+  // | { type: "ADD_ONE_ATTENDEE.SUBMIT"; attendee: string }
+  // | { type: "DELETE_ATTENDEE" }
+  // | { type: "DELETE_ATTENDEE.YES"; attendee: string }
+  // | { type: "DELETE_ATTENDEE.NO" }
   | { type: "RETRIEVE_EVENTS.RETRY" }
   | { type: "ADD_ATTENDANCE.CLOSE" }
   | { type: "ADD_EVENT.CLOSE" }
@@ -132,10 +143,20 @@ type ClubEventEvents =
   | { type: "DELETE_EVENT"; currentEvent: EventType }
   | { type: "DELETE_EVENT.SUBMIT"; deleteEventId: string }
   | { type: "DELETE_EVENT.CLOSE" }
+  | { type: "DELETE_ATTENDEE"; currentAttendee: string }
+  | { type: "DELETE_ATTENDEE.SUBMIT"; deleteAttendeeId: string }
+  | { type: "DELETE_ATTENDEE.CLOSE" }
+  | { type: "EDIT_ATTENDEE"; currentAttendee: string }
+  | { type: "EDIT_ATTENDEE.SUBMIT"; attendeeId: string, attendeeType: Attendee }
+  | { type: "EDIT_ATTENDEE.CLOSE" }
   | { type: "error.platform.addeventtoDB"; data: { error: string } }
   | { type: "error.platform.editeventonDB"; data: { error: string } }
-  | { type: "error.platform.deleteevent"; data: { error: string } };
-
+  | { type: "error.platform.deleteevent"; data: { error: string } }
+  | { type: "error.platform.deleteattendee"; data: { error: string } }
+  | { type: "error.platform.addattendancetoDB"; data: { error: string } }
+  | { type: "error.platform.editattendee"; data: { error: string } }
+  | { type: "error.platform.retrieveclubevents"; data: { error: string } }
+  | { type: "error.platform.verifyexcel"; data: { error: string } };
 //   | { type: "done.invoke.retrieveclubevents", data: EventType[]}
 //   | {type: "events.actions.checkAuthAndAddToContext", club: ClubType | undefined}
 //   | {type: "events.actions.checkAuthAndAddToContext", club}
@@ -146,7 +167,7 @@ const ClubEventMachine =
 
   /** @xstate-layout N4IgpgJg5mDOIC5QFEBuYB2AXWBiAwgDLICCASgPr4DyAcgCrIAa9A2gAwC6ioADgPawAlliH8MPEAA9EAWgCsAFkUA6AEzsAjAGY1mxQDZ2agwHZNAGhABPORvYrFADm1PTa3QE4Dn9u20AvgFWaJg4KgCSACLEuITUJFEc3EggAsKi4pIyCLKK2qpuxmrenvKapuyKVrYITmrqmvqmTlXySpr1QSHo2LAqAE5gWANCYKhCGFChfbgQ4mAqk6j8ANaLQyNj6ADGADYArgBG42GwyZLpImISqTmyFQYq2qaKJa7y7J6vntU2iJoTCpPNp5GY1KZPhVtGZuiAZuFNqNxpNpr0cHMFksMCt1oNhsjdocTujzpoUnxBNcsnc7JUVPJTKZQU1tJp5E55CYanJ9ConIZFOwDE5vPVjDo4Qj+kjtqjpbgwAMBvwBipeHsAIZYABmqoAtvitqd9sdTn0LqkrplbqB7qZfipOgYdE5AeZtN8eQg9A4ufJfOVFMydO0paSVBAhLANZrrPLSbhElEKMgAGrIBiWykZG7ZRCe+QqcwVNQacpON0Gb1Chw6ZyuZQ+V7ycNnSPR2PxqYK5MUEj0Ri0KIkWj4ZDZtJUm35hBNUwMkVqAUQpri+Q1+meepcxTeMzmTltvodmNa7tos64NMRZAAdX7g8zI7HE64l2nedpuTUbxU-i0ApXhcTwyxrEFi3aUwDDLNkAwqVtgnhCMozPOMEyvAAxCJCEYSh00zegAGUKEICIiLYd8rU-Gk7TkTxgW+ZwDHkGEITcZdvWXTR1EMUDPUBMx-EQnp21QrsMNmAiGAoEdGAobDcOQMhJ2tL86J-HQVBYjw2RKJQDHyP5aghBpf0ZIwXWcEFf2PcJxPPeVlVVXAyGQegyFvDNUwzBgiJUNyPIATVUmjbWkORmSeTxvDULlfE8TRPG9Fl-1Fdk3UUTQfGygw7P6EgIAgBEkyiFNpPoFQiGoIi3wpKdc1oiK520P1vjBDkORMbRtBSzkGSykEQXZJRFHylRCuK9FT0cqZMINUryt8yqiIAVQAIQAWQiSj6rUpqclYhiRVZdpRS0dkuOMZ4ssrUFvghQIkOlCaioRFRNSKySsHofgonWzEMEWZY1kWT6IHNLAsD+9bQsa8KcgqVQdAdepOVAvdQO9ToFyynTOm3JRlzG56I0m97we+37-sVZy1VjXUDQ+orIeh-64epBHEEUT5nlcLREpBdwQWMgsF09ZRPQFMxyk0cbwZIKHMAgTUMB2MBFsfIcX3HKr4lqjmZ2-Vri1XLxnHnD1vRg7QGVamK2SqGCYvlorFawZXVfV08JKmTb+BVvZNYHbXR111aAAV4kSVMmHHQhDfU5qXTrMUfFFGFvEsf4EEhBo3jeAUtEMSpPFdiB3c9tXFnQUYdSEC9kCkdWg-mIHsVxGulSEHVrDAZuwD2RODsQGDVBTwswUrJpkpzzR-CcG6XgqfRhpccvK4wFXq5UWue4b+UB6DpUVXprVGYGQ0997-uW+HrmEFcBpvCFINRV8MxvTdRedygqpuPXqTdsCslZby9mDL6UxN7b3VtTAGbdgY4lBszFWoCYHDBhvfWcJhVAwmUKKPcJR8icm9NuBoMJ2BuCJhUdgrEN5oPASg1E0DwFwNpqfdU589SXxQdqD2YDq5s1hlRHMnNZyckXixPcLRyjtC+LPWoLEeIcjZE0N4pR2T0P4egn2s0oBpk1HsIQxUj7ByfMOMOyAVBrS2jtLB34HrPHMB4F0BgCgBl6nPXKps3gVCKG4liWiq7ewcuhKYBijEmJbmY0Or4VCR2juVOOyAE4iIamIhx-UtAihFAJHJosEBDQZG6ecbgeb+HGhMMAAB3ZhDDq4EH1sgCgN57xa2fJY+xGlZBsieC6bKZQAwuAFBuHObgGImCcCxGWlYx6VLGLUqB9T1a4EUnhdpFjXxdOarIEwPE3EaFFL+QmrFvSQiLL+QERNgx+E9ONUJjdEzICiDtHyhFtn3AMsCMwBgWKcheHFGsehHBNCkZ8aCrFGTjWQFGLA70Hmon9oHXAzzXkhw6XEmx21dofnhrOWQ0Fx5Mi5DLPcGVrYuAZEjACLQiHQthSVVF9A3kMD1jVOquKMndPUcCQw+haHOyUFUFKZR-yGDcWUAoWUIQiWQu2GFIh3qQGuD2dEgNEGdxUMqj26JxDszSftB+Cg-DPESqxYwPNvhujOSbYUPNHhGB5k9JCGAA5wEkNKTlRtunz2uuozoTQIQug5N6HpJtYr8xJV1JQ41ojEC9Une4TrtJMUoTKnQn8c4EsXhZVqzIpnMlskAk8soUSqrOAmkeuQAwOD8EKSWQo3C-Oxv1aChkP75GFJ0EmokTwIvLX0StRqkqL2ZDFYUrECiVicCKhi7RtwS0MhbYU9zOx6OQHTId+LfiLwKGuEZ7BzCUJSj1Z4NDly6EMAKUw41yboi3d+Nx-I3TMkqP04wShQ2-ltoYFxZrZZaFvW9aaqE9HzUvg+jSwYeLfH5VQl0F7Q0jW+R4V988XBvCA1NMITCB0-RhpB5qTQeLT1fV2+ecUCkLmyvPSE1k3HZT3EEgR6tCM5B6qoF+tD9Dv2FKYb0SgizshMFZXwVRAG9vCCA7RjD+1QCRYYtjiAlC2zKG4yEMUDIimtrobSUafAFEvWoZjOjr4Hx7EfJTCADk3XsJCF0ZrSGHueC4YUvwmTCgk3Kk80ngkQKjEsmT1c4FWecA0dwJg9DLh0i8bGI6z3z1BdBeoiUTOybXWE-RhjjFNxboR6GvAATz1UGWN4T8QyGX4yAPYYAdRYEQKBReQ0xR7NeKCKwRx+BQ34PqIrXJ1C-g8PUCrwYrCjCgAAC3q3OcTwJPQtZdG16sIBakQCwBNgEGh-x+B27tvwTQrATbAEISb03nBWByI1ubMUlyLfyKM2oTQqgDbK8N3pwZ5k1LqUF1j1E8XGx4v4MwZWlHfEoQ9xAGngR+FljBDzVR6WKvvX9rlOyyiqH9SUoN5Kc7+kcHuXQDHdCMicIjuFIGMsXgU3sKzBLXjFnTrQmKYnOI536bykWwZCUlBvcW8ICryc4e1d9WnH9HAlADe6YNM6c4tBI7LQuApvC6CCEEIAA */
 
-  /** @xstate-layout N4IgpgJg5mDOIC5QFEBuYB2AXWBiAwgDLICCASgPr4DyAcgCrIAa9A2gAwC6ioADgPawAlliH8MPEAA9EAWgCsAFkUA6AEzsAjAGY1mxQDZ2agwHZNAGhABPORvYrFADm1PTa3QE4Dn9u20AvgFWaJg4KgCSACLEuITUJFEc3EggAsKi4pIyCLKK2qpuxmrenvKapuyKVrYITmrqmvqmTlXySpr1QSHo2LAqAE5gWANCYKhCGFChfbgQ4mAqk6j8ANaLQyNj6ADGADYArgBG42GwyZLpImISqTmynZ4qni5qak6K7E71Rk41iE0ni8-F9PNp2J5vBDuiAZuFNqNxpNpr0cLgwAMBvwBipeHsAIZYABm2IAtoNhojdocTqjzlxLoJrlk7nJTJ5VJ0DDonJo1OZtJ5TP8EHoHPI1PJfOVFKZtDp2jC4f0IEJYHj8dZkcrcIkohRkAA1ZAMC6pK6ZW6gHLc7QqCVy7TyMw6UwtEWCzSODneeSCoyQsFKukqVXqglaqY6vUUEj0Ri0KIkWj4ZBmvhMy3ZRDaUzyRwggz5PNqRSlkWyu2S7lyjnaMxB4KwkNhjWRlFnXCGiLIADqsfjJqTKbTDPNmZu2dyfKe8r95X5PN58hFUqcKgFJblec8TWDZ1Darb2rpuAAYhFCIxKEaTfQAMoUQgRe9sMcZjKT1m5IFC5wGP0DH5Nx3hFd4vVLHwPF3ExKidfc+kPcNNRPTtbwYCgk0YCgLyvZAyHTNIJxZa07EFFR6w0XkXEUPlyjAtwC3kFx5C0T4DHlBDwlbCNUNmZAogiegDWNU13yIz8SOkOQHRUJo+S0TwSnYICDArPw5IKNxzB09kiy4lUj14qNTyiZBiGw9C3xSD9mStaTckUXwVCcXwIVMIC+T5bRV2clxPOY1jNC0TQDKQ48o0xbFcDIZB6DIHtjREu97xUWL4oATUIi0v1I3I5QMZ5vElZTd08D1yhUUFNGY-RNB8eqDDCkgIAgOFdSifUrJUIhqHvUcbIkuypx0cUhWdQKfm0HybBzJx8w6MEwRqpRFGa1q4SQ4yoDPMkOq60T6BUe8AFUACEAFkhOy4j7JyP0ngMXkFWY3wmhXWbRWMCjaO+J0hX5QIm2VFQWra1EVHxVq+Kweh+CiM65gWJYMBWdZIda05sCweGzpuyS7oBUxOVzF53ilUtITUEVOlMRx6olR55rLD51vBsIMdVEywjhhH0SinENWJMlOaxrAcYR-Hhu-RRWIo1xFM0MF3DBapPtzCiOXyF5DDzPdgZDKGIBIcXMAgfEMB2MB9oHBNh1THr4n6qWs2-JW6e5EoHrzbT6xFIw7SFHdWklIVdDCo2TawM2Lat8Ltou-hzb2G24zt5MHZOgAFeJEgNJhU0IF3coc4mHEqWWauUIV6rV2oXC9CFSwblSDCA0wI9aqOY8txZ0FGIkhHbZApCtlP5gwRZljWPuMSEIlrDAUewD2YupJyPN8yaVpaL5ZxdGpz75LpkLdyA2j5WMTvjdNjBzd7lR+-noftWXlOMSxQWCWFgZySfhel5jzXoTBA5Q7SynqkKNoSkfAilcnTJyuZnQ6GcMFNQ19u531josI2yJMH3ytrzRGE8p6oxnpzQk0csG9wlnjcSOV145iAvaNwstWLyHMDRGmVQHDV0qD4ICUpZQYNvgQnB0Mpj4OwUQ-mn9cTfxJL-ChojsG0OAVOF4Tx6omFLOwcwfpjAijlA4SUOhgqMyetNERVCxHxxQlMQ0+I9hCDam-VOg5EwZ2QMdc6V1rKMgJiNNBLkWjfAqErWUZQaalnzIKUskDVLvDWgbA8kcVEPx4vYqAjjnGuLHu49OI4VDZ1zl1Au5l1Fu3evaGJOgORuhUsKI+Wh1yU3lAIosHInBhQmGAAA7ng9JVsCBO2QBQbsfZbZDi8ZUvKDwOFyV9OUMoZZd5qU+nKVpzhmZOUhHEnpYwBmSKGdbXC14pmeJHLMhyAF7QeWmt4Co7BXrcNufczRspm6GDCsgVUWB2oCSEslBgjs+oDQCdLOZrhVB+jlMWQCJRpqrnBCE9kIVOF+HQSkxCvyRCbUye2ROydcCAuEt1U6l1rr0NulOWQaKXIvEEd5coHD-ZmE0k6Xkvh5omCati8IuL-kQ0gNcbm2AkaTxRmjRYIro6onEJLalgTvwKA1k6fR-gKiyyRRs55VUno+ClAUPwZYfl-M2rKmGsjsTyMJIo8ksqxYKroYNBhICHhVEKpRIsWh3D+C+P7eaVUtUVA8G3GqWKegHiiCvYYYB2pmQsmM7qvVnZKshQ5WQ7x1xmDcL6dwUE-afQanJWWnwIQvQAmFGNew434qMlk3av9cCJrismw6PjKX+PHMquZZaVAcQ8KWQwLpDA0z5B7JyEoPg6Dbpxfl-Qa11ohhAWNogxVYAlaQ6VoY11gDFtc+4TkvS0QArLIwUpB0ijBHaD4SDZ1t35PIate78VrqtR-G1Qt7W7trdHA96bXZQqVhuesAECgAT0ZCOuAI9Ae2MErDiyDkFBCbBgJOcBJDKghUBzNTQywUVUp8UN-q-ifVkNNBwxVcwqQhFKPkYVojEBwyXI9foB1-i+E+2dTTah0vXBwjiejXBmF0MkqNiEETbBhvAHtGb7hSgcCaqo+RPhuDbjTINHlOkqXyCpTo4nmwHgJTJljjDpxChcroJ6+GgIlDlB6SE9o1xOWMMYZweiwomcip-Mz7quk-W3h8Vi5gA3q2mhRJ57wxNPWEQu0GG1UR+anBxFyvJtz6bQUoEUWb8iOCAq4ZieY-C1jZvW2A20m2kmSzLcwzxzBqbzJ7FwOWVrPAK9uYKNFI1GcQmDTauCN1EJq3leSaWKg0e5FlmDCA6b1WCnmZw3h2lOWsT3K2I2HKGHzBAnwFcKY+BmrUArLkqL5CcJ5Msng1vULjt5qARKnGbZtMTfLnw9DtH0G4SwGymgUSos6YwHF6o3dsf-F+UY37PcQB5BoHxfTygqGCP016LtVQXE9Z0vgjChXi2kmx2DOaDIJ73YbcncM2h0OocEvKPiSmUNEjy9WlILaevUL4oPCf3ZyS4keY9ocIHMU8ZQHkeQVHuWR2o284dKWLPWFlbcDn9OJ+tsAAuXAbnqtNVozp3AXxpoKQOtNWgRMsYZkGgq4QC49RyQjJhiN+vBJLxAkTHCChaE0EKip4uW5XQ2wlScnvk9Y3IIoA6pTGOx65PRq427PHd2CEwfpwJmrxcKv5MNrfY8cCUToTR+TcmYkY3kLlyj6GzU5QdL6-3xqS8H8zdLlCOGUHoJWNUqY-frmCDc7g3hsIqCy6vy6Ob3aq9bgRzeyyAnbyz6JNUanuHF-NNvfKJPhCXdHN9f7M-1-dYKJ4EokPTRCxW1HEFe-1n0bLjuqGgA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QFEBuYB2AXWBiAwgDLICCASgPr4DyAcgCrIAa9A2gAwC6ioADgPawAlliH8MPEAA9EAWgCsAFkUA6AEzsAjAGY1mxQDZ2agwHZNAGhABPORvYrFADm1PTa3QE4Dn9u20AvgFWaJg4KgCSACLEuITUJFEc3EggAsKi4pIyCLKK2qpuxmrenvKapuyKVrYITmrqmvqmTlXySpr1QSHo2LAqAE5gWANCYKhCGFChfbgQ4mAqk6j8ANaLQyNj6ADGADYArgBG42GwyZLpImISqTmynZ4qni5qak6K7E71Rk41iE0ni8-F9PNp2J5vBDuiAZuFNqNxpNpr0cLgwAMBvwBipeHsAIZYABm2IAtoNhojdocTqjzlxLoJrlk7nJTJ5VJ0DDonJo1OZtJ5TP8EHoHPI1PJfOVFKZtDp2jC4f0IEJYHj8dZkcrcIkohRkAA1ZAMC6pK6ZW6gHLc7QqCVy7TyMw6UwtEWCzSODneeSCoyQsFKukqVXqglaqY6vUUEj0Ri0KIkWj4ZBmvhMy3ZRDaUzyRwggz5PNqRSlkWyu2S7lyjnaMxB4KwkNhjWRlFnXCGiLIADqsfjJqTKbTDPNmZu2dyfKe8r95X5PN58hFUqcKgFJblec8TWDZ1Darb2rpuCNJvoFCTjAoADEIoRGGR02kJyzrXZBSp6xpeS5FHy5Qiu8pgFvILjyFonwGPK+59Ie4aaienbIFEESXueppjhmGSTqyuQOioTR8longlOwBgmBWfhEQUbjmAx7JFnB4SthGyGzFEyDEDemFsNhr64e+0hyIovgqE4vgQqYlF8ny2iruJLiyeBkGaFomgsSqR7sVGmLYrgZDIPQZA9saBrGgwADKKhGSZACaL4WnhH65HKBjPN4krkbungeuUKigpo4H6JoPhhQYWkqCQEAQHCupRPqfEqEQ1BWaOKQ4cyVoiQgOjikKzqqT82gKTYOZOPmHRgmCwVKIoUUxXFqIIbpUC3mSCVJZZ9AqFZACqABCACy6FOW+OU5H6TwGLyCrgb4TQruVorGN+AHfE6Qr8oETbKtFsVwio+KxRxWD0PwUSDXMCxLBgKzrMdsWnNgWCXYN41CZNAKmJyuYvO8UqlpCagip0oEAQYEqPJVZYfI1h0tSdqpRqiF1Xei+k4hqxJkk9EAvVgb1XZ92VTookHfq4pGaGC7hgtUK25t+HL5C8hh5nue0hsjJBE5gED4hgOxgF1A4JsOqYpfE6Wk1m+G06B3IlNNeb0fWIpGHaQo7q0kpCroUW8-zGCC8LixsUhUzDfwgt7GLcYS8mUv9QACvEiQGkwqaEHLLm5b9DiVBTwXKEKYWM7ULhehCpbRxRBiUaYRuxXzWAC0LIsqOgoxEkI7bIFIIv2-MGCLMsayLDnQhEtYYBF2Aex+8JOR5vmTStABfLOLooMrcRoEabulEAfKxgpxAacZ+b2cYjX+fag39sYli2MErjAzktXtf18XzffQg5R2rKYVCm0ZE+CKkkQ3Tzo6M46lqBPU+m5nizI8iL9myL6PXaX5f3UrvjQk6dX7m2Jh9ASzkW45kovaNwFNILyHMP+MGVQHBh0qD4SiUpZTPxNt-d+p0phfzfr-TGq9cTrxJJvYBBC34QP3lOF4TwwomFLOwcwfpjAijlA4SUOh1LQ1mqVfBoDCEIWPFMQ0+I9hCDikvB2g5EzO2QH1Iao1+KZUEmTBWj8JItG+BUWmsoyhg1LPmQUpZT6UUovDbmB5jbiLfpItqMi5EKOLkop2I4VBuw9klb23EmF6OCvaCxOgORugosKfuWh1zA3lNgosHInBRQmGAAA7p-eh5sCAy2QBQbsfZxZDlUSE1yDxkFEV9OUMoZYu4GF4a4dQzhYZiUhFY9JYxskkNySLXAXEeKFMdkOZAGVGRfSnLTL0hgoYSiUN8KUs1zF5nUKUIx-gYIlCisgVUWB4qoXQhZC80s0oTPHFM-CshXCqD9HKYsfpKJgjKrUbhBj2QaRQX4J+Dj4J7JEEdS27YbZ2zPGhDCPV1EjTGlAiaU5ZCfIki8HB8lyjIM1mYWiTpeS+EqiYSKfzwgAoOS1SA1xUZhBumXO6D1FjkvTqicQJM4VXMqfc78yDgr+AqBTUqvD2D5gok4HwUoCh+DLLs-ZR0GVnQodiKhhIaHkgZYTZlkDtHQIPg8KoHkfxFi0O4fwXxNaVUCryioHhE7BV+T0A8URG7DDAPFIZxlCnJVSrLVlujKnvHXGYNwvp3A+CtZrXcREKafAhPNKGUUHV7CdUCnSVt2qdVdbxKFA0YVaMmT63KeQlAqG2boZQidzCGDBnyJWYkJQfB0InWCRL+jxsTS1AmCbRCUuwNSgBdLQyOvToTCp+axKzLCkoZ0grvC6BFC8iSjz62J35PIONA7nVtoHXKleCqcbKv7R2sAQ7vXy0qfKJ47koYFChpwyEkcAR6CVsYWmME7531XQer+h7BncTdaUxM4yzles1fC-CUNvzK3rEY5wWDzE6ECq0WaJYqiSmTk2lQLb06fotsm9sHVN7fuGX+riais2aOHTkSDEbo3RNrPkMGlQ7RqSFHrCoXwV1oYw2ALD+7hg5PEV+-+tKgHtqdSAgWh7yMVQ3BKUskaviK1+mDXMDQ9BQxMO4esMF31Ou4yJztUAsPyrXkqvGemwBidNhJ49-sprsntHmJ0nCBHLVqGFesRFZogSFC8Lk3Ssl8engMo5l5Rn-ouVlE9I724VG3LNbkdZzHht+vTCmKK4ZSpELpnDyI8OknBcc0LxHoVkeszA3IKGNwcjY1sqrTT+7zI3PrbZkkcEZawNx2VfT+Oi0ExXR6DKLMEzAJJ3I7moZgg8LVOsEJ6NYv0OUW0M5JQNTQySjr+yAuWdFtu4zG8VX7MG1Z4DbKovrgvhyRWxj6hgxDY1sERRNpaF2na-5+zDPBaIwBz14WdGRfuJKZ4Py8xiS0JN74YNnSqDLFV-kYkOm7SbBgW2cBJDKlzX9uQTQyzgZMJ8S1xq-grRueCZ4lFBTgTx5CKK0RiDo5s6JP0RahSfHqJzessTaiIvXMgmCnDXBmBLVFBE2wzrwEuXm+4UoHASqqPkFnMk6uubNQrkHRZwTcnsS91i2Wu04Dp2Vh4QoJK6FmljyiJQ5QekhPaNcIONBx04VFYF2osb6+1ak9aHcPiQXMCapmpVvysfeCW2aeC0NNThG7qcMEJK8m3BRJoxglAilkKWY+ZOPhunaBFBGzUwitRTblqP+ET7PHLV8PMysXAp7qqTjw251L-ltc2A8EekbEI7NgX+xfXLEVjxUXMCfH7J5WqBMK6lgctaSWJMRgWwA99yoYfMJ8fDByBj4V5iAycSV-GHbkMFcyz7AVnZ31tbayIXzaX6jgDV6Gz9Bywo+mjfl-JOkwSSj8SO3gvKMS9L+IBkgaA+F9HlAqDBD9FnRFUCgXFmmdF8CME0jQycTn3xk20IW73FwxwQFtHUHBAJQ+GWzvTyn5A8m8zFBkm+F-E-xcVPygHcXkULmLn-zyinUcFlFtDjxklcErXqGRTT3cnRUTj816QM36Xn0wPpwQHlGN0MTeHUi8l3A5wBEFS9DKHaA4Q0zzDa0jwkIN3kNUH1TxyNXBEJ1qFMUcEFBaDeD8CLHAm0LbR1ygFBQv10O1SKCLSlD4XgMkk4VXETmeEsIm0vXeEQK136BJRlQ2112YNkHgMcBKE6CaBIOClMIAN5AknKH0D9TEm2W03Th0Ii0kMRWUDYLLEBGChBkfyjjBA3HcDeCKm7g8DyPXXz1oKL1cIRWwVKL0BmSlDIiqPvTCQdAfRaDqTCmaKBU3WiI6OuUFCeAlBfVKh92jUgK9H5DeHZwqNLFQzCPQzXSw2YNk3nRCkqHrV91SLyjh0a0h38BKA2hW12M4yy0QlwzJEOLKCIkeBaDEn+k6Ah14PqKhkiQAhsOaN0ymNEO63eKAIpjjyexdAGLynqCeAhD8AlHu0tTawOJmPZQomeBMAu3DhQT7lc1S2uJeX1kVixIIUPVcULzeJxPzVKieEMGD0fmUA2Ih0MHUH1i2kDhN2pO6xUE60hPE3EMKINydC9G5VKmMC+BrT8n7iYnnWcC+DV0dEJSCCAA */
   createMachine(
     {
       predictableActionArguments: true,
@@ -159,18 +180,18 @@ const ClubEventMachine =
       },
 
       context: {
-        modalAddAttendance: false,
-        modalAddEvent: false,
-        modalViewAttendance: false,
+        // modalAddAttendance: false,
+        // modalAddEvent: false,
+        // modalViewAttendance: false,
         loading: false,
         errorMsg: undefined,
         alert: undefined,
         excelAttendance: undefined,
-        attendee: undefined,
+        currentAttendee: undefined,
         currentAttendance: undefined,
         currentEvent: undefined,
         events: undefined,
-        filteredEvents: undefined,
+        // filteredEvents: undefined,
         newEvent: undefined,
         dateFilter: {
           fromDate: getFilteredDates(DateFilters.currentYear).fromDate,
@@ -209,31 +230,16 @@ const ClubEventMachine =
 
         displayingEvents: {
           on: {
-            ADD_EVENT: {
-              target: "AddEvent",
-              actions: "openAddEventModal",
-            },
+            ADD_EVENT: "AddEvent",
 
             ADD_ATTENDANCE: {
               target: "addAttendance",
-              actions: [
-                "addSelectedEventAndAttendanceToContext",
-                "openAddAttendanceModal",
-              ],
+              actions: ["addSelectedEventAndAttendanceToContext"],
             },
 
             VIEW_ATTENDANCE: {
               target: "viewingAttendance",
-              actions: [
-                "addSelectedEventAndAttendanceToContext",
-                "openViewAttendanceModal",
-              ],
-            },
-
-            FILTER_EVENTS_LIST: {
-              target: "displayingEvents",
-              internal: true,
-              actions: "filterEvents",
+              actions: ["addSelectedEventAndAttendanceToContext"],
             },
 
             EVENT_DATE_FILTER: {
@@ -281,7 +287,7 @@ const ClubEventMachine =
 
                 onDone: {
                   target: "#Events.retrievingEvents",
-                  actions: ["alertNewEventAdded", "closeAddNewModal"],
+                  actions: ["alertNewEventAdded"],
                 },
 
                 onError: {
@@ -345,7 +351,6 @@ const ClubEventMachine =
                   target: "#Events.viewingAttendance",
                   actions: [
                     "alertAttendanceAdded",
-                    "closeAddAttendaceModal",
                     "clearExcelFromContext",
                     "modifyCurrentEventInContext",
                   ],
@@ -367,28 +372,21 @@ const ClubEventMachine =
           initial: "displayingModal",
 
           on: {
-            "ADD_ATTENDANCE.CLOSE": {
-              target: "displayingEvents",
-              actions: "closeAddAttendaceModal",
-            },
+            "ADD_ATTENDANCE.CLOSE": "displayingEvents",
           },
         },
 
         viewingAttendance: {
           on: {
-            CLOSE_VIEW_ATTENDANCE: {
-              target: "displayingEvents",
-              actions: "closeViewAttendanceModal",
+            CLOSE_VIEW_ATTENDANCE: "displayingEvents",
+
+            DELETE_ATTENDEE: {
+              target: "DeleteAttendee",
+              actions: "setCurrentAttendee",
             },
 
-            FILTER_ATTENDANCE: {
-              target: "viewingAttendance",
-              internal: true,
-              actions: "filterCurrentAttendance",
-            },
+            EDIT_ATTENDEE: "EditAttendee",
           },
-
-          entry: "openViewAttendanceModal",
         },
 
         EditEvent: {
@@ -437,11 +435,11 @@ const ClubEventMachine =
               on: {
                 "DELETE_EVENT.SUBMIT": {
                   target: "deletingEvent",
-                  actions: "setLoadingTrue"
+                  actions: "setLoadingTrue",
                 },
               },
 
-              exit: "clearErrorMsgFromContext"
+              exit: "clearErrorMsgFromContext",
             },
 
             deletingEvent: {
@@ -455,7 +453,7 @@ const ClubEventMachine =
                 },
               },
 
-              exit: "setLoadingFalse"
+              exit: "setLoadingFalse",
             },
           },
 
@@ -463,6 +461,82 @@ const ClubEventMachine =
 
           on: {
             "DELETE_EVENT.CLOSE": "displayingEvents",
+          },
+        },
+
+        DeleteAttendee: {
+          states: {
+            displayingForm: {
+              on: {
+                "DELETE_ATTENDEE.SUBMIT": {
+                  target: "deletingAttendee",
+                  actions: "setLoadingTrue",
+                },
+              },
+
+              exit: "clearErrorMsgFromContext",
+            },
+
+            deletingAttendee: {
+              invoke: {
+                src: "deleteAttendee",
+                id: "deleteattendee",
+                onDone: {
+                  target: "#Events.viewingAttendance",
+                  actions: "deleteAttendeeFromContext",
+                },
+                onError: {
+                  target: "displayingForm",
+                  actions: "addErrorMsgToContext",
+                },
+              },
+
+              exit: "setLoadingFalse",
+            },
+          },
+
+          initial: "displayingForm",
+
+          on: {
+            "DELETE_ATTENDEE.CLOSE": "viewingAttendance",
+          },
+        },
+
+        EditAttendee: {
+          states: {
+            displayingForm: {
+              exit: "clearErrorMsgFromContext",
+
+              on: {
+                "EDIT_ATTENDEE.SUBMIT": {
+                  target: "editingAttendee",
+                  actions: "setLoadingTrue",
+                },
+              },
+            },
+
+            editingAttendee: {
+              invoke: {
+                src: "editAttendee",
+                id: "editattendee",
+                onDone: {
+                  target: "#Events.viewingAttendance",
+                  actions: "editCurrentAttendance"
+                },
+                onError: {
+                  target: "displayingForm",
+                  actions: "addErrorMsgToContext",
+                },
+              },
+
+              exit: "setLoadingFalse",
+            },
+          },
+
+          initial: "displayingForm",
+
+          on: {
+            "EDIT_ATTENDEE.CLOSE": "viewingAttendance",
           },
         },
       },
@@ -548,21 +622,21 @@ const ClubEventMachine =
         // }),
         clearContext: assign({
           events: (_) => undefined,
-          filteredEvents: (_) => undefined,
+          // filteredEvents: (_) => undefined,
           excelAttendance: (_) => undefined,
           currentAttendance: (_) => undefined,
-          filteredAttendance: (_) => undefined,
+          // filteredAttendance: (_) => undefined,
         }),
         addEventsListToContext: assign({
           events: (_, event) => event.data as EventType[],
-          filteredEvents: (_, event) => event.data as EventType[],
+          // filteredEvents: (_, event) => event.data as EventType[],
         }),
-        filterEvents: assign({
-          filteredEvents: (context, event) =>
-            context.events.filter((f) =>
-              f.id.toLowerCase().includes(event.query.toLowerCase())
-            ),
-        }),
+        // filterEvents: assign({
+        //   filteredEvents: (context, event) =>
+        //     context.events.filter((f) =>
+        //       f.id.toLowerCase().includes(event.query.toLowerCase())
+        //     ),
+        // }),
         // updateDateFilter: assign({
         //   dateFilter: (_, event) => event.query,
         // }),
@@ -589,24 +663,24 @@ const ClubEventMachine =
         // alertOneAttendeeDeleted: assign({
         //   alert: (_) => `One Attendee deleted`,
         // }),
-        openAddEventModal: assign({
-          modalAddEvent: true,
-        }),
-        closeAddNewModal: assign({
-          modalAddEvent: false,
-        }),
-        openAddAttendanceModal: assign({
-          modalAddAttendance: true,
-        }),
-        closeAddAttendaceModal: assign({
-          modalAddAttendance: false,
-        }),
-        openViewAttendanceModal: assign({
-          modalViewAttendance: true,
-        }),
-        closeViewAttendanceModal: assign({
-          modalViewAttendance: false,
-        }),
+        // openAddEventModal: assign({
+        //   modalAddEvent: true,
+        // }),
+        // closeAddNewModal: assign({
+        //   modalAddEvent: false,
+        // }),
+        // openAddAttendanceModal: assign({
+        //   modalAddAttendance: true,
+        // }),
+        // closeAddAttendaceModal: assign({
+        //   modalAddAttendance: false,
+        // }),
+        // openViewAttendanceModal: assign({
+        //   modalViewAttendance: true,
+        // }),
+        // closeViewAttendanceModal: assign({
+        //   modalViewAttendance: false,
+        // }),
         addSelectedEventAndAttendanceToContext: assign({
           currentEvent: (_, event) => event.currentEvent,
           currentAttendance: (_, event) => {
@@ -621,18 +695,18 @@ const ClubEventMachine =
               return attendance;
             }
           },
-          filteredAttendance: (_, event) => {
-            if (event.currentEvent.attendance === undefined) return [];
-            else {
-              const attendance: AttendanceViewType[] = [];
-              for (const [key, value] of Object.entries(
-                event.currentEvent.attendance
-              )) {
-                attendance.push({ id: key, attendee: value });
-              }
-              return attendance;
-            }
-          },
+          // filteredAttendance: (_, event) => {
+          //   if (event.currentEvent.attendance === undefined) return [];
+          //   else {
+          //     const attendance: AttendanceViewType[] = [];
+          //     for (const [key, value] of Object.entries(
+          //       event.currentEvent.attendance
+          //     )) {
+          //       attendance.push({ id: key, attendee: value });
+          //     }
+          //     return attendance;
+          //   }
+          // },
           // currentAttendance: (context, event) => event.currentEvent.attendance,
           // filteredAttendance: (context, event) => event.currentEvent.attendance,
           // filteredAttendance: (context, event) => {
@@ -640,13 +714,13 @@ const ClubEventMachine =
           //   else return Object.keys(event.currentEvent.attendance);
           // },
         }),
-        filterCurrentAttendance: assign({
-          filteredAttendance: (context, event) => {
-            return context.currentAttendance.filter((f) =>
-              f.id.toLowerCase().includes(event.query.toLowerCase())
-            );
-          },
-        }),
+        // filterCurrentAttendance: assign({
+        //   filteredAttendance: (context, event) => {
+        //     return context.currentAttendance.filter((f) =>
+        //       f.id.toLowerCase().includes(event.query.toLowerCase())
+        //     );
+        //   },
+        // }),
         clearSelectedEventFromContext: assign({
           currentEvent: (_) => undefined,
         }),
@@ -667,6 +741,26 @@ const ClubEventMachine =
         addNewEventFormToContext: assign({
           newEvent: (_, event) => event.newEvent,
         }),
+        setCurrentAttendee: assign({
+          currentAttendee: (_, event) => event.currentAttendee,
+        }),
+        deleteAttendeeFromContext: assign({
+          currentAttendance: (context, event) => {
+            return context.currentAttendance.filter(
+              (f) => f.id !== event.data.deleteAttendeeId
+            );
+          },
+        }),
+        editCurrentAttendance: assign({
+          currentAttendance: (context, event) => {
+            return context.currentAttendance.map((f) => {
+              if (f.id === event.data.attendeeId) {
+                f.attendee = event.data.attendeeType;
+              }
+              return f;
+            });
+          }
+        }),
         modifyCurrentEventInContext: (context, event) => {
           console.log({ "modify context: ": event.data });
           context.currentEvent.attendance = event.data.newAttendance;
@@ -680,7 +774,7 @@ const ClubEventMachine =
             )) {
               attendance.push({ id: key, attendee: value });
             }
-            return attendance;
+            context.currentAttendance = attendance;
           }
           // filteredAttendance: (_, event) => {
           //   if (event.currentEvent.attendance === undefined) return [];

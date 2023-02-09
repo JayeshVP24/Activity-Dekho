@@ -13,6 +13,7 @@ import {
 import {
   addAttendanceQuery,
   addEventToDBQuery,
+  deleteAttendeeOnDBQuery,
   deleteEventOnDBQuery,
   editEventOnDBQuery,
   retrieveClubEventsQuery,
@@ -83,10 +84,16 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
       editEventOnDb: async (context, event) => {
         return await editEventOnDBQuery(authClub.id, event.editedEvent)
       },
-      deleteEvent: async (conext, event) => {
+      deleteEvent: async (context, event) => {
         console.log("deleting event")
-        return await deleteEventOnDBQuery(authClub.id, event.deleteEventId)
-      }
+        return await deleteEventOnDBQuery(authClub.id, event.deleteEventId, context.currentAttendance)
+      },
+      deleteAttendee: async (context, event) => {
+        return await deleteAttendeeOnDBQuery(authClub.id, context.currentEvent, event.deleteAttendeeId)
+      },
+      // editAttendee: async (context, event) => {
+      //   return await editAttendeeOnDBQuery(authClub.id, context.currentEvent, event.attendeeId, event.attendeeType)
+      // },
       //   retrieveAttendance: async (_) =>
       //     new Promise(() => {
       //       return resolve("afw")
