@@ -1,11 +1,13 @@
 import { useActor, useSelector } from "@xstate/react";
-import { ChangeEvent, useCallback, useContext, useMemo, useState } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useCallback, useContext, useMemo, useState } from "react";
 import { Attendee } from "../../enums";
 import Confirmation from "./Confirmation";
 import { GlobalStateContext } from "./GlobalStateProvider";
 import ModalWrapper from "./ModalWrapper";
 
-const ViewAttendance: React.FC = () => {
+const ViewAttendance: React.FC<{
+  setAttendeeType:Dispatch<SetStateAction<Attendee>>
+}> = ({setAttendeeType}) => {
   const globalServices = useContext(GlobalStateContext);
   const [state, send] = useActor(globalServices.clubEventService);
 
@@ -27,7 +29,6 @@ const ViewAttendance: React.FC = () => {
   }, [inputData, currentAttendance]);
 
 
-  const [attendeeType, setAttendeeType] = useState<Attendee>()
 
   return (
     <section>
@@ -69,16 +70,16 @@ const ViewAttendance: React.FC = () => {
         {filteredAttendance.map((a) => (
           <span
             key={a.id}
-            className="flex flex-col justify-between w-full  mx-auto bg-lime-300 px-4 py-2 rounded-2xl
+            className="flex flex-col justify-between w-full  mx-auto bg-lime-300 px-4 py-4 lg:py-3 rounded-2xl
           "
           >
-            <p className="flex items-center">
+            <p className="flex flex-wrap justify-between items-center gap-y-2">
               {a.id}{" "}
-              <span className="italic bg-amber-200 px-2 rounded-full ml-auto text-sm">
+              <span className="italic bg-amber-200 px-2 rounded-full  text-sm">
                 {a.attendee}
               </span>
             </p>
-            <span className="mt-2 text-sm flex flex-grap gap-x-4 ">
+            <span className="mt-4 text-sm flex flex-wrap gap-x-4 gap-y-2 ">
               <button className="bg-red-400 px-4 rounded-3xl capitalize outline-none"
               onClick={() => {
                 send({type: "DELETE_ATTENDEE", currentAttendee:a.id})
@@ -111,32 +112,14 @@ const ViewAttendance: React.FC = () => {
         ))}
       </div>
       {(
-        <ModalWrapper
-          isModalOpen={state.matches("DeleteAttendee")}
-          loading={false}
-          closeModal={() => send("DELETE_ATTENDEE.CLOSE")}
+        <button
+          className="btnFtrs fixed  bg-stone-800 text-white 
+          bottom-10 right-5 rounded-full px-4 
+          "
+          onClick={() => send({ type: "ADD_ATTENDEE" })}
         >
-          <Confirmation errorMsg={errorMsg} mainMsg={`Delete ${currentAttendee}`}
-          loading={loading}
-          subMsg={`This will delete attendance of this student for event ${currentEvent?.name}`}
-          closeConfirm={() => send("DELETE_ATTENDEE.CLOSE")}
-          submitConfirm={() => send({type: "DELETE_ATTENDEE.SUBMIT", deleteAttendeeId: currentAttendee } )}
-          />
-        </ModalWrapper>
-      )}
-      {(
-        <ModalWrapper
-          isModalOpen={state.matches("EditAttendee")}
-          loading={false}
-          closeModal={() => send("EDIT_ATTENDEE.CLOSE")}
-        >
-          <Confirmation errorMsg={errorMsg} mainMsg={`Make ${currentAttendee} ${attendeeType} `}
-          loading={loading}
-          subMsg={`This will mark the attendee as ${attendeeType} for event ${currentEvent?.name}`}
-          closeConfirm={() => send("EDIT_ATTENDEE.CLOSE")}
-          submitConfirm={() => send({type: "EDIT_ATTENDEE.SUBMIT", attendeeId: currentAttendee, attendeeType } )}
-          />
-        </ModalWrapper>
+          Add Attendee
+        </button>
       )}
     </section>
   );

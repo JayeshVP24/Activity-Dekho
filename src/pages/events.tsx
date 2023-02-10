@@ -7,10 +7,11 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { State } from "xstate";
-import { DateFilters } from "../../enums";
+import { Attendee, DateFilters } from "../../enums";
 import { ClubType } from "../../types";
 import { getFilteredDates } from "../../utils";
 import AddAttendanceForm from "../components/AddAttendanceForm";
+import AddAttendeeForm from "../components/AddAttendeeForm";
 import AddEventForm from "../components/AddEventForm";
 import AvatarGenerator from "../components/AvatarGenerator";
 import Confirmation from "../components/Confirmation";
@@ -39,6 +40,8 @@ const Events: NextPage = () => {
   // const { send: authSend } = globalServices.clubAuthService;
   const authClub = globalServices.authClub;
   const router = useRouter();
+  const [attendeeType, setAttendeeType] = useState<Attendee>()
+
   const {dateFilter, currentEvent, events, loading, errorMsg, currentAttendee} = useSelector(
     globalServices.clubEventService,
     (state) => state.context
@@ -410,7 +413,46 @@ const Events: NextPage = () => {
           closeModal={() => send("CLOSE_VIEW_ATTENDANCE")}
           loading={loading}
         >
-          <ViewAttendance />
+          <ViewAttendance setAttendeeType={setAttendeeType} />
+        </ModalWrapper>
+      )}
+      {(
+        <ModalWrapper
+          isModalOpen={state.matches("viewingAttendance.DeleteAttendee")}
+          loading={false}
+          closeModal={() => send("DELETE_ATTENDEE.CLOSE")}
+        >
+          <Confirmation errorMsg={errorMsg} mainMsg={`Delete ${currentAttendee}`}
+          loading={loading}
+          confirmMsg="Delete Attendee"
+          subMsg={`This will delete attendance of this student for event ${currentEvent?.name}`}
+          closeConfirm={() => send("DELETE_ATTENDEE.CLOSE")}
+          submitConfirm={() => send({type: "DELETE_ATTENDEE.SUBMIT", deleteAttendeeId: currentAttendee } )}
+          />
+        </ModalWrapper>
+      )}
+      {(
+        <ModalWrapper
+          isModalOpen={state.matches("viewingAttendance.EditAttendee")}
+          loading={false}
+          closeModal={() => send("EDIT_ATTENDEE.CLOSE")}
+        >
+          <Confirmation errorMsg={errorMsg} mainMsg={`Make ${currentAttendee} ${attendeeType} `}
+          loading={loading}
+          confirmMsg="Update Attendee"
+          subMsg={`This will mark the attendee as ${attendeeType} for event ${currentEvent?.name}`}
+          closeConfirm={() => send("EDIT_ATTENDEE.CLOSE")}
+          submitConfirm={() => send({type: "EDIT_ATTENDEE.SUBMIT", attendeeId: currentAttendee, attendeeType } )}
+          />
+        </ModalWrapper>
+      )}
+      {(
+        <ModalWrapper
+          isModalOpen={state.matches("viewingAttendance.AddAttendee")}
+          closeModal={() => send("ADD_ATTENDEE.CLOSE")}
+          loading={loading}
+        >
+          <AddAttendeeForm />
         </ModalWrapper>
       )}
       {(
@@ -457,6 +499,7 @@ const Events: NextPage = () => {
           closeModal={() => send("DELETE_EVENT.CLOSE")}
         >
           <Confirmation errorMsg={errorMsg} mainMsg={`Delete ${currentEvent?.name}`}
+          confirmMsg="Delete Event"
           loading={loading}
           subMsg="This will delete all the attendance records of this event"
           closeConfirm={() => send("DELETE_EVENT.CLOSE")}

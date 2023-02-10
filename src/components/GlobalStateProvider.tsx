@@ -12,9 +12,11 @@ import {
 } from "../firebase/firestore/Club";
 import {
   addAttendanceQuery,
+  addAttendeeToDBQuery,
   addEventToDBQuery,
   deleteAttendeeOnDBQuery,
   deleteEventOnDBQuery,
+  editAttendeeOnDBQuery,
   editEventOnDBQuery,
   retrieveClubEventsQuery,
 } from "../firebase/firestore/Events";
@@ -91,9 +93,12 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
       deleteAttendee: async (context, event) => {
         return await deleteAttendeeOnDBQuery(authClub.id, context.currentEvent, event.deleteAttendeeId)
       },
-      // editAttendee: async (context, event) => {
-      //   return await editAttendeeOnDBQuery(authClub.id, context.currentEvent, event.attendeeId, event.attendeeType)
-      // },
+      editAttendee: async (context, event) => {
+        return await editAttendeeOnDBQuery(authClub.id, context.currentEvent, event.attendeeId, event.attendeeType)
+      },
+      addAttendee: async (context, event) => {
+        return await addAttendeeToDBQuery(authClub.id, context.currentEvent, event.attendeeId, event.attendeeType)
+      },
       //   retrieveAttendance: async (_) =>
       //     new Promise(() => {
       //       return resolve("afw")

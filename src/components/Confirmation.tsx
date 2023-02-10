@@ -7,11 +7,12 @@ import { GlobalStateContext } from "./GlobalStateProvider";
 const Confirmation: React.FC<{
   loading: boolean,
   subMsg: string,
-  mainMsg: string
+  mainMsg: string,
+  confirmMsg: string,
   submitConfirm: () => void,
   closeConfirm: () => void,
-  errorMsg: string
-}> = ({loading,subMsg, mainMsg, submitConfirm, closeConfirm, errorMsg}) => {
+  errorMsg: string,
+}> = ({loading,subMsg, mainMsg, confirmMsg, submitConfirm, closeConfirm, errorMsg}) => {
   // const globalService = useContext(GlobalStateContext);
   // const [state, send] = useActor(globalService.clubEventService!);
 
@@ -43,7 +44,7 @@ const Confirmation: React.FC<{
             submitConfirm()
           }}
           >
-            {loading ? "Loading..." : "Delete Club"}
+            {loading ? "Loading..." : confirmMsg}
           </button>
         </span>
       </div>

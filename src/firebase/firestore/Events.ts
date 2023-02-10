@@ -453,13 +453,50 @@ export const editAttendeeOnDBQuery = async (
   return new Promise<{ attendeeId: string, attendeeType: Attendee }>(async (resolve, reject) => {
     try {
       await runTransaction(firedb, async (transaction) => {
-
+        console.log({attendeeId})
         const student =  (await transaction.get(doc(firedb, "STUDENTS", attendeeId))).data() as StudentType;
         student.attendance[clubId][editEvent.id] = attendeeType ;
 
         // const event = (await transaction.get(doc(firedb, "clubs", clubId, "EVENTS", deleteEventId))).data() as EventType;
         // delete editEvent.attendance[attendeeId];
         editEvent.attendance[attendeeId] = attendeeType;
+        console.log({clubId, editEvent})
+        transaction.set(doc(firedb, "STUDENTS", attendeeId), student);
+        transaction.set(doc(firedb, "clubs", clubId, "EVENTS", editEvent.id), editEvent);
+
+        console.log("Im in firestore folder");
+        console.log(editEvent.id);
+        // console.log(newEventRef);
+        
+      })
+      resolve({
+        attendeeId,
+        attendeeType
+      });
+    } catch (e) {
+      console.log(e);
+      reject({ error: e.message as string });
+    }
+  });
+};
+
+export const addAttendeeToDBQuery = async (
+  clubId: string,
+  editEvent: EventType,
+  attendeeId: string,
+  attendeeType: Attendee
+) => {
+  return new Promise<{ attendeeId: string, attendeeType: Attendee }>(async (resolve, reject) => {
+    try {
+      await runTransaction(firedb, async (transaction) => {
+        console.log({attendeeId})
+        const student =  (await transaction.get(doc(firedb, "STUDENTS", attendeeId))).data() as StudentType;
+        student.attendance[clubId][editEvent.id] = attendeeType ;
+
+        // const event = (await transaction.get(doc(firedb, "clubs", clubId, "EVENTS", deleteEventId))).data() as EventType;
+        // delete editEvent.attendance[attendeeId];
+        editEvent.attendance[attendeeId] = attendeeType;
+        console.log({clubId, editEvent})
         transaction.set(doc(firedb, "STUDENTS", attendeeId), student);
         transaction.set(doc(firedb, "clubs", clubId, "EVENTS", editEvent.id), editEvent);
 
