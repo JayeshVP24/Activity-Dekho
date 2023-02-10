@@ -4,7 +4,7 @@
 const nextConfig = {
     /* config options here */
     images: {
-        // domains: ["www.shutterstock.com"]
+        domains: ["firebasestorage.googleapis.com"]
     },
     typescript: {
       // !! WARN !!

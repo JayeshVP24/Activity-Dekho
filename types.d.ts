@@ -7,7 +7,6 @@ export interface ClubType {
   email: string;
   photoUrl?: string;
   Events?: EventType[];
-  Students?: StudentType[];
 }
 
 export interface EventType {
@@ -26,8 +25,8 @@ export interface ClubStudentType {
 }
 
 export interface StudentType {
-  id: string;
-  clubs: string[];
+  id?: string;
+  attendance: Record<Record<string, Attendee>>
 }
 
 export interface AttendanceViewType {

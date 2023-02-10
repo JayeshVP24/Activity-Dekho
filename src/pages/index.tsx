@@ -1,4 +1,4 @@
-import { useActor } from "@xstate/react";
+import { useActor, useSelector } from "@xstate/react";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useContext, useState } from "react";
@@ -35,8 +35,12 @@ const Index: NextPage = () => {
   };
 
   const globalServices = useContext(GlobalStateContext);
-  const [state, send] = useActor(globalServices.clubAuthService)
-  // const { send } = globalServices.clubAuthService;
+  // const [state, send] = useActor(globalServices.clubAuthService)
+  const { send } = globalServices.clubAuthService;
+  const { loggedIn } = useSelector(
+    globalServices.clubAuthService,
+    (state) => state.context
+  );
   return (
     <main className="mx-10 xl:mx-20 2xl:mx-32 xl:flex  ">
       <h1
@@ -90,7 +94,7 @@ const Index: NextPage = () => {
           🚀 Generate 🚀
         </button>
       </form>
-      {!state.context.loggedIn && <button
+      {!loggedIn && <button
         className="fixed left-[50%] translate-x-[-50%] bottom-5 bg-red-400 w-4/5 text-center py-2 rounded-2xl 
             max-w-md xl:bottom-10 font-medium ring-red-100 ring-4 hover:ring-red-300 transition-all
             active:scale-90"
@@ -100,7 +104,7 @@ const Index: NextPage = () => {
       >
         🥷 Are you a club admin? 🥷
       </button>}
-      {state.context.loggedIn && <button
+      {loggedIn && <button
         className="fixed left-[50%] translate-x-[-50%] bottom-5 bg-blue-400 w-4/5 text-center py-2 rounded-2xl 
             max-w-md xl:bottom-10 font-medium ring-blue-100 ring-4 hover:ring-blue-300 transition-all
             active:scale-90"
