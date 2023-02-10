@@ -2,7 +2,7 @@ import { useActor, useSelector } from "@xstate/react";
 import { useContext } from "react";
 import { GlobalStateContext } from "./GlobalStateProvider";
 import { Timestamp } from "firebase/firestore";
-import { Attendee, EventScope } from "../../enums";
+import { Attendee, EventScope } from "../utils/enums";
 const AddAttendeeForm: React.FC = () => {
   const globalServices = useContext(GlobalStateContext);
   //   const [state, send] = useActor(globalServices.clubEventService);
@@ -17,7 +17,7 @@ const AddAttendeeForm: React.FC = () => {
   );
   return (
     <section>
-      <div className="max-h-[30rem] overflow-y-scroll p-2 customScrollbar">
+      <div className="max-h-[38rem] overflow-y-scroll p-2 customScrollbar">
         {errorMsg && (
           <p className="text-red-600 text-xl font-semibold">{errorMsg}</p>
         )}

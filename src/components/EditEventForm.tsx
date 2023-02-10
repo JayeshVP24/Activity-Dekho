@@ -2,18 +2,18 @@ import { useActor, useSelector } from "@xstate/react";
 import { useContext } from "react";
 import { GlobalStateContext } from "./GlobalStateProvider";
 import { Timestamp } from "firebase/firestore";
-import { EventScope } from "../../enums";
+import { EventScope } from "../utils/enums";
 const EditEventForm: React.FC = () => {
   const globalServices = useContext(GlobalStateContext);
   // const [_, send] = useActor(globalServices.clubEventService);
-const {send} = globalServices.clubEventService
-    const currentEvent = useSelector(globalServices.clubEventService, state=>state.context.currentEvent )
-    const loading = useSelector(globalServices.clubEventService, state=>state.context.loading )
-
+  const {send} = globalServices.clubEventService
+  const {errorMsg, loading, currentEvent} = useSelector(globalServices.clubEventService, (state) => state.context)
+  
   return (
     <section>
-      <div className="max-h-[30rem] overflow-y-scroll p-2 customScrollbar">
-        <h3 className="text-4xl font-semibold mt-2">Add New Event</h3>
+      <div className="max-h-[38rem] overflow-y-scroll p-2 customScrollbar">
+      {errorMsg && <p className="text-red-600 text-xl font-semibold">{errorMsg}</p>}
+        <h3 className="text-4xl font-semibold mt-2">Edit Event</h3>
         <form
           className="mt-4 flex flex-col gap-y-4"
           onSubmit={(e) => {
@@ -22,7 +22,7 @@ const {send} = globalServices.clubEventService
               type: "EDIT_EVENT.SUBMIT",
               editedEvent: {
                 name: e.currentTarget["NAME"].value,
-                activityHours: e.currentTarget["ACTIVITY_HOURS"].value,
+                activityHours: Number(e.currentTarget["ACTIVITY_HOURS"].value),
                 startDate: Timestamp.fromDate(
                   new Date(e.currentTarget["FROM"].value)
                 ),

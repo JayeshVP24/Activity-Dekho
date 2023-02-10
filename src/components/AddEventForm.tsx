@@ -1,15 +1,17 @@
-import { useActor } from "@xstate/react";
+import { useActor, useSelector } from "@xstate/react";
 import { useContext } from "react";
 import { GlobalStateContext } from "./GlobalStateProvider";
 import { Timestamp } from "firebase/firestore";
-import { EventScope } from "../../enums";
+import { EventScope } from "../utils/enums";
 const AddEventForm: React.FC = () => {
   const globalServices = useContext(GlobalStateContext);
-  const [state, send] = useActor(globalServices.clubEventService);
-
+  // const [state, send] = useActor(globalServices.clubEventService);
+  const {send} = globalServices.clubEventService
+  const {errorMsg, loading} = useSelector(globalServices.clubEventService, (state) => state.context)
   return (
     <section>
-      <div className="max-h-[30rem] overflow-y-scroll p-2 customScrollbar">
+      <div className="max-h-[38rem]  overflow-y-scroll p-2 customScrollbar">
+        {errorMsg && <p className="text-red-600 text-xl font-semibold">{errorMsg}</p>}
         <h3 className="text-4xl font-semibold mt-2">Add New Event</h3>
         <form
           className="mt-4 flex flex-col gap-y-4"
@@ -19,7 +21,7 @@ const AddEventForm: React.FC = () => {
               type: "ADD_EVENT.SUBMIT",
               newEvent: {
                 name: e.currentTarget["NAME"].value,
-                activityHours: e.currentTarget["ACTIVITY_HOURS"].value,
+                activityHours: Number(e.currentTarget["ACTIVITY_HOURS"].value),
                 startDate: Timestamp.fromDate(
                   new Date(e.currentTarget["FROM"].value)
                 ),
@@ -128,7 +130,7 @@ const AddEventForm: React.FC = () => {
             className="bg-green-400 ring-4 ring-green-200  hover:ring-green-300 w-full mt-8  btnFtrs
         "
           >
-            🚀 Add Event 🚀
+            {loading ? "Loading 💭" :"🚀 Add Event 🚀"}
           </button>
         </form>
       </div>

@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { resolve } from "node:path/win32";
 import React, { useEffect, useState } from "react";
 import { createContext } from "react";
-import { ClubType } from "../../types";
+import { ClubType } from "../utils/types";
 import { auth } from "../firebase/config";
 import {
   getClubsListQuery,
