@@ -11,7 +11,7 @@ import {
 import { GlobalStateContext } from "./GlobalStateProvider";
 import XLSX from "xlsx";
 import Image from "next/image";
-import { Attendee } from "../../enums";
+import { Attendee } from "../utils/enums";
 const AddAttendanceForm: React.FC = () => {
   const globalServices = useContext(GlobalStateContext);
   const [state, send] = useActor(globalServices.clubEventService);
@@ -65,7 +65,7 @@ const AddAttendanceForm: React.FC = () => {
     console.log({ currentEvent });
   }, []);
   return (
-    <section className="max-h-[30rem] overflow-y-scroll p-2 customScrollbar">
+    <section className="max-h-[38rem] overflow-x-hidden overflow-y-scroll p-2 customScrollbar">
       <div className="">
         <h2 className="text-2xl font-medium ">Add Attendance</h2>
         <h3 className="text-4xl font-semibold mt-2">
@@ -100,7 +100,7 @@ const AddAttendanceForm: React.FC = () => {
           priority
           loading="eager"
           alt="Example Excel Sample for attendance"
-          className="w-[80%] mx-auto"
+          className="w-full lg:w-[80%] mx-auto"
         />
         {errorMsg && (
           <span

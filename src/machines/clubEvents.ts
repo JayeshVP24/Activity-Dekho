@@ -1,8 +1,8 @@
 import { Timestamp } from "firebase/firestore";
 import { createMachine, assign, sendParent, ActorRefFrom } from "xstate";
-import { Attendee, DateFilters } from "../../enums";
-import { AttendanceViewType, ClubType, EventType } from "../../types";
-import { getFilteredDates } from "../../utils";
+import { Attendee, DateFilters } from "../utils/enums";
+import { AttendanceViewType, ClubType, EventType } from "../utils/types";
+import { getFilteredDates } from "../utils/utils";
 
 // interface newEventInterface {
 //   name: string;

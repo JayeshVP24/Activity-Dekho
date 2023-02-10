@@ -1,6 +1,6 @@
 import { useActor, useSelector } from "@xstate/react";
 import { ChangeEvent, Dispatch, SetStateAction, useCallback, useContext, useMemo, useState } from "react";
-import { Attendee } from "../../enums";
+import { Attendee } from "../utils/enums";
 import Confirmation from "./Confirmation";
 import { GlobalStateContext } from "./GlobalStateProvider";
 import ModalWrapper from "./ModalWrapper";
@@ -44,7 +44,7 @@ const ViewAttendance: React.FC<{
         placeholder="Search"
         onChange={inputDataHandler}
       />
-      <div className="flex flex-col gap-y-4 mt-6 h-72 overflow-auto customScrollbar">
+      <div className="flex flex-col gap-y-4 mt-6 h-96 lg:h-80 overflow-auto customScrollbar">
         {currentAttendance?.length === 0 && (
           <div className="my-auto">
             <p className="text-center text-3xl">No attendance found 🤧</p>

@@ -7,9 +7,9 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { State } from "xstate";
-import { Attendee, DateFilters } from "../../enums";
-import { ClubType } from "../../types";
-import { getFilteredDates } from "../../utils";
+import { Attendee, DateFilters } from "../utils/enums";
+import { ClubType } from "../utils/types";
+import { getFilteredDates } from "../utils/utils";
 import AddAttendanceForm from "../components/AddAttendanceForm";
 import AddAttendeeForm from "../components/AddAttendeeForm";
 import AddEventForm from "../components/AddEventForm";
@@ -303,7 +303,7 @@ const Events: NextPage = () => {
               to - {state.context.dateFilter.toDate.toDate().toDateString()}{" "}
             </p>
           </div> */}
-          <section className="lg:flex flex-wrap gap-7  mt-8">
+          <section className="flex  flex-wrap gap-7  mt-8">
             {(events?.length <= 0 || filteredEvents?.length <= 0) ? (
               <div className="w-full mt-10" >
                 <h2 className="text-3xl lg:text-5xl font-semibold mx-auto w-fit">No Events Found 🤐</h2>

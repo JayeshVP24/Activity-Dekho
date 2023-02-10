@@ -54,9 +54,9 @@ const ModalWrapper: React.FC<{
                 scale: 0.9,
                 opacity: 0,
               }}
-              className={`bg-violet-400 fixed w-4/5 max-w-xl h-auto max-h-[90%]
+              className={`bg-violet-400 fixed w-5/6 lg:w-4/5 max-w-xl h-auto max-h-[95%] lg:max-h-[90%]
                   top-[50%] translate-y-[-50%] left-[50%] translate-x-[-50%]
-                  rounded-3xl px-10 py-16 
+                  rounded-3xl px-6 lg:px-10 py-12
                   `}
             >
               {loading && (

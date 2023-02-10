@@ -41,3 +41,4 @@ export const getFilteredDates = (dateFilter: DateFilters) => {
   }
   return { fromDate: Timestamp.fromDate(fromDate), toDate: Timestamp.fromDate(toDate) };
 };
+

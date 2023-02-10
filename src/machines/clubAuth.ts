@@ -1,5 +1,5 @@
 import { assign, createMachine, ActorRefFrom } from "xstate";
-import { ClubType } from "../../types";
+import { ClubType } from "../utils/types";
 
 export interface ClubAuthContext {
   club?: ClubType;

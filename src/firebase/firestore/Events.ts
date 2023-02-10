@@ -15,13 +15,12 @@ import {
   where,
   writeBatch,
 } from "firebase/firestore";
-import { AttendanceViewType, EventType, StudentType } from "../../../types";
+import { AttendanceViewType, AttendeeZod, EventScopeZod, EventType, StudentType, EventSchema } from "../../utils/types";
 import { firedb } from "../config";
 import XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { Attendee, DateFilters, EventScope } from "../../../enums";
-
-import { getFilteredDates } from "../../../utils";
+import { Attendee, DateFilters, EventScope } from "../../utils/enums";
+import { getFilteredDates } from "../../utils/utils";
 
 export const retrieveClubEventsQuery = async (
   clubId: string,
@@ -221,8 +220,8 @@ export interface displayAttendanceType {
   to: string;
   "Activity Hours": number;
   email: string;
-  title: Attendee;
-  scope: EventScope;
+  title: AttendeeZod;
+  scope: EventScopeZod;
   "Extra Hours": number;
   "Total Hours": number;
 }
@@ -311,6 +310,17 @@ export const addEventToDBQuery = async (
 ) => {
   return new Promise<{ successfull: boolean }>(async (resolve, reject) => {
     try {
+
+      // parse zod schema
+      try {
+        EventSchema.parse(newEvent)
+
+      } catch (e) {
+        console.log(e)
+        return reject({error: e.issues[0].message as string})
+      }
+      // return reject({error: "error"})
+      
       console.log("Im in firestore folder");
       console.log(newEvent);
       const newEventRef = await addDoc(
@@ -322,7 +332,7 @@ export const addEventToDBQuery = async (
         successfull: true,
       });
     } catch (e) {
-      return reject(e.message as string);
+      return reject({error: e.message as string});
     }
   });
 };
@@ -332,6 +342,16 @@ export const editEventOnDBQuery = async (
 ) => {
   return new Promise<{ successfull: boolean }>(async (resolve, reject) => {
     try {
+
+       // parse zod schema
+       try {
+        EventSchema.parse(editedEvent)
+
+      } catch (e) {
+        console.log(e)
+        return reject({error: e.issues[0].message as string})
+      }
+
       console.log("Im in firestore folder");
       console.log(editedEvent);
       const newEventRef = await setDoc(

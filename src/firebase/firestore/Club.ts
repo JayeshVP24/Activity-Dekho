@@ -1,6 +1,6 @@
 import { collection, getDocs } from "firebase/firestore";
 import { browserSessionPersistence, setPersistence, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { ClubType } from "../../../types";
+import { ClubType } from "../../utils/types";
 import { auth, firedb } from "../config";
 
 // export const getClubsListQuery1 = () => {
