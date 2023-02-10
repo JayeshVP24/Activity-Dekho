@@ -17,3 +17,4 @@ export enum EventScope {
   institute = "INSTITUTE",
   department = "DEPARTMENT",
 }
+

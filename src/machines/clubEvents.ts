@@ -15,6 +15,7 @@ export interface ClubEventContext {
   errorMsg?: string;
   events?: EventType[];
   // filteredEvents?: EventType[];
+
   currentEvent?: EventType;
   newEvent?: EventType;
   currentAttendee?: string;
@@ -24,6 +25,7 @@ export interface ClubEventContext {
   currentAttendance?: AttendanceViewType[];
   // filteredAttendance?: AttendanceViewType[];
   // modalViewAttendance: boolean;
+
   loading: boolean;
   excelFileName?: string;
   excelAttendance?: {
@@ -153,6 +155,7 @@ type ClubEventEvents =
   | { type: "error.platform.editattendee"; data: { error: string } }
   | { type: "error.platform.retrieveclubevents"; data: { error: string } }
   | { type: "error.platform.verifyexcel"; data: { error: string } };
+
 //   | { type: "done.invoke.retrieveclubevents", data: EventType[]}
 //   | {type: "events.actions.checkAuthAndAddToContext", club: ClubType | undefined}
 //   | {type: "events.actions.checkAuthAndAddToContext", club}

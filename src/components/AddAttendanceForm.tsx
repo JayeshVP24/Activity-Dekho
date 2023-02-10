@@ -70,6 +70,7 @@ const AddAttendanceForm: React.FC = () => {
         <h2 className="text-2xl font-medium ">Add Attendance</h2>
         <h3 className="text-4xl font-semibold mt-2">
           {currentEvent?.name}
+
         </h3>
       </div>
       <form

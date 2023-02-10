@@ -9,6 +9,7 @@ import ClubAuthMachine, {
 } from "../machines/clubAuth";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
+
 import Image from "next/image";
 import AvatarGenerator from "./AvatarGenerator";
 import { useRouter } from "next/router";
@@ -103,6 +104,7 @@ const ClubAuth: React.FC = () => {
             value={inputData}
             placeholder="Search"
             onChange={inputDataHandler}
+
           />
           <div
             className="flex flex-col gap-y-6 mt-8 max-h-64 overflow-y-auto  p-2 
@@ -110,6 +112,7 @@ const ClubAuth: React.FC = () => {
           >
             {filteredClubList &&
               filteredClubList.map((c) => (
+
                 <motion.button
                   variants={variants}
                   initial="hidden"
@@ -169,6 +172,7 @@ const ClubAuth: React.FC = () => {
             )}
             <h3 className="text-3xl font-semibold mt-4">
               {club.name}
+
             </h3>
             <input
               name="PASSWORD"
@@ -182,12 +186,14 @@ const ClubAuth: React.FC = () => {
               placeholder="Enter your password here"
             />
             {error && (
+
               <p
                 className="text-sm text-white
                     bg-red-500 px-4 py-1 rounded-xl mt-2
                     "
               >
                 {error}
+
               </p>
             )}
             {state.matches("validatingAuth") && (

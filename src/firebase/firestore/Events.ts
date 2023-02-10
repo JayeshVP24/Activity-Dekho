@@ -20,6 +20,7 @@ import { firedb } from "../config";
 import XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { Attendee, DateFilters, EventScope } from "../../../enums";
+
 import { getFilteredDates } from "../../../utils";
 
 export const retrieveClubEventsQuery = async (
@@ -36,6 +37,7 @@ export const retrieveClubEventsQuery = async (
   // const { fromDate, toDate } = getFilteredDates(dateFilter);
   // console.log({fromDate, toDate})
   if (!dateFilter.fromDate || !dateFilter.toDate) {
+
     dateFilter = getFilteredDates(DateFilters.currentYear);
     // fromDate = dates.fromDate;
     // toDate = dates.toDate;
@@ -49,6 +51,7 @@ export const retrieveClubEventsQuery = async (
   return await getDocs(q)
     .then((snap) => {
       console.log("in the query");
+
       const eventsList: EventType[] = [];
       snap.forEach((s) => {
         eventsList.push({
@@ -63,6 +66,7 @@ export const retrieveClubEventsQuery = async (
     })
     .catch((err) => {
       console.log("some error occured");
+
       return err.message as string;
     });
 };
@@ -126,6 +130,7 @@ export const addAttendanceQuery = async (
         //   "student club attendance: ",
         //   studentDoc.data().attendance[clubId]
         // );
+
         if (studentDoc.exists()) {
           console.log("student exists");
           studentAttendance = {
@@ -158,6 +163,7 @@ export const addAttendanceQuery = async (
           //     },
           //   }
           // }
+
           // studentAttendance[clubId] = {
           //   [eventId]: true,
           //   ...studentAttendance[clubId],

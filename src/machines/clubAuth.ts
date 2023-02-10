@@ -6,6 +6,7 @@ export interface ClubAuthContext {
   error?: string;
   clubList?: ClubType[];
   // filteredClubList?: ClubType[];
+
   password?: string;
   loggedIn: boolean;
   modalOpen: boolean;
