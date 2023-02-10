@@ -1,11 +1,14 @@
-import { useActor } from "@xstate/react";
+import { useActor, useSelector } from "@xstate/react";
 import { useContext } from "react";
 import { GlobalStateContext } from "./GlobalStateProvider";
 import { Timestamp } from "firebase/firestore";
 import { EventScope } from "../../enums";
-const AddEventForm: React.FC = () => {
+const EditEventForm: React.FC = () => {
   const globalServices = useContext(GlobalStateContext);
-  const [state, send] = useActor(globalServices.clubEventService);
+  // const [_, send] = useActor(globalServices.clubEventService);
+const {send} = globalServices.clubEventService
+    const currentEvent = useSelector(globalServices.clubEventService, state=>state.context.currentEvent )
+    const loading = useSelector(globalServices.clubEventService, state=>state.context.loading )
 
   return (
     <section>
@@ -16,8 +19,8 @@ const AddEventForm: React.FC = () => {
           onSubmit={(e) => {
             e.preventDefault();
             send({
-              type: "ADD_EVENT.SUBMIT",
-              newEvent: {
+              type: "EDIT_EVENT.SUBMIT",
+              editedEvent: {
                 name: e.currentTarget["NAME"].value,
                 activityHours: e.currentTarget["ACTIVITY_HOURS"].value,
                 startDate: Timestamp.fromDate(
@@ -27,6 +30,7 @@ const AddEventForm: React.FC = () => {
                   new Date(e.currentTarget["TO"].value)
                 ),
                 scope: e.currentTarget["SCOPE"].value as EventScope,
+                id: currentEvent?.id
               },
             });
           }}
@@ -38,6 +42,7 @@ const AddEventForm: React.FC = () => {
             <input
               required
               name="NAME"
+              defaultValue={currentEvent?.name}
               className="w-full  bg-transparent  py-2 rounded-2xl mt-2 outline-none
           pl-4 text-slate-900 placeholder:text-slate-600  font-semibold
           text-lg  transition-all ring-4 focus:ring-orange-400 ring-orange-300
@@ -55,6 +60,7 @@ const AddEventForm: React.FC = () => {
               required
               name="ACTIVITY_HOURS"
               type="number"
+              defaultValue={currentEvent?.activityHours}
               className="w-full  bg-transparent  py-2 rounded-2xl mt-2 outline-none
           pl-4 text-slate-900 placeholder:text-slate-600  font-semibold
           text-lg  transition-all ring-4 focus:ring-orange-400 ring-orange-300
@@ -72,7 +78,7 @@ const AddEventForm: React.FC = () => {
           pl-4 text-slate-900 placeholder:text-slate-600  font-semibold
           text-lg  transition-all ring-4 focus:ring-orange-400 ring-orange-300
           xl:mt-2 xl:py-2"
-          defaultValue={EventScope.department}
+          defaultValue={currentEvent?.scope}
           >
               {Object.values(EventScope).map(s => (
                 <option>{s}</option>
@@ -99,6 +105,7 @@ const AddEventForm: React.FC = () => {
               required
               name="FROM"
               type="date"
+              defaultValue={currentEvent?.startDate.toDate().toISOString().split('T')[0]}
               className="w-full  bg-transparent  py-2 rounded-2xl mt-2 outline-none
             pl-4 text-slate-900 placeholder:text-slate-600  font-semibold
             text-lg  transition-all ring-4 focus:ring-orange-400 ring-orange-300
@@ -115,6 +122,7 @@ const AddEventForm: React.FC = () => {
               required
               name="TO"
               type="date"
+              defaultValue={currentEvent?.endDate.toDate().toISOString().split('T')[0]}
               className="w-full  bg-transparent  py-2 rounded-2xl mt-2 outline-none
             pl-4 text-slate-900 placeholder:text-slate-600  font-semibold
             text-lg  transition-all ring-4 focus:ring-orange-400 ring-orange-300
@@ -128,7 +136,7 @@ const AddEventForm: React.FC = () => {
             className="bg-green-400 ring-4 ring-green-200  hover:ring-green-300 w-full mt-8  btnFtrs
         "
           >
-            🚀 Add Event 🚀
+            {loading ? "Loading 🔃" : "📝 Edit Event 📝"}
           </button>
         </form>
       </div>
@@ -136,4 +144,4 @@ const AddEventForm: React.FC = () => {
   );
 };
 
-export default AddEventForm;
+export default EditEventForm;

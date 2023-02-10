@@ -5,7 +5,8 @@ export interface ClubAuthContext {
   club?: ClubType;
   error?: string;
   clubList?: ClubType[];
-  filteredClubList?: ClubType[];
+  // filteredClubList?: ClubType[];
+
   password?: string;
   loggedIn: boolean;
   modalOpen: boolean;
@@ -34,7 +35,7 @@ export type ClubAuthEvent =
 // } 
 
   const ClubAuthMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QGMA2BXARgYgMIBkB5AZQFEB9AWUIBEBBfAbQAYBdRUABwHtYBLAC59uAOw4gAHogC0ARgDsANgB0zAKwAmeQA4AzLu0aNa5gBZtAGhABPGRt0BOZWu2LZG5tve7F8hwF9-KzQsbEIABVIAOSpaBhZ2JBAefiFRcSkEWQVlBwcXRV1TDQdtNQNZK1sEaQ1ZbWcHUyL5LXNZUzV5QOCMHAjo2PomWUSuXkFhMSTMzpVTRXbmXXs1UsUqmXqNZQ1TZs0XT2NFNR6QEMxlVG4oGAhCdAFsIgBxAEkohPEUyfSZmS6XJ5dyKQzMZilbStSw2RDyZSuRQOPbuUyyBwGFznS7KGACIQiKC4PqwfB8WDPCCiMDKPgiABu3AA1rT8ZdUBSBN8kr80tNQJlDspfK5PBV7MZNllmDsHAomq06tDZLKcX08WACfTiaTyZTsGAAE5G7hG5ScVAAQwEADMzQBbTUCDlcnnjVJTDKITTKdGmCG6dT2fayDZwrLGVSQ3TyUytFZFezqrDKCAUy1W6w6klYMlc7BkfCkXAAFXIBAAqgAhd3JCb870IWOmZSOEyuaHy2PSjSLZQ6fYLTyy4zyXQpq7p2CZ7NE3OYfMGgBi73wpdIACUK-ga+R8O9iKW63yvQCEEiB3G3LJY35DJUIyU1KoPEZOvIFGUzJO0xnrXOUCkCaZrYJupClpuACaJ4NmegqIH2KiqnGph5GoxR+Bo0reM4MZKG4kJaIoii-pwpoOgIpAiAIxrhFasCwAA7maEDYAAagw7z0Bu5B0JWpYABKwZ6-wIQgGiuG28byg4ZinCR0ofoi5jikREJdGRFFUTRdEMcxrHYK8hDkNWdC4AA0iJfwCpIPraA0rjyPIkJeOiHRqNKBgNPIXSFC5xSyOUE5BBcGoMlanIQDaOp0E8AAW2DUiItL0kyrLKBFUU2mAVoJdZjbngGzCNPk2TMPUagmNhEZgkCjjfhiSo+CFvSpllfDRYSUBxQIiXGqa5qZnajqZZFnU5XlfUFfBdkIE0yhBXUJTLF4Ll9l5kmqLGYZFHk9jLIEoUiNwEBwOIlw-HBYlzbUJQqSYGJaHJJQrNK0grAinhuJJhSKMwpxnKFuI3HckCPAIV2ibZmRyF4D0VSifiypiNXVMwv74t1C5LpDvLXTDiHuLkewrPs+hKPkujvWheEQtkzR+E0bS-tOs45nqXJQzZTZrAibhQmhZiGIUvbjn6nhLXVOgA6z-5ZjqwGDdzhXiR0uReO42jytsDinPIvbNCKkmaGUesfkDbVXOR3CUdRtFGvRjEsUaEAq7NmR3iK6gYp9VX-UUXnQnhSjFEGdQKr+HVdbFCXuzdmRaLIuSqgG+txtrPYRhhOweCi5vFFoOi-lN8XEOgyDIHAsC2ugqDx4TCBgnKxSuLoCi+R4nnZ2oyd9mV9ifgsRRHf4QA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QGMA2BXARgYgMIBkB5AZQFEB9AWUIBEBBfAbQAYBdRUABwHtYBLAC59uAOw4gAHogC0ARgDsANgB0zAKwAmeQA4AzLu0aNa5gBZtAGhABPGRt0BOZWu2LZG5tve7F8hwF9-KzQsbEIABVIAOSpaBhZ2JBAefiFRcSkEWQVlBwcXRV1TDQdtNQNZK1sEaQ1ZbWcHUyL5LXNZUzV5QOCMHAjo2PomWUSuXkFhMSTMzpVTRXbmXXs1UsUqmXqNZQ1TZs0XT2NFNR6QEMxlVG4oGAhCdAFsIgBxAEkohPEUyfSZmS6XJ5dyKQzMZilbStSw2RDyZSuRQOPbuUyyBwGFznS7KGACIQiKC4PqwfB8WDPCCiMDKPgiABu3AA1rT8ZdUBSBN8kr80tNQJlDspfK5PBV7MZNllmDsHAomq06tDZLKcX08WACfTiaTyZTsGAAE5G7hG5ScVAAQwEADMzQBbTUCDlcnnjVJTDKITTKdGmCG6dT2fayDZwrLGVSQ3TyUytFZFezqrDKCAUy1W6w6klYMlc7BkfCkXAAFXIBAAqgAhd3JCb870IWOmZSOEyuaHy2PSjSLZQ6fYLTyy4zyXQpq7p2CZ7NE0gms3YABKpFLy4AmnW+V6AQg+ypVXHTHk1MU-Bppd5nDGlG5IVpFIpJxbTQ6BKQRAJjeErbBYAA7maEDYAAagw7z0KWFB0JWpYABLbg2u6CogGiuG28byg4ZinE+0qdAi2jmOKD4Ql0L6cG+H5fj+f6AcB2CvIQ5DVnQuAANJIZ6-yoQgLgNK48jyJCXjoh0ajSgYDTyF0hQicUsjlBOQQXBqDJWpyEA2jqdBPAAFtg1IiLS9JMqyygaVpNpgFaBncX8AqSIgAbMI0+TZMw9RqCYl4RmCQKOGUXkOEqPgqb0qZWXw2mElAekCIZxqmuamZ2o6lmaTFNl2YlDmNnuTTKEpdQlMsXgiX2UnoaosZhkUeT2MsgSqSI3AQHA4iXD8yG8c5NRGE4xEmBiWg4SUKzStIKwIp4bhGNo0JmNCL43HckCPAIPU8U5mRyF4iKdCFY2ypifnVMwL74nFuaYPmlLbY5TalbkewrPs+hKPkuhTSeN4QtkzR+E0bQvtOs45nqXKPQVfFrAibhQiey19j9EZaECAZeJoAU6Mwz6qbi4PWnOUALilMMof1HS5F47jaPK2wOKc8i9s0IroZoZTM4RZyExqVHcO+n7fkav7-kBRoQJTfWZLGCPqBiM0+YoyymFJ0I3koxRBnUCovtFsW6QZMu7Wh8iyLkqoBizcYMz2EZnjsHgojzxRaDoL65fpxDoMgyBwLAtroKgptNmCcrFK4ugKLJHiSY7aiW32Hn2BbCxFC1-hAA */
   createMachine(
     {
       predictableActionArguments: true,
@@ -110,12 +111,6 @@ export type ClubAuthEvent =
             SELECT_CLUB: {
               target: "promtEnterPassword",
               actions: "addClubToContext",
-            },
-
-            FILTER_CLUB_LIST: {
-              target: "displayingClubsList",
-              internal: true,
-              actions: "filterClublist"
             }
           },
         },
@@ -170,13 +165,13 @@ export type ClubAuthEvent =
           clubList: (_,event) => {
             // console.log("inside machine event: ", event.data)
             return event.data as ClubType[]},
-          filteredClubList: (_, event) => event.data as ClubType[]
+          // filteredClubList: (_, event) => event.data as ClubType[]
         }),
-        filterClublist: assign({
-          filteredClubList: (context, event) => {
-            return context.clubList.filter(f => f.name.toLowerCase().includes(event.query.toLowerCase()))
-          }
-        }),
+        // filterClublist: assign({
+        //   // filteredClubList: (context, event) => {
+        //   //   return context.clubList.filter(f => f.name.toLowerCase().includes(event.query.toLowerCase()))
+        //   // }
+        // }),
     
         addClubToContext: assign({
           club: (_, event) => event.club

@@ -1,4 +1,4 @@
-import { useActor, useMachine } from "@xstate/react";
+import { useActor, useMachine, useSelector } from "@xstate/react";
 import {
   getClubsListQuery,
   validateAuthQuery,
@@ -8,7 +8,8 @@ import ClubAuthMachine, {
   ClubAuthEvent,
 } from "../machines/clubAuth";
 import { AnimatePresence, motion, Variants } from "framer-motion";
-import { useContext, useEffect } from "react";
+import { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
+
 import Image from "next/image";
 import AvatarGenerator from "./AvatarGenerator";
 import { useRouter } from "next/router";
@@ -47,6 +48,21 @@ const ClubAuth: React.FC = () => {
 
   const globalServices = useContext(GlobalStateContext);
   const [state, send] = useActor(globalServices.clubAuthService);
+  // const { send } = globalServices.clubAuthService;
+  const [inputData, setInputData] = useState("");
+  const inputDataHandler = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setInputData(e.target.value);
+  }, []);
+  const { clubList, club, error } = useSelector(
+    globalServices.clubAuthService,
+    (state) => state.context
+  );
+  const filteredClubList = useMemo(() => {
+    if (!inputData) return clubList;
+    return clubList.filter((a) =>
+      a.id.toLowerCase().includes(inputData.toLowerCase())
+    );
+  }, [inputData, clubList]);
   //   console.log(typeof send)
 
   //   useEffect(() => {
@@ -55,7 +71,7 @@ const ClubAuth: React.FC = () => {
 
   useEffect(() => {
     console.log(state.value);
-    console.log(state.context);
+    // console.log(state.context);
   }, [state]);
 
   return (
@@ -85,18 +101,18 @@ const ClubAuth: React.FC = () => {
             className="w-full outline-none rounded-full px-4 py-2 mt-4 bg-opacity-50 bg-white
                   "
             type="text"
+            value={inputData}
             placeholder="Search"
-            onChange={(e) => {
-              console.log(e.target.value);
-              send({ type: "FILTER_CLUB_LIST", query: e.target.value });
-            }}
+            onChange={inputDataHandler}
+
           />
           <div
             className="flex flex-col gap-y-6 mt-8 max-h-64 overflow-y-auto  p-2 
                   "
           >
-            {state.context.filteredClubList &&
-              state.context.filteredClubList.map((c) => (
+            {filteredClubList &&
+              filteredClubList.map((c) => (
+
                 <motion.button
                   variants={variants}
                   initial="hidden"
@@ -142,20 +158,21 @@ const ClubAuth: React.FC = () => {
             exit="hidden"
             className="mt-6  "
           >
-            {state.context.club && state.context?.club?.photoUrl && (
+            {club && club?.photoUrl && (
               <Image
-                src={state.context.club.photoUrl}
+                src={club.photoUrl}
                 width="100"
                 height={100}
-                alt={`Logo of ${state.context.club.name}`}
+                alt={`Logo of ${club.name}`}
                 className="w-24"
               />
             )}
-            {state.context.club && !state.context.club.photoUrl && (
-              <AvatarGenerator big name={state.context.club.name} />
+            {club && !club.photoUrl && (
+              <AvatarGenerator big name={club.name} />
             )}
             <h3 className="text-3xl font-semibold mt-4">
-              {state.context.club.name}
+              {club.name}
+
             </h3>
             <input
               name="PASSWORD"
@@ -168,13 +185,15 @@ const ClubAuth: React.FC = () => {
               type="password"
               placeholder="Enter your password here"
             />
-            {state.context.error && (
+            {error && (
+
               <p
                 className="text-sm text-white
                     bg-red-500 px-4 py-1 rounded-xl mt-2
                     "
               >
-                {state.context.error}
+                {error}
+
               </p>
             )}
             {state.matches("validatingAuth") && (

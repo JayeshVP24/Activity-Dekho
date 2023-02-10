@@ -8,7 +8,7 @@
     }
 
     .btnFtrs {
-        @apply rounded-2xl py-2 text-2xl font-semibold   
+        @apply rounded-2xl py-2 text-lg lg:text-2xl font-semibold   
         active:scale-90 transition-all active:ring-0;
     }
    

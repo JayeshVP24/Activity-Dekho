@@ -12,7 +12,12 @@ import {
 } from "../firebase/firestore/Club";
 import {
   addAttendanceQuery,
+  addAttendeeToDBQuery,
   addEventToDBQuery,
+  deleteAttendeeOnDBQuery,
+  deleteEventOnDBQuery,
+  editAttendeeOnDBQuery,
+  editEventOnDBQuery,
   retrieveClubEventsQuery,
 } from "../firebase/firestore/Events";
 import ClubAuthMachine, { ClubAuthActor } from "../machines/clubAuth";
@@ -72,12 +77,27 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
         return await addAttendanceQuery(
           authClub.id,
           context.currentEvent.id,
-          context.attendance
+          context.excelAttendance
         );
       },
-      // @ts-ignore
       addEventToDB: async (context, event) => {
         return await addEventToDBQuery(authClub.id, event.newEvent);
+      },
+      editEventOnDb: async (context, event) => {
+        return await editEventOnDBQuery(authClub.id, event.editedEvent)
+      },
+      deleteEvent: async (context, event) => {
+        console.log("deleting event")
+        return await deleteEventOnDBQuery(authClub.id, event.deleteEventId, context.currentAttendance)
+      },
+      deleteAttendee: async (context, event) => {
+        return await deleteAttendeeOnDBQuery(authClub.id, context.currentEvent, event.deleteAttendeeId)
+      },
+      editAttendee: async (context, event) => {
+        return await editAttendeeOnDBQuery(authClub.id, context.currentEvent, event.attendeeId, event.attendeeType)
+      },
+      addAttendee: async (context, event) => {
+        return await addAttendeeToDBQuery(authClub.id, context.currentEvent, event.attendeeId, event.attendeeType)
       },
       //   retrieveAttendance: async (_) =>
       //     new Promise(() => {
