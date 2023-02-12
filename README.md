@@ -136,9 +136,9 @@ Start the server
 
 Contributions are always welcome!
 
-See `CONTRIBUTING.md` for ways to get started.
+See [`CONTRIBUTING.md`](https://github.com/JayeshVP24/Activity-Dekho/blob/main/CONTRIBUTING.md) for ways to get started.
 
-Please adhere to this project's `CODE_OF_CONDUCT.md`.
+Please adhere to this project's[ `CODE_OF_CONDUCT.md`](https://github.com/JayeshVP24/Activity-Dekho/blob/main/CODE_OF_CONDUCT.md).
 
 
 ## Feedback
