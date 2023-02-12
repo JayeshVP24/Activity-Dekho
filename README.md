@@ -50,7 +50,7 @@ The application also helps the Organization /Clubs /Communities to organize, mai
 
 ## Features
 
-🗄️ It aims to organize and store the data of the events that are conducted by the organization.
+🗄️ It aims to organize and store the attendance data of the events that are conducted by the organization.
 
 👨‍🎓 Systematically providing AICTE points to an individual user (student).
 
@@ -62,7 +62,7 @@ The application also helps the Organization /Clubs /Communities to organize, mai
 
 ## Tech Stack
 
-**Frontend** - Next.js, Chakra UI, TailwindCSS
+**Frontend** - Next.js, TailwindCSS
 
 **Backend** - Firebase
 
@@ -140,24 +140,13 @@ See `CONTRIBUTING.md` for ways to get started.
 
 Please adhere to this project's `CODE_OF_CONDUCT.md`.
 
-## Guide
-
-A guideline of project composition and creation.
-
-soon adding `guide.md`
-
-Please adhere to this project's `CODE_OF_CONDUCT.md`.
 
 ## Feedback
 
 If you have any feedback, please reach out to us at **jayeshpotlabattini24@gmail.com**
 
 
-## Support
-
-For support join our Slack channel - [AMA](https://ml-geeksworkspace.slack.com/archives/C03K2M9SBAA)
-
 ## License
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+<a href="https://opensource.org/licenses/MIT" rel="nofollow"><img src="https://img.shields.io/github/license/JayeshVP24/Activity-Dekho" alt="License"></a>
 
