@@ -12,7 +12,7 @@
     <a href="https://github.com/JayeshVP24/AICTE-Diary"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/JayeshVP24/AICTE-Diary">View Demo</a>
+    <a href="https://activitydekho.jayeshvp24.dev/">View Demo</a>
     ·
     <a href="https://github.com/JayeshVP24/AICTE-Diary/issues">Report Bug</a>
     ·
