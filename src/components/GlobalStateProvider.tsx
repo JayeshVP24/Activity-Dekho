@@ -138,7 +138,7 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
       </ModalWrapper>
       {state.context.loggedIn && <button
         className="btnFtrs fixed  bg-stone-800 text-white 
-          bottom-10 right-5 rounded-full px-4  
+          bottom-10 lg:bottom-20 right-5 rounded-full px-4  z-20
           "
         onClick={() => {
           // console.log({"events": eventState.context.filteredEvents})

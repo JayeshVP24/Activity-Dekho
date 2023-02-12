@@ -16,6 +16,7 @@ import GlobalStateProvider, {
   GlobalStateContext,
 } from "../components/GlobalStateProvider";
 import ModalWrapper from "../components/ModalWrapper";
+import Footer from "../components/Footer";
 import { auth } from "../firebase/config";
 const poppins = Raleway({
   subsets: ["latin"],
@@ -40,6 +41,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         
         <Header />
         <Component {...pageProps} />
+        <Footer />
       </GlobalStateProvider>
     </div>
   );

@@ -42,7 +42,7 @@ const Index: NextPage = () => {
     (state) => state.context
   );
   return (
-    <main className="mx-10 xl:mx-20 2xl:mx-32 xl:flex  ">
+    <main className="mx-10 xl:mx-20 2xl:mx-32 block xl:flex   ">
       <h1
         className="text-6xl mt-4 font-bold leading-[1.2] tracking-wide
       xl:w-2/4 xl:text-8xl xl:mr-4 xl:leading-[1.25] "
@@ -88,15 +88,38 @@ const Index: NextPage = () => {
 
         <button
           type="submit"
-          className="bg-green-400 ring-4 ring-green-200  hover:ring-green-300 w-full mt-12 btnFtrs
-        "
+          className="bg-green-400 ring-4 ring-green-200  hover:ring-green-300 w-full mt-12 mb-8 btnFtrs
+              "
         >
           🚀 Generate 🚀
         </button>
+        {!loggedIn && <button
+        className=" bg-red-400 w-full text-center py-2 rounded-2xl 
+             font-medium ring-red-100 ring-4 hover:ring-red-300 transition-all
+            active:scale-90"
+        onClick={() => {
+          send("OPEN_MODAL");
+
+        }}
+        type="button"
+      >
+        🥷 Are you a club admin? 🥷
+      </button>}
+      {loggedIn && <button
+              type="button"
+        className=" bg-blue-400 w-full text-center py-2 rounded-2xl 
+             font-medium ring-blue-100 ring-4 hover:ring-blue-300 transition-all
+            active:scale-90"
+        onClick={() => {
+          router.push("/events")
+        }}
+      >
+        🥷 Go to club dashboard 🥷
+      </button>}
       </form>
-      {!loggedIn && <button
+      {/* {!loggedIn && <button
         className="fixed left-[50%] translate-x-[-50%] bottom-5 bg-red-400 w-4/5 text-center py-2 rounded-2xl 
-            max-w-md xl:bottom-10 font-medium ring-red-100 ring-4 hover:ring-red-300 transition-all
+            max-w-md xl:bottom-44 font-medium ring-red-100 ring-4 hover:ring-red-300 transition-all
             active:scale-90"
         onClick={() => {
           send("OPEN_MODAL");
@@ -106,14 +129,14 @@ const Index: NextPage = () => {
       </button>}
       {loggedIn && <button
         className="fixed left-[50%] translate-x-[-50%] bottom-5 bg-blue-400 w-4/5 text-center py-2 rounded-2xl 
-            max-w-md xl:bottom-10 font-medium ring-blue-100 ring-4 hover:ring-blue-300 transition-all
+            max-w-md xl:bottom-44 font-medium ring-blue-100 ring-4 hover:ring-blue-300 transition-all
             active:scale-90"
         onClick={() => {
           router.push("/events")
         }}
       >
         🥷 Go to club dashboard 🥷
-      </button>}
+      </button>} */}
     </main>
   );
 

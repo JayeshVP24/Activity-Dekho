@@ -13,6 +13,8 @@
     "file-saver": "^2.0.5",
     "firebase": "^9.15.0",
     "framer-motion": "^8.0.2",
+    "html2pdf": "^0.0.11",
+    "jspdf": "^2.5.1",
     "next": "latest",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

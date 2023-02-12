@@ -467,7 +467,7 @@ const Events: NextPage = () => {
       {state.matches("displayingEvents") && (
         <button
           className="btnFtrs fixed  bg-stone-800 text-white 
-          bottom-24 right-5 rounded-full px-4 
+          bottom-24 lg:bottom-36 right-5 rounded-full px-4 
           "
           onClick={() => send({ type: "ADD_EVENT" })}
         >
