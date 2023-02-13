@@ -57,7 +57,7 @@ const AddAttendeeForm: React.FC = () => {
                 text-lg  transition-all ring-4 focus:ring-orange-400 ring-orange-300
                 xl:mt-2 xl:py-2
                 "
-              placeholder="Student ERP ID"
+              placeholder="S1032xxxxxx"
             />
           </span>
           <span className="flex flex-wrap items-center gap-x-8">

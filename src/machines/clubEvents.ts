@@ -622,11 +622,16 @@ const ClubEventMachine =
               reject("Empty attendance, please check the sample format");
               return;
             }
+            if (obj.participants.length === 0) {
+              reject("Empty attendance, please check the sample format");
+              return;
+            }
             if (obj.participants.length + obj.organizers.length >= 200) {
               reject(`Limit on Students UID in one Excel Upload is 200!`);
               return;
             }
-            const regex = new RegExp("^\\d{2}-[A-Z]+\\d{2}-\\d{2}$", "s");
+            // const regex = new RegExp("^S1032\d{6}$", "m");
+            const regex=/^S1032\d{6}$/;
             let valid: boolean = true;
             console.log("arrayy  ", obj);
             // for (let i = 0; i < obj.students.length; i++) {
@@ -638,9 +643,9 @@ const ClubEventMachine =
             // }
             obj.participants.forEach((element) => {
               console.log(
-                `regex test for student ${element} is ${regex.test(element)}}`
+                `regex test for student ${element} is ${!!element.match(regex)}}`
               );
-              if (regex.test(element) == false) {
+              if (element.match(regex) == null) {
                 valid = false;
               }
             });

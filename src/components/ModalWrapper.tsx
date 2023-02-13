@@ -34,7 +34,7 @@ const ModalWrapper: React.FC<{
                 duration: 0.2,
               }}
               onClick={() => closeModal()}
-              className={`bg-stone-800  w-screen h-screen fixed top-0 left-0    
+              className={`bg-stone-800  w-screen h-screen fixed top-0 left-0 z-20   
            `}
             />
             <motion.div
@@ -56,7 +56,7 @@ const ModalWrapper: React.FC<{
               }}
               className={`bg-violet-400 fixed w-5/6 lg:w-4/5 max-w-xl h-auto max-h-[95%] lg:max-h-[90%]
                   top-[50%] translate-y-[-50%] left-[50%] translate-x-[-50%]
-                  rounded-3xl px-6 lg:px-10 py-12
+                  rounded-3xl px-6 lg:px-10 py-12 z-20
                   `}
             >
               {loading && (

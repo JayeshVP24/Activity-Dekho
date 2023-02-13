@@ -603,6 +603,8 @@ export const addAttendeeToDBQuery = async (
 ) => {
   return new Promise<{ attendeeId: string; attendeeType: Attendee }>(
     async (resolve, reject) => {
+      const regex=/^S1032\d{6}$/;
+      if(attendeeId.match(regex)===null) reject({error:"Invalid Student ID"})
       try {
         await runTransaction(firedb, async (transaction) => {
           console.log({ attendeeId });
