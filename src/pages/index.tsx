@@ -40,7 +40,7 @@ const Index: NextPage = () => {
       setError("You don't seem to have attended any events");
     } else {
       setError(false);
-      saveExcel(studentId, studentData.displayAttendance);
+      saveExcel("S1032" + admissionYear + studentId, studentData.displayAttendance);
     }
     setLoading(false);
   };
