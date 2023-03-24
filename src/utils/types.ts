@@ -33,7 +33,7 @@ export const EventSchema = z.object({
   attendance: z.record(AttendeeSchema).optional(),
   activityHours: z.number().min(0, {message: "Activity hours cannot be negative."}),
   scope: EventScopeSchema.optional()
-}).refine(data => data.startDate.toDate() < data.endDate.toDate(), {message: "Event can't end before it is started! Please Check dates."})
+}).refine(data => data.startDate.toDate() <= data.endDate.toDate(), {message: "Event can't end before it is started! Please Check dates."})
 
 export type EventType = z.infer<typeof EventSchema>
 

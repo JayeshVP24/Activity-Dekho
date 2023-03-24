@@ -54,7 +54,7 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
         ),
     },
     context: {
-      modalOpen: false,
+    modalOpen: false,
       loggedIn: !!auth.currentUser,
       club: authClub
     },
@@ -80,10 +80,10 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
           context.excelAttendance
         );
       },
-      addEventToDB: async (context, event) => {
+      addEventToDB: async (_, event) => {
         return await addEventToDBQuery(authClub.id, event.newEvent);
       },
-      editEventOnDb: async (context, event) => {
+      editEventOnDb: async (_, event) => {
         return await editEventOnDBQuery(authClub.id, event.editedEvent)
       },
       deleteEvent: async (context, event) => {

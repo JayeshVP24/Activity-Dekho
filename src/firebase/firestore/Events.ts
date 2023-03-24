@@ -91,7 +91,7 @@ export const addAttendanceQuery = async (
   // const studentRef = doc(firedb, "STUDENTS", studentID)
   console.log({ clubId, eventId });
   const eventRef = doc(firedb, "clubs", clubId, "EVENTS", eventId);
-  try {
+  // try {
     const newAttendance = await runTransaction(firedb, async (transacton) => {
       // clubs->event document - read
       const eventDoc = await transacton.get(eventRef);
@@ -213,12 +213,12 @@ export const addAttendanceQuery = async (
     return {
       newAttendance,
     };
-  } catch (e) {
-    console.log("firebase query error: ", e);
-    return {
-      error: e,
-    };
-  }
+  // } catch (e) {
+  //   console.log("firebase query error: ", e);
+  //   return {
+  //     error: e,
+  //   };
+  // }
 };
 
 export interface displayAttendanceType {
