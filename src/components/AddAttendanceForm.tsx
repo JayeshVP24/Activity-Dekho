@@ -20,8 +20,8 @@ const AddAttendanceForm: React.FC = () => {
     (state) => state.context
   );
   const parseUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.files[0]);
-    console.log("file parsing onw");
+    // console.log(e.target.files[0]);
+    // console.log("file parsing onw");
     const file = e.target.files[0];
     // setExcelFileName(file.name);
     const data = await file?.arrayBuffer();
@@ -30,13 +30,13 @@ const AddAttendanceForm: React.FC = () => {
     const jsonData = XLSX.utils.sheet_to_json(
       workbook.Sheets[workbook.SheetNames[0]]
     );
-    console.log(jsonData);
+    // console.log(jsonData);
     const participants: string[] = [];
     const organizers: string[] = [];
     const volunteers: string[] = [];
     Object.values(jsonData).forEach((e) => {
-      // console.log(e);
-      console.log(e["STUDENTS"]);
+      // // console.log(e);
+      // console.log(e["STUDENTS"]);
       e[Attendee.participant + "S"] &&
         participants.push(e[Attendee.participant + "S"].trim());
       e[Attendee.organizer + "S"] &&
@@ -49,8 +49,8 @@ const AddAttendanceForm: React.FC = () => {
         volunteers.push(e[Attendee.volunteer + "S"].trim());
     });
     // setExcelStringArray(students);
-    console.log({ coordinatorsArr: organizers });
-    console.log({ participants, organizers, volunteers });
+    // console.log({ coordinatorsArr: organizers });
+    // console.log({ participants, organizers, volunteers });
     send({
       type: "ADD_ATTENDANCE.UPLOAD_EXCEL",
       excelFileName: file.name,
@@ -62,7 +62,7 @@ const AddAttendanceForm: React.FC = () => {
     });
   };
   useEffect(() => {
-    console.log({ currentEvent });
+    // console.log({ currentEvent });
   }, []);
   return (
     <section className="max-h-[38rem] overflow-x-hidden overflow-y-scroll p-2 customScrollbar">

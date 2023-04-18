@@ -603,13 +603,13 @@ const ClubEventMachine =
     {
       guards: {
         // isLoggedIn: (_, event) => {
-        //     console.log(event.club)
-        //     console.log(event.club !== undefined)
+        //     // console.log(event.club)
+        //     // console.log(event.club !== undefined)
         //     return event.club !== undefined
         // },
         // eventsNotEmpty: (context, event) => {
-        //   // console.log("event.data: ", event)
-        //   console.log(event.data)
+        //   // // console.log("event.data: ", event)
+        //   // console.log(event.data)
         //   return event.data.length > 0;
         // },
       },
@@ -617,7 +617,7 @@ const ClubEventMachine =
         verifyExcel: (context, event) => {
           return new Promise((resolve, reject) => {
             const obj = event.excelStringArray;
-            console.log("size", obj.participants.length);
+            // console.log("size", obj.participants.length);
             if (obj.participants.length === 0) {
               reject("Empty attendance, please check the sample format");
               return;
@@ -633,16 +633,16 @@ const ClubEventMachine =
             // const regex = new RegExp("^S1032\d{6}$", "m");
             const regex=/^S1032\d{6}$/;
             let valid: boolean = true;
-            console.log("arrayy  ", obj);
+            // console.log("arrayy  ", obj);
             // for (let i = 0; i < obj.students.length; i++) {
-            //   console.log(i, regex.test(obj.students[i]));
+            //   // console.log(i, regex.test(obj.students[i]));
             //   if (regex.test(obj.students[i]) == false) {
             //     valid = false;
             //     break;
             //   }
             // }
             obj.participants.forEach((element) => {
-              console.log(
+              // console.log(
                 `regex test for student ${element} is ${!!element.match(regex)}}`
               );
               if (element.match(regex) == null) {
@@ -650,14 +650,14 @@ const ClubEventMachine =
               }
             });
             // for (let i = 0; i < obj.coordinators.length; i++) {
-            //   console.log(i, regex.test(obj.coordinators[i]));
+            //   // console.log(i, regex.test(obj.coordinators[i]));
             //   if (regex.test(obj.coordinators[i]) == false) {
             //     valid = false;
             //     break;
             //   }
             // }
             // obj.organizers.forEach((element) => {
-            //   console.log(
+            //   // console.log(
             //     `regex test for coordinator ${element} is ${regex.test(
             //       element
             //     )}}`
@@ -750,7 +750,7 @@ const ClubEventMachine =
         }),
         addAttendeeToContext: assign({
           currentAttendance: (context, event) => {
-            console.log("alreadyIncldues: ", context.currentAttendance.findIndex(e => e.id === event.data.attendeeId))
+            // console.log("alreadyIncldues: ", context.currentAttendance.findIndex(e => e.id === event.data.attendeeId))
             const index = context.currentAttendance.findIndex(e => e.id === event.data.attendeeId)
             if(index !== -1) {
               const tempAttendance = context.currentAttendance
@@ -777,7 +777,7 @@ const ClubEventMachine =
           }
         }),
         modifyCurrentEventInContext: (context, event) => {
-          console.log({ "modify context: ": event.data });
+          // console.log({ "modify context: ": event.data });
           context.currentEvent.attendance = event.data.newAttendance;
           // context.currentAttendance = Object.keys(event.data.newAttendance)
           // context.filteredAttendance = Object.keys(event.data.newAttendance)

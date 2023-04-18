@@ -63,15 +63,15 @@ const ClubAuth: React.FC = () => {
       a.id.toLowerCase().includes(inputData.toLowerCase())
     );
   }, [inputData, clubList]);
-  //   console.log(typeof send)
+  //   // console.log(typeof send)
 
   //   useEffect(() => {
   //     send("OPEN_MODAL");
   //   }, []);
 
   useEffect(() => {
-    console.log(state.value);
-    // console.log(state.context);
+    // console.log(state.value);
+    // // console.log(state.context);
   }, [state]);
 
   return (

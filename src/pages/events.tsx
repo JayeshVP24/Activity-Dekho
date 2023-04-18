@@ -60,14 +60,14 @@ const Events: NextPage = () => {
     );
   }, [inputData, events]);
   useEffect(() => {
-    console.log(state.value);
+    // console.log(state.value);
   }, [state]);
 
   useEffect(() => {
-    // console.log();
-    // console.log(state.context.filteredEvents)
+    // // console.log();
+    // // console.log(state.context.filteredEvents)
     // send("CLEAR_CONTEXT")
-    // console.log(state.context.filteredEvents)
+    // // console.log(state.context.filteredEvents)
     if (authClub) {
       send("LOAD");
     }
@@ -75,7 +75,7 @@ const Events: NextPage = () => {
 
   // useEffect(() => {
   //   if (!authClub) {
-  //     //   console.log("login pop");
+  //     //   // console.log("login pop");
   //     authSend("OPEN_MODAL");
   //   }
   // }, [authClub]);
@@ -228,7 +228,7 @@ const Events: NextPage = () => {
               className="rounded-full bg-transparent  "
               type="date"
               name="fromDate"
-              onChange={e => console.log(e.target.value)}
+              onChange={e => // console.log(e.target.value)}
 
             />
             <label htmlFor="toDate">To: </label>

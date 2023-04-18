@@ -38,12 +38,12 @@ export const retrieveClubEventsQuery = async (
     toDate?: Timestamp;
   }
 ) => {
-  console.log("i came in firebase folder too");
-  // console.log("retreiving events of club: ", clubId)
-  console.log({ dateFilter });
-  // console.log({fromDate, toDate})
+  // console.log("i came in firebase folder too");
+  // // console.log("retreiving events of club: ", clubId)
+  // console.log({ dateFilter });
+  // // console.log({fromDate, toDate})
   // const { fromDate, toDate } = getFilteredDates(dateFilter);
-  // console.log({fromDate, toDate})
+  // // console.log({fromDate, toDate})
   if (!dateFilter.fromDate || !dateFilter.toDate) {
     dateFilter = getFilteredDates(DateFilters.currentYear);
     // fromDate = dates.fromDate;
@@ -57,7 +57,7 @@ export const retrieveClubEventsQuery = async (
   );
   return await getDocs(q)
     .then((snap) => {
-      console.log("in the query");
+      // console.log("in the query");
 
       const eventsList: EventType[] = [];
       snap.forEach((s) => {
@@ -68,11 +68,11 @@ export const retrieveClubEventsQuery = async (
           ...s.data(),
         } as EventType);
       });
-      console.log("events list: ", eventsList);
+      // console.log("events list: ", eventsList);
       return eventsList;
     })
     .catch((err) => {
-      console.log("some error occured");
+      // console.log("some error occured");
 
       return err.message as string;
     });
@@ -89,17 +89,17 @@ export const addAttendanceQuery = async (
 ) => {
   // const batch = writeBatch(firedb);
   // const studentRef = doc(firedb, "STUDENTS", studentID)
-  console.log({ clubId, eventId });
+  // console.log({ clubId, eventId });
   const eventRef = doc(firedb, "clubs", clubId, "EVENTS", eventId);
   // try {
     const newAttendance = await runTransaction(firedb, async (transacton) => {
       // clubs->event document - read
       const eventDoc = await transacton.get(eventRef);
-      // console.log(eventDoc.data());
+      // // console.log(eventDoc.data());
       const eventAttendance: Record<string, string> = {
         ...eventDoc.data().attendance,
       };
-      // console.log({ eventDoc });
+      // // console.log({ eventDoc });
       const studentSnapshots: DocumentSnapshot<DocumentData>[] = [];
       // student document - read
       // const studentSnapshots =  await getDocs(query(collection(firedb, "STUDENTS"),
@@ -107,10 +107,10 @@ export const addAttendanceQuery = async (
       for (const studentId of data.participants) {
         const studentRef = doc(firedb, "STUDENTS", studentId);
         const studentDoc = await transacton.get(studentRef);
-        // console.log({ studentDoc });
+        // // console.log({ studentDoc });
         studentSnapshots.push(studentDoc);
       }
-      // console.log(studentSnapshots);
+      // // console.log(studentSnapshots);
       // for (const studentDoc of studentSnapshots) {
       for (const studentId of data.participants) {
         // clubs->event->attendance - write
@@ -131,15 +131,15 @@ export const addAttendanceQuery = async (
         // student document - write
         let studentAttendance = {};
         // let coordinatorAttendance = {};
-        // console.log(studentDoc);
-        // console.log("student attendance: ", studentDoc.data().attendance);
-        // console.log(
+        // // console.log(studentDoc);
+        // // console.log("student attendance: ", studentDoc.data().attendance);
+        // // console.log(
         //   "student club attendance: ",
         //   studentDoc.data().attendance[clubId]
         // );
 
         if (studentDoc.exists()) {
-          console.log("student exists");
+          // console.log("student exists");
           studentAttendance = {
             [clubId]: {
               ...studentDoc.data().attendance[clubId],
@@ -152,13 +152,13 @@ export const addAttendanceQuery = async (
           // ? Attendee.volunteer
           // : Attendee.participant;
           if (data.organizers.includes(studentId)) {
-            console.log("student is coordinator");
+            // console.log("student is coordinator");
             studentAttendance[clubId][eventId] = Attendee.organizer;
           } else if (data.volunteers.includes(studentId)) {
-            console.log("student is volunteer");
+            // console.log("student is volunteer");
             studentAttendance[clubId][eventId] = Attendee.volunteer;
           } else {
-            console.log("student is participant");
+            // console.log("student is participant");
             studentAttendance[clubId][eventId] = Attendee.participant;
           }
           // if(data.coordinators.includes(studentId)) {
@@ -179,7 +179,7 @@ export const addAttendanceQuery = async (
             attendance: studentAttendance,
           });
         } else {
-          console.log("student doesn't exists");
+          // console.log("student doesn't exists");
           studentAttendance = {
             [clubId]: {
               [eventId]: Attendee.participant,
@@ -195,10 +195,10 @@ export const addAttendanceQuery = async (
             attendance: studentAttendance,
           });
         }
-        console.log("after adding new", studentAttendance);
+        // console.log("after adding new", studentAttendance);
       }
-      // console.log(eventDoc.data());
-      // console.log({ eventAttendance });
+      // // console.log(eventDoc.data());
+      // // console.log({ eventAttendance });
       transacton.update(eventRef, {
         attendance: eventAttendance as Record<string, string>,
       });
@@ -209,12 +209,12 @@ export const addAttendanceQuery = async (
     // await setDoc(collection(firedb,eventRef) ,{
 
     // })
-    console.log({ newAttendance });
+    // console.log({ newAttendance });
     return {
       newAttendance,
     };
   // } catch (e) {
-  //   console.log("firebase query error: ", e);
+  //   // console.log("firebase query error: ", e);
   //   return {
   //     error: e,
   //   };
@@ -237,7 +237,7 @@ export interface displayAttendanceType {
 export const getStudentEvents = async (studentId: string) => {
   try {
     const studentRef = doc(firedb, "STUDENTS", studentId);
-    console.log("studentId in firestore query: ", studentId);
+    // console.log("studentId in firestore query: ", studentId);
     const studentDoc = await getDoc(doc(firedb, "STUDENTS", studentId));
     const attendance: Record<
       string,
@@ -245,7 +245,7 @@ export const getStudentEvents = async (studentId: string) => {
     > = studentDoc.data().attendance;
     const displayAttendance: displayAttendanceType[] = [];
     const ObjectAttendance = Object.entries(attendance);
-    console.log(ObjectAttendance);
+    // console.log(ObjectAttendance);
     for (const [clubId, value] of Object.entries(attendance)) {
       for (const [eventId, attendeeType] of Object.entries(value)) {
         const clubRef = doc(firedb, "clubs", clubId);
@@ -282,7 +282,7 @@ export const getStudentEvents = async (studentId: string) => {
         });
       }
     }
-    console.log(displayAttendance);
+    // console.log(displayAttendance);
     return { displayAttendance };
   } catch (e) {
     return {
@@ -313,7 +313,7 @@ export const saveExcel = (
   // const max_width = displayAttendance.reduce((w, r) => Math.max(w, r["Activity Hours"].length), 10);
   // worksheet["!cols"] = [ { wch: max_width } ];
   const html = XLSX.utils.sheet_to_html(worksheet, { id: "myTable" });
-  console.log(html);
+  // console.log(html);
   const styles = `  
     <style>
       table {
@@ -382,7 +382,7 @@ export const saveExcel = (
   // const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
   // const data = new Blob([excelBuffer], { type: EXCEL_TYPE });
   // // const data = new Blob([excelBuffer], { type: "EXCEL_TYPE" });
-  // console.log(data);
+  // // console.log(data);
   // saveAs(data, studentId + ".xlsx");
 };
 
@@ -396,18 +396,18 @@ export const addEventToDBQuery = async (
       try {
         EventSchema.parse(newEvent);
       } catch (e) {
-        console.log(e);
+        // console.log(e);
         return reject({ error: e.issues[0].message as string });
       }
       // return reject({error: "error"})
 
-      console.log("Im in firestore folder");
-      console.log(newEvent);
+      // console.log("Im in firestore folder");
+      // console.log(newEvent);
       const newEventRef = await addDoc(
         collection(firedb, "clubs", clubId, "EVENTS"),
         newEvent
       );
-      console.log(newEventRef.id);
+      // console.log(newEventRef.id);
       return resolve({
         successfull: true,
       });
@@ -426,12 +426,12 @@ export const editEventOnDBQuery = async (
       try {
         EventSchema.parse(editedEvent);
       } catch (e) {
-        console.log(e);
+        // console.log(e);
         return reject({ error: e.issues[0].message as string });
       }
 
-      console.log("Im in firestore folder");
-      console.log(editedEvent);
+      // console.log("Im in firestore folder");
+      // console.log(editedEvent);
       const newEventRef = await setDoc(
         doc(firedb, "clubs", clubId, "EVENTS", editedEvent.id),
         editedEvent,
@@ -439,7 +439,7 @@ export const editEventOnDBQuery = async (
           merge: true,
         }
       );
-      console.log(newEventRef);
+      // console.log(newEventRef);
       return resolve({
         successfull: true,
       });
@@ -455,15 +455,15 @@ export const editEventOnDBQuery = async (
 // ) => {
 //   return new Promise<{ successfull: boolean }>(async (resolve, reject) => {
 //     try {
-//       console.log("Im in firestore folder");
-//       console.log(deleteEventId);
+//       // console.log("Im in firestore folder");
+//       // console.log(deleteEventId);
 //       await deleteDoc(doc(firedb, "clubs", clubId, "EVENTS", deleteEventId));
-//       // console.log(newEventRef);
+//       // // console.log(newEventRef);
 //       return resolve({
 //         successfull: true,
 //       });
 //     } catch (e) {
-//       console.log(e);
+//       // console.log(e);
 //       reject({ error: e.message as string });
 //     }
 //   });
@@ -479,7 +479,7 @@ export const deleteEventOnDBQuery = async (
       await runTransaction(firedb, async (transaction) => {
         const students: StudentType[] = [];
         // reject({ error: "error" });
-        console.log({ clubId, deleteEventId, studentsList });
+        // console.log({ clubId, deleteEventId, studentsList });
         for (const student of studentsList) {
           const studentRef = doc(firedb, "STUDENTS", student.id);
           students.push({
@@ -488,10 +488,10 @@ export const deleteEventOnDBQuery = async (
           });
         }
         for (const student of students) {
-          console.log("student id: ", student.id);
-          console.log("student before delete: ", student.attendance[clubId]);
+          // console.log("student id: ", student.id);
+          // console.log("student before delete: ", student.attendance[clubId]);
           delete student.attendance[clubId][deleteEventId];
-          console.log("student after delete: ", student.attendance[clubId]);
+          // console.log("student after delete: ", student.attendance[clubId]);
           transaction.set(doc(firedb, "STUDENTS", student.id), student);
         }
         const docRef = doc(firedb, "clubs", clubId, "EVENTS", deleteEventId);
@@ -509,7 +509,7 @@ export const deleteEventOnDBQuery = async (
         successfull: true,
       });
     } catch (e) {
-      console.log("firebase query error: ", e);
+      // console.log("firebase query error: ", e);
       // throw new Error(e.message)
       reject({
         error: e.message as string,
@@ -540,15 +540,15 @@ export const deleteAttendeeOnDBQuery = async (
           deleteEvent
         );
 
-        console.log("Im in firestore folder");
-        console.log(deleteEvent.id);
-        // console.log(newEventRef);
+        // console.log("Im in firestore folder");
+        // console.log(deleteEvent.id);
+        // // console.log(newEventRef);
       });
       resolve({
         deleteAttendeeId,
       });
     } catch (e) {
-      console.log(e);
+      // console.log(e);
       reject({ error: e.message as string });
     }
   });
@@ -563,7 +563,7 @@ export const editAttendeeOnDBQuery = async (
     async (resolve, reject) => {
       try {
         await runTransaction(firedb, async (transaction) => {
-          console.log({ attendeeId });
+          // console.log({ attendeeId });
           const student = (
             await transaction.get(doc(firedb, "STUDENTS", attendeeId))
           ).data() as StudentType;
@@ -572,23 +572,23 @@ export const editAttendeeOnDBQuery = async (
           // const event = (await transaction.get(doc(firedb, "clubs", clubId, "EVENTS", deleteEventId))).data() as EventType;
           // delete editEvent.attendance[attendeeId];
           editEvent.attendance[attendeeId] = attendeeType;
-          console.log({ clubId, editEvent });
+          // console.log({ clubId, editEvent });
           transaction.set(doc(firedb, "STUDENTS", attendeeId), student);
           transaction.set(
             doc(firedb, "clubs", clubId, "EVENTS", editEvent.id),
             editEvent
           );
 
-          console.log("Im in firestore folder");
-          console.log(editEvent.id);
-          // console.log(newEventRef);
+          // console.log("Im in firestore folder");
+          // console.log(editEvent.id);
+          // // console.log(newEventRef);
         });
         resolve({
           attendeeId,
           attendeeType,
         });
       } catch (e) {
-        console.log(e);
+        // console.log(e);
         reject({ error: e.message as string });
       }
     }
@@ -607,7 +607,7 @@ export const addAttendeeToDBQuery = async (
       if(attendeeId.match(regex)===null) reject({error:"Invalid Student ID"})
       try {
         await runTransaction(firedb, async (transaction) => {
-          console.log({ attendeeId });
+          // console.log({ attendeeId });
           let student = (
             await transaction.get(doc(firedb, "STUDENTS", attendeeId))
           ).data() as StudentType | undefined;
@@ -618,23 +618,23 @@ export const addAttendeeToDBQuery = async (
           // delete editEvent.attendance[attendeeId];
           if (editEvent.attendance === undefined) editEvent.attendance = {};
           editEvent.attendance[attendeeId] = attendeeType;
-          console.log({ clubId, editEvent });
+          // console.log({ clubId, editEvent });
           transaction.set(doc(firedb, "STUDENTS", attendeeId), student);
           transaction.set(
             doc(firedb, "clubs", clubId, "EVENTS", editEvent.id),
             editEvent
           );
 
-          console.log("Im in firestore folder");
-          console.log(editEvent.id);
-          // console.log(newEventRef);
+          // console.log("Im in firestore folder");
+          // console.log(editEvent.id);
+          // // console.log(newEventRef);
         });
         resolve({
           attendeeId,
           attendeeType,
         });
       } catch (e) {
-        console.log(e);
+        // console.log(e);
         reject({ error: e.message as string });
       }
     }

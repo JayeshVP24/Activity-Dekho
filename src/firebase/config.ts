@@ -7,10 +7,10 @@ import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 
-console.log("prod env ", process.env.NODE_ENV);
+// console.log("prod env ", process.env.NODE_ENV);
 let firebaseConfig = {};
 // if (process.env.NODE_ENV === "production") {
-//   console.log("here is the node env")
+//   // console.log("here is the node env")
 //   firebaseConfig = {
 //     apiKey: process.env.FIREBASE_API_KEY,
 //     authDomain: "aicte-diary.firebaseapp.com",
@@ -21,7 +21,7 @@ let firebaseConfig = {};
 //   };
 // } 
 // if (process.env.NODE_ENV === "production") {
-//   console.log("here is the node env")
+//   // console.log("here is the node env")
 //   firebaseConfig = {
 //     apiKey: "AIzaSyAXaqKx8APu7fsUZUA1A1T7UvsP-8UKwt4",
 //     authDomain: "aicte-diary.firebaseapp.com",
