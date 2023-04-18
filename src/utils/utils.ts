@@ -6,7 +6,7 @@ export const getFilteredDates = (dateFilter: DateFilters) => {
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
   if (dateFilter.includes(DateFilters.currentSem)) {
-    console.log("current sem");
+    // console.log("current sem");
     if (currentMonth < 7) {
       // even sem
       fromDate = new Date(`${currentYear}-01-01`);
@@ -18,7 +18,7 @@ export const getFilteredDates = (dateFilter: DateFilters) => {
     }
   }
   if (dateFilter.includes(DateFilters.lastSem)) {
-    console.log("last sem");
+    // console.log("last sem");
     if (currentMonth < 7) {
       //current sem is even sem
       // odd sem is last sem which is last year

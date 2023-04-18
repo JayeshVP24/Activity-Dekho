@@ -69,7 +69,7 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
   const clubEventService = useInterpret(ClubEventMachine, {
     services: {
       retrieveClubEvents: async (context,_) => {
-        console.log("well i reached in global context");
+        // console.log("well i reached in global context");
         return await retrieveClubEventsQuery(authClub.id, context.dateFilter);
       },
       // @ts-ignore
@@ -87,7 +87,7 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
         return await editEventOnDBQuery(authClub.id, event.editedEvent)
       },
       deleteEvent: async (context, event) => {
-        console.log("deleting event")
+        // console.log("deleting event")
         return await deleteEventOnDBQuery(authClub.id, event.deleteEventId, context.currentAttendance)
       },
       deleteAttendee: async (context, event) => {
@@ -117,7 +117,7 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
   // }, []);
   useEffect(() => {
     if (authClub) {
-      //   console.log("login pop");
+      //   // console.log("login pop");
       state.context.loggedIn = true;
       state.context.club = JSON.parse(sessionStorage.getItem("club"))
       send("OPEN_MODAL");
@@ -141,9 +141,9 @@ const GlobalStateProvider: React.FC<{ children: React.ReactNode }> = ({
           bottom-10 lg:bottom-20 right-5 rounded-full px-4  z-20
           "
         onClick={() => {
-          // console.log({"events": eventState.context.filteredEvents})
+          // // console.log({"events": eventState.context.filteredEvents})
           eventSend("CLEAR_CONTEXT")
-          // console.log({"events": eventState.context.filteredEvents})
+          // // console.log({"events": eventState.context.filteredEvents})
           signOut(auth).then(() => {
             sessionStorage.removeItem("club")
             state.context.loggedIn = false;

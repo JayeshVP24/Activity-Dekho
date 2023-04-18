@@ -17,11 +17,11 @@ const Confirmation: React.FC<{
   // const [state, send] = useActor(globalService.clubEventService!);
 
   //   useEffect(() => {
-  //     console.log(state.context.currentClub)
+  //     // console.log(state.context.currentClub)
   //   },[state.context.currentClub])
   
   useEffect(() => {
-    console.log("opened confirmationcajfeaofib ")
+    // console.log("opened confirmationcajfeaofib ")
   }, [])
   
   return (
@@ -40,7 +40,7 @@ const Confirmation: React.FC<{
           </button>
           <button className="bg-red-400 ring-4 ring-red-200  hover:ring-red-300 w-full mt-4  btnFtrs"
           onClick={() => {
-            console.log("clickafaefboaiebgbfi")
+            // console.log("clickafaefboaiebgbfi")
             submitConfirm()
           }}
           >

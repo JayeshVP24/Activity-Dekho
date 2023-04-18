@@ -82,7 +82,7 @@ const Index: NextPage = () => {
         className="mt-6 block xl:mt-12 lg:w-2/4"
         onSubmit={(e) => {
           e.preventDefault();
-          // console.log(e.currentTarget["UID"].value);
+          // // console.log(e.currentTarget["UID"].value);
           getStudentData();
         }}
       >

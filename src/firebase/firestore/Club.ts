@@ -86,12 +86,12 @@ export const getClubsListQuery = async () => {
           id: doc.id,
           ...doc.data(),
         } as ClubType);
-        console.log(clubList);
+        // console.log(clubList);
       });
       return clubList;
     })
     .catch((error) => {
-      // console.log(error)
+      // // console.log(error)
       return error.message as string;
     });
 };
@@ -152,14 +152,14 @@ export const validateAuthQuery = (
 //         // .then(() => resolve({ club }))
 //         .catch((err) => {
 //           // error = err.code + "\t" + err.message;
-//           console.log(err);
+//           // console.log(err);
 //           // reject({ error });
 //           return {
 //             error: err.message
 //           }
 //         });
 //    ;
-// console.log({ club, error });
+// // console.log({ club, error });
 // return {
 //   club,
 //   error,

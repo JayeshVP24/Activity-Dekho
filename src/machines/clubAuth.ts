@@ -163,7 +163,7 @@ export type ClubAuthEvent =
       actions: {
         addClubsListToContext: assign({
           clubList: (_,event) => {
-            // console.log("inside machine event: ", event.data)
+            // // console.log("inside machine event: ", event.data)
             return event.data as ClubType[]},
           // filteredClubList: (_, event) => event.data as ClubType[]
         }),
