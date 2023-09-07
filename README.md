@@ -103,7 +103,7 @@ Clone the project
 Install dependencies:
 
 ```bash
-  cd www.aicte-dairy.com/
+  cd AICTE-dairy/
   
   yarn install
 ```
